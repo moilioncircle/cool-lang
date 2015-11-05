@@ -20,7 +20,7 @@ public class TreeFactory {
         return this;
     }
 
-    private <T> T setPos(TreeNode node) {
+    private <T extends TreeNode> T setPos(TreeNode node) {
         node.starPos = this.startPos;
         node.endPos = this.endPos;
         return (T) node;

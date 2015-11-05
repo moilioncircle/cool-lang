@@ -8,7 +8,7 @@ import com.leon.cool.lang.object.CoolObject;
  * Created by leon on 15-10-31.
  */
 public class Paren extends Expression {
-    public Expression expr;
+    public final Expression expr;
 
     public Paren(Expression expr) {
         this.expr = expr;

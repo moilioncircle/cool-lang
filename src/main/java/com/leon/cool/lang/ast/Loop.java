@@ -1,17 +1,17 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.support.Env;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.object.CoolVoid;
 
 /**
  * Created by leon on 15-10-31.
  */
 public class Loop extends Expression {
-    public Expression condExpr;
-    public Expression loopExpr;
+    public final Expression condExpr;
+    public final Expression loopExpr;
 
     public Loop(Expression condExpr, Expression loopExpr) {
         this.condExpr = condExpr;
@@ -36,6 +36,6 @@ public class Loop extends Expression {
         while (((CoolBool) condExpr.eval(env)).val) {
             loopExpr.eval(env);
         }
-        return o.coolVoid();
+        return ObjectFactory.coolVoid();
     }
 }

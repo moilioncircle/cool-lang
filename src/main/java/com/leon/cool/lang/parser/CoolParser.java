@@ -3,7 +3,7 @@ package com.leon.cool.lang.parser;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.factory.TreeFactory;
 import com.leon.cool.lang.support.ClassTable;
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.Filter;
 import com.leon.cool.lang.tokenizer.Token;
@@ -20,9 +20,9 @@ import static com.leon.cool.lang.tokenizer.TokenKind.*;
  * Created by leon on 15-10-8.
  */
 public class CoolParser {
-    private CoolScanner scanner;
-    private TreeFactory f;
-    public List<String> errMsgs = new ArrayList<>();
+    private final CoolScanner scanner;
+    private final TreeFactory f;
+    public final List<String> errMsgs = new ArrayList<>();
 
     public CoolParser(CoolScanner scanner, TreeFactory f) {
         this.scanner = scanner;
@@ -52,10 +52,7 @@ public class CoolParser {
                     accept(SEMI);
                 } catch (RuntimeException e) {
                     reportSyntaxError(e.getMessage());
-                    if (errRecovery(true, false, false, EOF)) {
-                        continue;
-                    } else {
-                        //avoid death loop.
+                    if (!errRecovery(true, false, false, EOF)) {
                         break;
                     }
                 }
@@ -100,10 +97,7 @@ public class CoolParser {
                             accept(SEMI);
                         } catch (RuntimeException e) {
                             reportSyntaxError(e.getMessage());
-                            if (errRecovery(false, false, true, ID, RBRACE)) {
-                                continue;
-                            } else {
-                                //avoid death loop.
+                            if (!errRecovery(false, false, true, ID, RBRACE)) {
                                 break;
                             }
                         }
@@ -242,10 +236,10 @@ public class CoolParser {
     /*
     Same as SymbolTable
      */
-    List<List<Object>> suffixExprListSupply = new ArrayList<>();
-    List<Stack<TokenKind>> opStackSupply = new ArrayList<>();
-    Stack<Token> errStartTokenSupply = new Stack<>();
-    Token errEndToken;
+    private final List<List<Object>> suffixExprListSupply = new ArrayList<>();
+    private final List<Stack<TokenKind>> opStackSupply = new ArrayList<>();
+    private final Stack<Token> errStartTokenSupply = new Stack<>();
+    private Token errEndToken;
 
     private void newErrStartToken() {
         errStartTokenSupply.push(token);
@@ -465,10 +459,7 @@ public class CoolParser {
                             accept(SEMI);
                         } catch (RuntimeException e) {
                             reportSyntaxError(e.getMessage());
-                            if (errRecovery(false, false, true, RBRACE)) {
-                                continue;
-                            } else {
-                                //avoid death loop.
+                            if (!errRecovery(false, false, true, RBRACE)) {
                                 break;
                             }
                         }
@@ -626,7 +617,7 @@ public class CoolParser {
                 TokenKind op = (TokenKind) suffixExpr.get(i);
                 switch (op) {
                     case MONKEYS_AT:
-                        _.error("unexpected '@' found" + _.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        Utils.error("unexpected '@' found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                     case DOT:
                         if (nextIsAt(i, suffixExpr)) {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
@@ -638,7 +629,7 @@ public class CoolParser {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
                             Expression expr = this.getGenericElement(stack);
                             // self.doSomething() equals to doSomething(). this is totally for simple tail-recursive optimization.
-                            if (expr instanceof IdConst && _.isSelf(((IdConst) expr).tok)) {
+                            if (expr instanceof IdConst && Utils.isSelf(((IdConst) expr).tok)) {
                                 stack.push(f.at(startPos, endPos).dispatch(dispatch.id, dispatch.params));
                             } else {
                                 stack.push(f.at(startPos, endPos).staticDispatch(expr, Optional.empty(), dispatch));
@@ -684,7 +675,7 @@ public class CoolParser {
                         break;
                     case LT:
                         if (nonAssoc) {
-                            _.error("non assoc error found" + _.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            Utils.error("non assoc error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -694,7 +685,7 @@ public class CoolParser {
                         break;
                     case LTEQ:
                         if (nonAssoc) {
-                            _.error("non assoc error found" + _.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            Utils.error("non assoc error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -704,7 +695,7 @@ public class CoolParser {
                         break;
                     case EQ:
                         if (nonAssoc) {
-                            _.error("non assoc error found" + _.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            Utils.error("non assoc error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -713,7 +704,7 @@ public class CoolParser {
                         }
                         break;
                     default:
-                        _.error("error found" + _.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        Utils.error("error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                 }
             } else {
                 stack.push(suffixExpr.get(i));
@@ -727,7 +718,7 @@ public class CoolParser {
         try {
             return (T) stack.pop();
         } catch (ClassCastException e) {
-            _.error("error found" + _.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+            Utils.error("error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
         }
         return null;
     }
@@ -840,11 +831,11 @@ public class CoolParser {
     }
 
     private void syntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        _.error("expected " + _.mkString(Arrays.asList(tks), ",") + " but actual " + actual + " at " + pos);
+        Utils.error("expected " + Utils.mkString(Arrays.asList(tks), ",") + " but actual " + actual + " at " + pos);
     }
 
     private void reportSyntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        reportSyntaxError("expected " + _.mkString(Arrays.asList(tks), ",") + " but actual " + actual + " at " + pos);
+        reportSyntaxError("expected " + Utils.mkString(Arrays.asList(tks), ",") + " but actual " + actual + " at " + pos);
     }
 
     private void reportSyntaxError(String message) {
@@ -853,7 +844,7 @@ public class CoolParser {
     }
 
     private void syntaxError(TokenKind actual, Pos pos) {
-        _.error("unexpected " + actual + " at " + pos);
+        Utils.error("unexpected " + actual + " at " + pos);
     }
 
 }

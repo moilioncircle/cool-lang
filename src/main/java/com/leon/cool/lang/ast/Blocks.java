@@ -1,9 +1,9 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.support.Env;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.object.CoolVoid;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * Created by leon on 15-10-31.
  */
 public class Blocks extends Expression {
-    public List<Expression> exprs;
+    public final List<Expression> exprs;
 
     public Blocks(List<Expression> exprs) {
         this.exprs = exprs;
@@ -31,7 +31,7 @@ public class Blocks extends Expression {
 
     @Override
     public CoolObject eval(Env env) {
-        CoolObject object = o.coolVoid();
+        CoolObject object = ObjectFactory.coolVoid();
         for (Expression expr : exprs) {
             object = expr.eval(env);
         }

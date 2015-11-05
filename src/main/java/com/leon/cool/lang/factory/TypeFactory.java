@@ -1,6 +1,6 @@
 package com.leon.cool.lang.factory;
 
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.type.*;
 import com.leon.cool.lang.util.Constant;
 
@@ -44,7 +44,7 @@ public class TypeFactory {
             case Constant.BOOL:
                 return booleanType();
             case Constant.SELF_TYPE:
-                _.error("Not allowed SELF_TYPE");
+                Utils.error("Not allowed SELF_TYPE");
             default:
                 return new ObjectType(type);
         }

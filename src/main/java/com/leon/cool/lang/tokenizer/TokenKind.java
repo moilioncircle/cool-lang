@@ -18,8 +18,8 @@ public enum TokenKind implements Filter<TokenKind>, Dumpable {
     DOT(".", 100), MONKEYS_AT("@", 90), SEMI(";"), LBRACE("{"), RBRACE("}"), LPAREN("("), RPAREN(")"), EQGT("=>"), COL(":"), EQ("=", 40, Assoc.NONE), LTSUB("<-", 20, Assoc.RIGHT), COMMA(","),
     //ERROR,EOF
     ERROR(), EOF();
-    public String name;
-    public TokenTag tag;
+    public final String name;
+    public final TokenTag tag;
     public int prec = 10;
     public Assoc assoc = Assoc.LEFT;
 
@@ -62,8 +62,6 @@ public enum TokenKind implements Filter<TokenKind>, Dumpable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("'");
         switch (tag) {
             case NAME:
                 return "ID";

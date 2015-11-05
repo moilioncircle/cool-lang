@@ -9,7 +9,7 @@ import com.leon.cool.lang.tokenizer.Token;
  * Created by leon on 15-10-31.
  */
 public class IdConst extends Expression {
-    public Token tok;
+    public final Token tok;
 
     public IdConst(Token tok) {
         this.tok = tok;

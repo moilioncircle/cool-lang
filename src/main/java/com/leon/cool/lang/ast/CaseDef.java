@@ -1,8 +1,9 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.Env;
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.type.TypeEnum;
 
@@ -13,8 +14,8 @@ import java.util.Optional;
  * Created by leon on 15-10-31.
  */
 public class CaseDef extends Expression {
-    public Expression caseExpr;
-    public List<Branch> branchList;
+    public final Expression caseExpr;
+    public final List<Branch> branchList;
 
     public CaseDef(Expression caseExpr, List<Branch> branchList) {
         this.caseExpr = caseExpr;
@@ -48,13 +49,13 @@ public class CaseDef extends Expression {
                 CoolObject returnVal = branch.expr.eval(env);
                 env.env.exitScope();
                 if (returnVal.type.type() == TypeEnum.VOID) {
-                    _.error("A case on void" + _.errorPos(branch.expr));
+                    Utils.error("A case on void" + Utils.errorPos(branch.expr));
                 }
                 return returnVal;
             }
-            temp = _.classGraph.get(temp);
+            temp = Utils.classGraph.get(temp);
         }
-        _.error("Execution of a case statement without a matching branch" + _.errorPos(starPos, endPos));
-        return o.coolVoid();
+        Utils.error("Execution of a case statement without a matching branch" + Utils.errorPos(starPos, endPos));
+        return ObjectFactory.coolVoid();
     }
 }

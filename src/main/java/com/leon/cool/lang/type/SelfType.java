@@ -1,13 +1,13 @@
 package com.leon.cool.lang.type;
 
 import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 
 /**
  * Created by leon on 15-10-16.
  */
 public class SelfType implements Type {
-    public String type;
+    private final String type;
 
     public SelfType(String type) {
         this.type = type;
@@ -19,7 +19,7 @@ public class SelfType implements Type {
 
     @Override
     public String className() {
-        _.error("Not allowed SELF_TYPE");
+        Utils.error("Not allowed SELF_TYPE");
         return toString();
     }
 
@@ -30,9 +30,8 @@ public class SelfType implements Type {
 
         SelfType selfType = (SelfType) o;
 
-        if (type != null ? !type.equals(selfType.type) : selfType.type != null) return false;
+        return !(type != null ? !type.equals(selfType.type) : selfType.type != null);
 
-        return true;
     }
 
     @Override

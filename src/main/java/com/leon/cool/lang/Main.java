@@ -3,7 +3,7 @@ package com.leon.cool.lang;
 import com.leon.cool.lang.ast.Program;
 import com.leon.cool.lang.factory.TreeFactory;
 import com.leon.cool.lang.parser.CoolParser;
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.CoolTokenizer;
 import com.leon.cool.lang.tree.*;
@@ -35,8 +35,8 @@ public class Main {
         }
         //expr.accept(new PrintTypeInfoTreeScanner());
         expr.run();
-        _.clear();
-        _.close();
+        Utils.clear();
+        Utils.close();
     }
 
     public static void main(String[] args) {

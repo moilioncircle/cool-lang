@@ -1,5 +1,8 @@
 package com.leon.cool.lang.object;
 
+import com.leon.cool.lang.factory.ObjectFactory;
+import com.leon.cool.lang.factory.TypeFactory;
+
 /**
  * Created by leon on 15-10-21.
  */
@@ -12,7 +15,7 @@ public class CoolInt extends CoolObject {
     }
 
     public CoolInt() {
-        this.type = t.integerType();
+        this.type = TypeFactory.integerType();
     }
 
     @Override
@@ -22,9 +25,7 @@ public class CoolInt extends CoolObject {
 
         CoolInt coolInt = (CoolInt) o;
 
-        if (val != coolInt.val) return false;
-
-        return true;
+        return val == coolInt.val;
     }
 
     @Override
@@ -33,6 +34,6 @@ public class CoolInt extends CoolObject {
     }
 
     public CoolInt copy() {
-        return o.coolInt(this.val);
+        return ObjectFactory.coolInt(this.val);
     }
 }

@@ -1,5 +1,7 @@
 package com.leon.cool.lang.object;
 
+import com.leon.cool.lang.factory.TypeFactory;
+
 /**
  * Created by leon on 15-10-21.
  */
@@ -12,7 +14,7 @@ public class CoolBool extends CoolObject {
     }
 
     public CoolBool() {
-        this.type = t.booleanType();
+        this.type = TypeFactory.booleanType();
     }
 
     @Override
@@ -22,9 +24,7 @@ public class CoolBool extends CoolObject {
 
         CoolBool coolBool = (CoolBool) o;
 
-        if (val != coolBool.val) return false;
-
-        return true;
+        return val == coolBool.val;
     }
 
     @Override

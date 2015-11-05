@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public class SymbolTable {
-    private Stack<HashMap<String, Object>> tbl;
+    private final Stack<HashMap<String, Object>> tbl;
 
     public SymbolTable() {
-        tbl = new Stack();
+        tbl = new Stack<>();
     }
 
     public void enterScope() {

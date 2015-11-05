@@ -14,7 +14,7 @@ import java.util.Optional;
  * Created by leon on 15-10-31.
  */
 public class Program extends TreeNode {
-    public List<ClassDef> classDef;
+    public final List<ClassDef> classDef;
 
     public Program(List<ClassDef> classDef) {
         this.classDef = classDef;
@@ -29,10 +29,7 @@ public class Program extends TreeNode {
 
     public CoolObject run() {
         Expression staticDispatch = new StaticDispatch(new NewDef(new Token("Main", TokenKind.TYPE)), Optional.<Token>empty(), new StaticDispatchBody(new Token("main", TokenKind.ID), new ArrayList<>()));
-
-        CoolObject coolObject = staticDispatch.eval(new Env());
-        return coolObject;
-
+        return staticDispatch.eval(new Env());
     }
 
     @Override

@@ -23,11 +23,11 @@ import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
 /**
  * Created by leon on 15-10-15.
  */
-public class _ {
+public class Utils {
     public static Map<String, String> classGraph = new HashMap<>();
-    public static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
-    public static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
-    public static Map<String, SymbolTable> symbolTables = new HashMap<>();
+    private static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
+    private static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
+    private static Map<String, SymbolTable> symbolTables = new HashMap<>();
     private static BufferedReader reader;
 
     public static void createSymbolTable(String className) {
@@ -50,16 +50,16 @@ public class _ {
 
     public static void putToClassGraph(String type, Optional<String> parentType) {
         if (classGraph.containsKey(type)) {
-            _.error("class:" + type + " Duplicated class defined.");
+            Utils.error("class:" + type + " Duplicated class defined.");
         } else {
             if (parentType.isPresent()) {
                 classGraph.put(type, parentType.get());
                 checkCircleInherits(classGraph);
             } else {
-                if (_.isObjectType(type)) {
+                if (Utils.isObjectType(type)) {
                     classGraph.put(type, null);
                 } else {
-                    _.error("class:" + type + " Must inherits Object.");
+                    Utils.error("class:" + type + " Must inherits Object.");
                 }
             }
         }
@@ -68,7 +68,7 @@ public class _ {
     public static void putToMethodGraph(String className, MethodDeclaration methodDeclaration) {
         Set<MethodDeclaration> methodDeclarations = methodGraph.get(className);
         if (methodDeclarations.contains(methodDeclaration)) {
-            _.error("class:" + className + " Duplicated method declaration " + methodDeclaration.methodName);
+            Utils.error("class:" + className + " Duplicated method declaration " + methodDeclaration.methodName);
         } else {
             methodDeclarations.add(methodDeclaration);
             methodGraph.put(className, methodDeclarations);
@@ -80,26 +80,24 @@ public class _ {
     }
 
     public static void mergeMethodGraph(String className) {
-        String parentClassName = _.classGraph.get(className);
+        String parentClassName = Utils.classGraph.get(className);
         while (parentClassName != null) {
-            if (parentClassName != null) {
-                Set<MethodDeclaration> methodDeclarations = methodGraph.get(className);
-                Set<MethodDeclaration> parentDeclarations = methodGraph.get(parentClassName);
-                for (MethodDeclaration declaration : methodDeclarations) {
-                    parentDeclarations.forEach(e -> {
-                        if (declaration.equals(e) && !declaration.returnType.equals(e.returnType)) {
-                            _.error("class :" + className + " Override error. Difference return type. method :" + declaration);
-                        }
-                    });
-                }
-                parentDeclarations.stream().forEach(e -> {
-                    if (!methodDeclarations.contains(e)) {
-                        methodDeclarations.add(e);
+            Set<MethodDeclaration> methodDeclarations = methodGraph.get(className);
+            Set<MethodDeclaration> parentDeclarations = methodGraph.get(parentClassName);
+            for (MethodDeclaration declaration : methodDeclarations) {
+                parentDeclarations.forEach(e -> {
+                    if (declaration.equals(e) && !declaration.returnType.equals(e.returnType)) {
+                        Utils.error("class :" + className + " Override error. Difference return type. method :" + declaration);
                     }
                 });
-                methodGraph.put(className, methodDeclarations);
             }
-            parentClassName = _.classGraph.get(parentClassName);
+            parentDeclarations.stream().forEach(e -> {
+                if (!methodDeclarations.contains(e)) {
+                    methodDeclarations.add(e);
+                }
+            });
+            methodGraph.put(className, methodDeclarations);
+            parentClassName = Utils.classGraph.get(parentClassName);
         }
     }
 
@@ -108,20 +106,20 @@ public class _ {
         String temp = className;
         while (temp != null) {
             inheritsLinks.push(temp);
-            temp = _.classGraph.get(temp);
+            temp = Utils.classGraph.get(temp);
         }
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
-                if (_.lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
-                    _.error("class:" + className + " Type check error. can not redefined attr " + attr.getKey() + " from parent class:" + parentClassName);
+                if (Utils.lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
+                    Utils.error("class:" + className + " Type check error. can not redefined attr " + attr.getKey() + " from parent class:" + parentClassName);
                 } else {
-                    _.lookupSymbolTable(className).addId(attr.getKey(), attr.getValue().type);
+                    Utils.lookupSymbolTable(className).addId(attr.getKey(), attr.getValue().type);
                 }
             }
         }
-        _.lookupSymbolTable(className).addId(Constant.SELF, Constant.SELF_TYPE);
+        Utils.lookupSymbolTable(className).addId(Constant.SELF, Constant.SELF_TYPE);
     }
 
 
@@ -130,7 +128,7 @@ public class _ {
         if (list.isEmpty()) {
             return Optional.empty();
         } else if (list.size() > 1) {
-            return _.minimumMethodDeclaration(list, className, typeInfo);
+            return Utils.minimumMethodDeclaration(list, className, typeInfo);
         } else {
             return Optional.of(list.get(0));
         }
@@ -172,7 +170,7 @@ public class _ {
     }
 
     public static boolean isTypeDefined(Token token) {
-        return isSelfType(token) || classGraph.containsKey(token.name);
+        return !isSelfType(token) && !classGraph.containsKey(token.name);
     }
 
     public static boolean isTypeDefined(String name) {
@@ -183,19 +181,19 @@ public class _ {
         return name.equals(Constant.SELF_TYPE);
     }
 
-    public static boolean isStringType(String name) {
+    private static boolean isStringType(String name) {
         return name.equals(Constant.STRING);
     }
 
-    public static boolean isIntType(String name) {
+    private static boolean isIntType(String name) {
         return name.equals(Constant.INT);
     }
 
-    public static boolean isBoolType(String name) {
+    private static boolean isBoolType(String name) {
         return name.equals(Constant.BOOL);
     }
 
-    public static boolean isObjectType(String name) {
+    private static boolean isObjectType(String name) {
         return name.equals(Constant.OBJECT);
     }
 
@@ -211,7 +209,7 @@ public class _ {
         return isBasicType(token.name);
     }
 
-    public static boolean isBasicType(String string) {
+    private static boolean isBasicType(String string) {
         return isBoolType(string) || isIntType(string) || isStringType(string);
     }
 
@@ -291,7 +289,7 @@ public class _ {
         String temp = type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
-            temp = _.classGraph.get(temp);
+            temp = Utils.classGraph.get(temp);
         }
 
         Env env1 = new Env();
@@ -348,7 +346,7 @@ public class _ {
             temp = classGraph.get(temp);
             list2.add(temp);
         }
-        return TypeFactory.objectType(list1.stream().filter(e -> list2.contains(e)).findFirst().get());
+        return TypeFactory.objectType(list1.stream().filter(list2::contains).findFirst().get());
     }
 
     private static void initializer(Env env) {
@@ -357,7 +355,7 @@ public class _ {
         String temp = env.so.type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
-            temp = _.classGraph.get(temp);
+            temp = Utils.classGraph.get(temp);
         }
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
@@ -376,7 +374,7 @@ public class _ {
         label:
         for (MethodDeclaration e : list) {
             for (int i = 0; i < e.paramTypes.size(); i++) {
-                if (!_.isParent(TypeFactory.objectType(e.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
+                if (!Utils.isParent(TypeFactory.objectType(e.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
                     continue label;
                 }
             }
@@ -384,8 +382,8 @@ public class _ {
         }
         for (MethodDeclaration e : list) {
             for (int i = 0; i < e.paramTypes.size(); i++) {
-                if (!_.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(e.paramTypes.get(i), className))) {
-                    _.error("class:" + className + " Can't decide which method need to choose. method name " + list);
+                if (!Utils.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(e.paramTypes.get(i), className))) {
+                    Utils.error("class:" + className + " Can't decide which method need to choose. method name " + list);
                     return Optional.empty();
                 }
             }
@@ -402,7 +400,7 @@ public class _ {
                 parent = classGraph.get(parent);
             }
             if (parent != null && parent.equals(key)) {
-                _.error("class:" + key + " Circle inherits.");
+                Utils.error("class:" + key + " Circle inherits.");
             }
         }
     }
@@ -412,7 +410,7 @@ public class _ {
             return false;
         } else {
             for (int i = 0; i < typeInfos.size(); i++) {
-                if (!_.isParent(typeInfos.get(i), TypeFactory.objectType(paramTypes.get(i), className))) {
+                if (!Utils.isParent(typeInfos.get(i), TypeFactory.objectType(paramTypes.get(i), className))) {
                     return false;
                 }
             }

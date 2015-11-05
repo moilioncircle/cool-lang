@@ -9,9 +9,9 @@ import java.util.Optional;
  * Created by leon on 15-10-31.
  */
 public class AttrDef extends Feature {
-    public Token id;
-    public Token type;
-    public Optional<Expression> expr;
+    public final Token id;
+    public final Token type;
+    public final Optional<Expression> expr;
 
     public AttrDef(Token id, Token type, Optional<Expression> expr) {
         this.id = id;

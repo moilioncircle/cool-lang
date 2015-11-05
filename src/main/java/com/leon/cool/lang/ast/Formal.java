@@ -7,8 +7,8 @@ import com.leon.cool.lang.tokenizer.Token;
  * Created by leon on 15-10-31.
  */
 public class Formal extends TreeNode {
-    public Token id;
-    public Token type;
+    public final Token id;
+    public final Token type;
 
     public Formal(Token id, Token type) {
         this.id = id;

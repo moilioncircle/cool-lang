@@ -1,19 +1,18 @@
 package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.ClassDef;
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 
 /**
  * Created by leon on 15-10-19.
  */
 public class ParentAttrDefTreeScanner extends TreeScanner {
-    private String className;
 
     public void applyClassDef(ClassDef classDef) {
-        className = classDef.type.name;
-        _.createSymbolTable(className);
-        _.lookupSymbolTable(className).enterScope();
-        _.mergeAttrGraph(className);
+        String className = classDef.type.name;
+        Utils.createSymbolTable(className);
+        Utils.lookupSymbolTable(className).enterScope();
+        Utils.mergeAttrGraph(className);
         super.applyClassDef(classDef);
     }
 }

@@ -1,17 +1,18 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.Env;
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tree.TreeVisitor;
 
 /**
  * Created by leon on 15-10-31.
  */
 public class Divide extends Expression {
-    public Expression left;
-    public Expression right;
+    public final Expression left;
+    public final Expression right;
 
     public Divide(Expression left, Expression right) {
         this.left = left;
@@ -36,8 +37,8 @@ public class Divide extends Expression {
         CoolInt l = (CoolInt) left.eval(env);
         CoolInt r = (CoolInt) right.eval(env);
         if (r.val == 0) {
-            _.error("Division by zero" +_.errorPos(right));
+            Utils.error("Division by zero" + Utils.errorPos(right));
         }
-        return o.coolInt(l.val / r.val);
+        return ObjectFactory.coolInt(l.val / r.val);
     }
 }

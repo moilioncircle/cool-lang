@@ -1,6 +1,6 @@
 package com.leon.cool.lang.tokenizer;
 
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.util.Constant;
 import com.leon.cool.lang.util.Pos;
 
@@ -15,7 +15,7 @@ public class CoolTokenizer {
         this.chs = chs;
     }
 
-    private char[] chs;
+    private final char[] chs;
     private int i = 0;
     private int column = 1;
     private int row = 1;
@@ -34,7 +34,7 @@ public class CoolTokenizer {
 
     private List<Character> name;
 
-    private TokenKind[] keys = new TokenKind[]{TokenKind.CLASS, TokenKind.ELSE, TokenKind.FALSE, TokenKind.FI, TokenKind.IF, TokenKind.IN, TokenKind.INHERITS, TokenKind.ISVOID, TokenKind.LET, TokenKind.LOOP, TokenKind.POOL, TokenKind.THEN, TokenKind.WHILE, TokenKind.CASE, TokenKind.ESAC, TokenKind.NEW, TokenKind.OF, TokenKind.NOT, TokenKind.TRUE};
+    private final TokenKind[] keys = new TokenKind[]{TokenKind.CLASS, TokenKind.ELSE, TokenKind.FALSE, TokenKind.FI, TokenKind.IF, TokenKind.IN, TokenKind.INHERITS, TokenKind.ISVOID, TokenKind.LET, TokenKind.LOOP, TokenKind.POOL, TokenKind.THEN, TokenKind.WHILE, TokenKind.CASE, TokenKind.ESAC, TokenKind.NEW, TokenKind.OF, TokenKind.NOT, TokenKind.TRUE};
 
     public Token readToken() {
         loop:
@@ -248,7 +248,7 @@ public class CoolTokenizer {
                     break loop;
                 default:
                     tk = TokenKind.ERROR;
-                    _.error("un-expected char " + currentChar() + " at row:" + row + " column:" + column);
+                    Utils.error("un-expected char " + currentChar() + " at row:" + row + " column:" + column);
             }
         }
         if (tk.tag == TokenTag.DEFAULT) {
@@ -294,18 +294,17 @@ public class CoolTokenizer {
                 case 0x1A:
                     //EOI
                     tk = TokenKind.ERROR;
-                    _.error("un-close string");
+                    Utils.error("un-close string");
                     return;
                 case '\b':
                 case '\t':
                 case '\n':
                 case '\f':
                     tk = TokenKind.ERROR;
-                    _.error("contains '\\b' '\\n' '\\t' '\\f' at row:" + row + " column:" + column);
+                    Utils.error("contains '\\b' '\\n' '\\t' '\\f' at row:" + row + " column:" + column);
                     return;
                 default:
                     putChar(currentChar());
-                    continue;
             }
         }
     }

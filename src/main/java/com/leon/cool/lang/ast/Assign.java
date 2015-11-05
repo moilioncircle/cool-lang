@@ -8,8 +8,8 @@ import com.leon.cool.lang.object.CoolObject;
  * Created by leon on 15-10-31.
  */
 public class Assign extends Expression {
-    public IdConst id;
-    public Expression expr;
+    public final IdConst id;
+    public final Expression expr;
 
     public Assign(IdConst id, Expression expr) {
         this.id = id;

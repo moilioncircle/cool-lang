@@ -1,13 +1,15 @@
 package com.leon.cool.lang.object;
 
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.factory.ObjectFactory;
+import com.leon.cool.lang.factory.TypeFactory;
+import com.leon.cool.lang.support.Utils;
 
 /**
  * Created by leon on 15-10-21.
  */
 public class CoolString extends CoolObject {
     public String str = "";
-    public int length = 0;
+    private int length = 0;
 
     public CoolString(String str, int length) {
         this();
@@ -16,7 +18,7 @@ public class CoolString extends CoolObject {
     }
 
     public CoolString() {
-        this.type = t.stringType();
+        this.type = TypeFactory.stringType();
     }
 
     public CoolInt length() {
@@ -24,17 +26,17 @@ public class CoolString extends CoolObject {
     }
 
     public CoolString concat(CoolString s) {
-        return o.coolString(this.str.concat(s.str));
+        return ObjectFactory.coolString(this.str.concat(s.str));
     }
 
     public CoolString substr(CoolInt i, CoolInt l) {
         try{
             String str = this.str.substring(i.val, i.val+l.val);
-            return o.coolString(str);
+            return ObjectFactory.coolString(str);
         }catch (StringIndexOutOfBoundsException e){
-            _.error("Substring out of range.");
+            Utils.error("Substring out of range.");
         }
-        return o.coolStringDefault();
+        return ObjectFactory.coolStringDefault();
     }
 
     @Override
@@ -44,10 +46,8 @@ public class CoolString extends CoolObject {
 
         CoolString that = (CoolString) o;
 
-        if (length != that.length) return false;
-        if (str != null ? !str.equals(that.str) : that.str != null) return false;
+        return length == that.length && !(str != null ? !str.equals(that.str) : that.str != null);
 
-        return true;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class CoolString extends CoolObject {
     }
 
     public CoolString copy() {
-        return o.coolString(this.str);
+        return ObjectFactory.coolString(this.str);
     }
 
     @Override

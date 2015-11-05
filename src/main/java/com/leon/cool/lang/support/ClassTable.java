@@ -15,7 +15,7 @@ import static com.leon.cool.lang.tokenizer.TokenKind.ID;
 import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
 
 public class ClassTable {
-    private TreeFactory f = new TreeFactory();
+    private final TreeFactory f = new TreeFactory();
 
     public List<ClassDef> installBasicClasses() {
         List<ClassDef> classDefs = new ArrayList<>();

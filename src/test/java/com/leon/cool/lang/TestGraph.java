@@ -2,7 +2,7 @@ package com.leon.cool.lang;
 
 import com.leon.cool.lang.util.FileUtils;
 import net.jcip.annotations.NotThreadSafe;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 /**
  * Created by leon on 15-11-1.

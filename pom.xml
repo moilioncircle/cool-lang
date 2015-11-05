@@ -14,19 +14,12 @@
         <resources-plugin-version>2.6</resources-plugin-version>
         <compiler-plugin-version>3.1</compiler-plugin-version>
         <assembly-plugin-version>2.5.2</assembly-plugin-version>
-        <testng-version>6.8.8</testng-version>
         <junit-version>4.12</junit-version>
         <system-rules-version>1.13.0</system-rules-version>
         <jicp-version>1.0</jicp-version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng-version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

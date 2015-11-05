@@ -3,7 +3,7 @@ package com.leon.cool.lang.ast;
 import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.Env;
-import com.leon.cool.lang.support._;
+import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.type.Type;
@@ -12,7 +12,7 @@ import com.leon.cool.lang.type.Type;
  * Created by leon on 15-10-31.
  */
 public class NewDef extends Expression {
-    public Token type;
+    public final Token type;
 
     public NewDef(Token type) {
         this.type = type;
@@ -32,11 +32,11 @@ public class NewDef extends Expression {
 
     public CoolObject eval(Env env) {
         Type type;
-        if (_.isSelfType(this.type)) {
+        if (Utils.isSelfType(this.type)) {
             type = env.so.type;
         } else {
             type = TypeFactory.objectType(this.type.name);
         }
-        return _.newDef(type);
+        return Utils.newDef(type);
     }
 }

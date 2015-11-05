@@ -4,7 +4,7 @@ package com.leon.cool.lang.type;
  * Created by leon on 15-10-14.
  */
 public class ObjectType implements Type {
-    public String type;
+    private final String type;
 
     public ObjectType(String type) {
         this.type = type;
@@ -32,9 +32,8 @@ public class ObjectType implements Type {
 
         ObjectType that = (ObjectType) o;
 
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        return !(type != null ? !type.equals(that.type) : that.type != null);
 
-        return true;
     }
 
     @Override

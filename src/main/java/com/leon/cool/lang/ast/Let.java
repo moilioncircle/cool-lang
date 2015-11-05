@@ -10,8 +10,8 @@ import java.util.List;
  * Created by leon on 15-10-31.
  */
 public class Let extends Expression {
-    public List<LetAttrDef> attrDefs;
-    public Expression expr;
+    public final List<LetAttrDef> attrDefs;
+    public final Expression expr;
 
     public Let(List<LetAttrDef> attrDefs, Expression expr) {
         this.attrDefs = attrDefs;

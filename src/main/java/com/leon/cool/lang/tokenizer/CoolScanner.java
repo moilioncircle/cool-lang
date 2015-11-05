@@ -12,9 +12,9 @@ public class CoolScanner {
 
     private Token prevToken;
 
-    private List<Token> savedTokens = new ArrayList<>();
+    private final List<Token> savedTokens = new ArrayList<>();
 
-    private CoolTokenizer tokenizer;
+    private final CoolTokenizer tokenizer;
 
     public CoolScanner(CoolTokenizer tokenizer) {
         this.tokenizer = tokenizer;

@@ -2,10 +2,10 @@ package com.leon.cool.lang;
 
 import com.leon.cool.lang.util.FileUtils;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
-import org.testng.annotations.Test;
 
 /**
  * Created by leon on 15-11-1.

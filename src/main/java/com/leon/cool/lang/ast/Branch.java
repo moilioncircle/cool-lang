@@ -9,9 +9,9 @@ import com.leon.cool.lang.tokenizer.Token;
  * Created by leon on 15-10-31.
  */
 public class Branch extends Expression {
-    public Token id;
-    public Token type;
-    public Expression expr;
+    public final Token id;
+    public final Token type;
+    public final Expression expr;
 
     public Branch(Token id, Token type, Expression expr) {
         this.id = id;

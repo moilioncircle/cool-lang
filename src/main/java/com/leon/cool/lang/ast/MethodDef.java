@@ -9,10 +9,10 @@ import java.util.List;
  * Created by leon on 15-10-31.
  */
 public class MethodDef extends Feature {
-    public Token id;
-    public List<Formal> formals;
-    public Token type;
-    public Expression expr;
+    public final Token id;
+    public final List<Formal> formals;
+    public final Token type;
+    public final Expression expr;
 
     public MethodDef(Token id, List<Formal> formals, Token type, Expression expr) {
         this.id = id;

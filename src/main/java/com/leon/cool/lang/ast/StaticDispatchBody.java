@@ -1,9 +1,9 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.support.Env;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.object.CoolVoid;
 import com.leon.cool.lang.tokenizer.Token;
 
 import java.util.List;
@@ -12,8 +12,8 @@ import java.util.List;
  * Created by leon on 15-10-31.
  */
 public class StaticDispatchBody extends Expression {
-    public Token id;
-    public List<Expression> params;
+    public final Token id;
+    public final List<Expression> params;
 
     public StaticDispatchBody(Token id, List<Expression> params) {
         this.id = id;
@@ -35,6 +35,6 @@ public class StaticDispatchBody extends Expression {
 
     @Override
     public CoolObject eval(Env env) {
-        return o.coolVoid();
+        return ObjectFactory.coolVoid();
     }
 }

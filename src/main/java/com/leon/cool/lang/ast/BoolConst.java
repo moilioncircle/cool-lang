@@ -1,15 +1,15 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.support.Env;
 import com.leon.cool.lang.tree.TreeVisitor;
-import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolObject;
 
 /**
  * Created by leon on 15-10-31.
  */
 public class BoolConst extends Expression {
-    public Boolean bool;
+    private final Boolean bool;
 
     public BoolConst(Boolean bool) {
         this.bool = bool;
@@ -29,6 +29,6 @@ public class BoolConst extends Expression {
 
     @Override
     public CoolObject eval(Env env) {
-        return o.coolBool(bool);
+        return ObjectFactory.coolBool(bool);
     }
 }

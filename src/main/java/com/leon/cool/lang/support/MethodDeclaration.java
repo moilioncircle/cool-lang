@@ -22,11 +22,8 @@ public class MethodDeclaration {
 
         MethodDeclaration that = (MethodDeclaration) o;
 
-        if (methodName != null ? !methodName.equals(that.methodName) : that.methodName != null) return false;
-        if (paramTypes != null ? !paramTypes.toString().equals(that.paramTypes.toString()) : that.paramTypes != null)
-            return false;
+        return !(methodName != null ? !methodName.equals(that.methodName) : that.methodName != null) && !(paramTypes != null ? !paramTypes.toString().equals(that.paramTypes.toString()) : that.paramTypes != null);
 
-        return true;
     }
 
     @Override

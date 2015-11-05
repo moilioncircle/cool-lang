@@ -9,7 +9,7 @@ import java.util.List;
  * Created by leon on 15-10-11.
  */
 public class Stack<T> implements Dumpable {
-    private List<T> list = new ArrayList<>();
+    private final List<T> list = new ArrayList<>();
 
     public boolean isEmpty() {
         return list.isEmpty();
@@ -45,6 +45,6 @@ public class Stack<T> implements Dumpable {
 
     @Override
     public void dump() {
-        list.forEach(e -> System.out.println(e));
+        list.forEach(System.out::println);
     }
 }

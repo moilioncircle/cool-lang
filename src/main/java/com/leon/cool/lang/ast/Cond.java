@@ -9,9 +9,9 @@ import com.leon.cool.lang.object.CoolObject;
  * Created by leon on 15-10-31.
  */
 public class Cond extends Expression {
-    public Expression condExpr;
-    public Expression thenExpr;
-    public Expression elseExpr;
+    public final Expression condExpr;
+    public final Expression thenExpr;
+    public final Expression elseExpr;
 
     public Cond(Expression condExpr, Expression thenExpr, Expression elseExpr) {
         this.condExpr = condExpr;

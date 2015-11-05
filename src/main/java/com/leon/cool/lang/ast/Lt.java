@@ -1,8 +1,8 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.support.Env;
 import com.leon.cool.lang.tree.TreeVisitor;
-import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 
@@ -10,8 +10,8 @@ import com.leon.cool.lang.object.CoolObject;
  * Created by leon on 15-10-31.
  */
 public class Lt extends Expression {
-    public Expression left;
-    public Expression right;
+    public final Expression left;
+    public final Expression right;
 
     public Lt(Expression left, Expression right) {
         this.left = left;
@@ -36,9 +36,9 @@ public class Lt extends Expression {
         CoolInt l = (CoolInt) left.eval(env);
         CoolInt r = (CoolInt) right.eval(env);
         if (l.val < r.val) {
-            return o.coolBool(true);
+            return ObjectFactory.coolBool(true);
         } else {
-            return o.coolBool(false);
+            return ObjectFactory.coolBool(false);
         }
     }
 }

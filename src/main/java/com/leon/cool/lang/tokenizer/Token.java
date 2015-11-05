@@ -9,8 +9,8 @@ import com.leon.cool.lang.util.Pos;
  * Created by leon on 15-10-7.
  */
 public class Token extends TreeNode implements TreeElement {
-    public String name;
-    public TokenKind kind;
+    public final String name;
+    public final TokenKind kind;
     public Pos startPos;
     public Pos endPos;
 

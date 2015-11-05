@@ -1,8 +1,8 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.support.Env;
 import com.leon.cool.lang.tree.TreeVisitor;
-import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.type.TypeEnum;
 
@@ -10,7 +10,7 @@ import com.leon.cool.lang.type.TypeEnum;
  * Created by leon on 15-10-31.
  */
 public class IsVoid extends Expression {
-    public Expression expr;
+    public final Expression expr;
 
     public IsVoid(Expression expr) {
         this.expr = expr;
@@ -31,6 +31,6 @@ public class IsVoid extends Expression {
     @Override
     public CoolObject eval(Env env) {
         CoolObject object = expr.eval(env);
-        return o.coolBool(object.type.type() == TypeEnum.VOID);
+        return ObjectFactory.coolBool(object.type.type() == TypeEnum.VOID);
     }
 }
