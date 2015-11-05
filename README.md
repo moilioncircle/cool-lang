@@ -24,3 +24,13 @@ An interpreter of Classroom Object Oriented Language(Stanford cs143) written by 
 ```
     Hello, world! chen bao yi
 ```
+
+## References
+
+  * [The Cool Reference Manual](https://spark-university.s3.amazonaws.com/stanford-compilers/resources%2Fcool_manual.pdf)
+  * [Video Lectures](https://class.coursera.org/compilers-004/lecture)
+  * [The shunting yard algorithm](http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm)
+  * [Java Tokenizer,Parser](http://hg.openjdk.java.net/jdk8/jdk8/langtools/)
+
+
+
