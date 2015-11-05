@@ -1,0 +1,25 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="cool" verbose="1">
+    <test name="cool-lang">
+        <classes>
+            <class name="com.leon.cool.lang.TestHairyscary"></class>
+            <class name="com.leon.cool.lang.TestHello"></class>
+            <class name="com.leon.cool.lang.TestIO"></class>
+            <class name="com.leon.cool.lang.TestPalindrome"></class>
+            <class name="com.leon.cool.lang.TestArith"></class>
+            <class name="com.leon.cool.lang.TestBookList"></class>
+            <class name="com.leon.cool.lang.TestCell"></class>
+            <class name="com.leon.cool.lang.TestComplex"></class>
+            <class name="com.leon.cool.lang.TestCool"></class>
+            <class name="com.leon.cool.lang.TestFactorial"></class>
+            <class name="com.leon.cool.lang.TestLam"></class>
+            <class name="com.leon.cool.lang.TestList"></class>
+            <class name="com.leon.cool.lang.TestNewComplex"></class>
+            <class name="com.leon.cool.lang.TestPrimes"></class>
+            <class name="com.leon.cool.lang.TestSortList"></class>
+            <class name="com.leon.cool.lang.tokenizer.TestTokenizer"></class>
+            <!--<class name="com.leon.cool.lang.TestGraph"></class>-->
+            <!--<class name="com.leon.cool.lang.TestLife"></class>-->
+        </classes>
+    </test>
+</suite>
