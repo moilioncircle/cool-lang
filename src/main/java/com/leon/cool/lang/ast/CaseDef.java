@@ -11,7 +11,21 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by leon on 15-10-31.
+ * Copyright leon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author leon on 15-10-31
  */
 public class CaseDef extends Expression {
     public final Expression caseExpr;
@@ -49,13 +63,13 @@ public class CaseDef extends Expression {
                 CoolObject returnVal = branch.expr.eval(env);
                 env.env.exitScope();
                 if (returnVal.type.type() == TypeEnum.VOID) {
-                    Utils.error("A case on void" + Utils.errorPos(branch.expr));
+                    Utils.error("runtime.error.void", Utils.errorPos(branch.expr));
                 }
                 return returnVal;
             }
             temp = Utils.classGraph.get(temp);
         }
-        Utils.error("Execution of a case statement without a matching branch" + Utils.errorPos(starPos, endPos));
+        Utils.error("runtime.error.case", Utils.errorPos(starPos, endPos));
         return ObjectFactory.coolVoid();
     }
 }

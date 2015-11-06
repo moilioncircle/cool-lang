@@ -5,7 +5,21 @@ import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.support.Utils;
 
 /**
- * Created by leon on 15-10-21.
+ * Copyright leon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author leon on 15-10-21
  */
 public class CoolString extends CoolObject {
     public String str = "";
@@ -29,12 +43,12 @@ public class CoolString extends CoolObject {
         return ObjectFactory.coolString(this.str.concat(s.str));
     }
 
-    public CoolString substr(CoolInt i, CoolInt l) {
-        try{
-            String str = this.str.substring(i.val, i.val+l.val);
+    public CoolString substr(CoolInt i, CoolInt l, String pos) {
+        try {
+            String str = this.str.substring(i.val, i.val + l.val);
             return ObjectFactory.coolString(str);
-        }catch (StringIndexOutOfBoundsException e){
-            Utils.error("Substring out of range.");
+        } catch (StringIndexOutOfBoundsException e) {
+            Utils.error("runtime.error.range", pos);
         }
         return ObjectFactory.coolStringDefault();
     }

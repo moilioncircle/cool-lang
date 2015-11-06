@@ -17,7 +17,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Created by leon on 15-10-31.
+ * Copyright leon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author leon on 15-10-31
  */
 public class StaticDispatch extends Expression {
     public final Expression expr;
@@ -51,7 +65,7 @@ public class StaticDispatch extends Expression {
         MethodDeclaration methodDeclaration;
         CoolObject obj = expr.eval(env);
         if (obj.type.type() == TypeEnum.VOID) {
-            Utils.error("A dispatch (static or dynamic) on void" + Utils.errorPos(expr));
+            Utils.error("runtime.error.dispatch.void", Utils.errorPos(expr));
         }
         if (type.isPresent()) {
             methodDeclaration = Utils.lookupMethodDeclaration(type.get().name, dispatch.id.name, paramTypes).get();
@@ -81,7 +95,7 @@ public class StaticDispatch extends Expression {
                         String str = Utils.reader().readLine();
                         return ObjectFactory.coolString(str);
                     } catch (Exception e) {
-                        Utils.error("error read input");
+                        Utils.error("unexpected.error");
                     }
                     return ObjectFactory.coolStringDefault();
                 } else if (methodDeclaration.methodName.equals("in_int")) {
@@ -89,7 +103,7 @@ public class StaticDispatch extends Expression {
                         String str = Utils.reader().readLine();
                         return ObjectFactory.coolInt(Integer.parseInt(str));
                     } catch (Exception e) {
-                        Utils.error("error read input");
+                        Utils.error("unexpected.error");
                     }
                     return ObjectFactory.coolIntDefault();
                 }
@@ -100,7 +114,7 @@ public class StaticDispatch extends Expression {
                 } else if (methodDeclaration.methodName.equals("concat")) {
                     return ((CoolString) obj).concat((CoolString) paramObjects.get(0));
                 } else if (methodDeclaration.methodName.equals("substr")) {
-                    return ((CoolString) obj).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1));
+                    return ((CoolString) obj).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1), Utils.errorPos(starPos, endPos));
                 }
                 break;
         }

@@ -12,12 +12,29 @@ import com.leon.cool.lang.util.Constant;
 import com.leon.cool.lang.util.Pos;
 import com.leon.cool.lang.util.Stack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static com.leon.cool.lang.tokenizer.TokenKind.*;
 
 /**
- * Created by leon on 15-10-8.
+ * Copyright leon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author leon on 15-10-8
  */
 public class CoolParser {
     private final CoolScanner scanner;
@@ -617,7 +634,7 @@ public class CoolParser {
                 TokenKind op = (TokenKind) suffixExpr.get(i);
                 switch (op) {
                     case MONKEYS_AT:
-                        Utils.error("unexpected '@' found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        Utils.error("parser.error.unexpected.at", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                     case DOT:
                         if (nextIsAt(i, suffixExpr)) {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
@@ -675,7 +692,7 @@ public class CoolParser {
                         break;
                     case LT:
                         if (nonAssoc) {
-                            Utils.error("non assoc error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            Utils.error("parser.error.non.assoc", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -685,7 +702,7 @@ public class CoolParser {
                         break;
                     case LTEQ:
                         if (nonAssoc) {
-                            Utils.error("non assoc error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            Utils.error("parser.error.non.assoc", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -695,7 +712,7 @@ public class CoolParser {
                         break;
                     case EQ:
                         if (nonAssoc) {
-                            Utils.error("non assoc error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            Utils.error("parser.error.non.assoc", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -704,7 +721,7 @@ public class CoolParser {
                         }
                         break;
                     default:
-                        Utils.error("error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        Utils.error("parser.error.expr", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
                 }
             } else {
                 stack.push(suffixExpr.get(i));
@@ -718,7 +735,7 @@ public class CoolParser {
         try {
             return (T) stack.pop();
         } catch (ClassCastException e) {
-            Utils.error("error found" + Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+            Utils.error("parser.error.expr", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
         }
         return null;
     }
@@ -831,20 +848,19 @@ public class CoolParser {
     }
 
     private void syntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        Utils.error("expected " + Utils.mkString(Arrays.asList(tks), ",") + " but actual " + actual + " at " + pos);
+        Utils.error("parser.error.expected", Utils.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString());
     }
 
     private void reportSyntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        reportSyntaxError("expected " + Utils.mkString(Arrays.asList(tks), ",") + " but actual " + actual + " at " + pos);
+        reportSyntaxError(Utils.errorMsg("parser.error.expected", Utils.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString()));
     }
 
     private void reportSyntaxError(String message) {
-//        System.err.println(message);
         errMsgs.add(message);
     }
 
     private void syntaxError(TokenKind actual, Pos pos) {
-        Utils.error("unexpected " + actual + " at " + pos);
+        Utils.error("parser.error.unexpected", actual.toString(), pos.toString());
     }
 
 }

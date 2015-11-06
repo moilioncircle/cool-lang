@@ -16,7 +16,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Created by leon on 15-10-15.
+ * Copyright leon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author leon on 15-10-15
  */
 public class TypeCheckTreeScanner extends TreeScanner {
     private String className = null;
@@ -45,8 +59,8 @@ public class TypeCheckTreeScanner extends TreeScanner {
         if (!staticDispatch.type.isPresent()) {
             Optional<MethodDeclaration> methodDeclaration = Utils.lookupMethodDeclaration(staticDispatch.expr.typeInfo.replace().className(), staticDispatch.dispatch.id.name, paramsTypes);
             if (!methodDeclaration.isPresent()) {
-                String method = constructMethod(staticDispatch.dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
-                reportTypeCheckError("class:" + staticDispatch.expr.typeInfo.replace().className() + " Method not define error. method:" + method + Utils.errorPos(staticDispatch.dispatch.id));
+                String method = Utils.constructMethod(staticDispatch.dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
+                reportTypeCheckError("type.error.method.undefined", staticDispatch.expr.typeInfo.replace().className(), method, Utils.errorPos(staticDispatch.dispatch.id));
                 staticDispatch.typeInfo = TypeFactory.noType();
             } else {
                 if (Utils.isSelfType(methodDeclaration.get().returnType)) {
@@ -58,13 +72,13 @@ public class TypeCheckTreeScanner extends TreeScanner {
         } else {
             Type type = TypeFactory.objectType(staticDispatch.type.get().name, className);
             if (!Utils.isParent(staticDispatch.expr.typeInfo, type)) {
-                reportTypeCheckError("type check error. expr type " + staticDispatch.expr.typeInfo + " is not subclass of " + type + Utils.errorPos(staticDispatch.type.get()));
+                reportTypeCheckError("type.error.subclass", staticDispatch.expr.typeInfo.toString(), type.toString(), Utils.errorPos(staticDispatch.type.get()));
                 staticDispatch.typeInfo = TypeFactory.noType();
             } else {
                 Optional<MethodDeclaration> methodDeclaration = Utils.lookupMethodDeclaration(type.className(), staticDispatch.dispatch.id.name, paramsTypes);
                 if (!methodDeclaration.isPresent()) {
-                    String method = constructMethod(staticDispatch.dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
-                    reportTypeCheckError("class:" + type.className() + " Method not define error. method:" + method + Utils.errorPos(staticDispatch.dispatch.id));
+                    String method = Utils.constructMethod(staticDispatch.dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
+                    reportTypeCheckError("type.error.method.undefined", type.className(), method, Utils.errorPos(staticDispatch.dispatch.id));
                     staticDispatch.typeInfo = TypeFactory.noType();
                 } else {
                     if (Utils.isSelfType(methodDeclaration.get().returnType)) {
@@ -88,8 +102,8 @@ public class TypeCheckTreeScanner extends TreeScanner {
         List<Type> paramsTypes = dispatch.params.stream().map(e -> e.typeInfo).collect(Collectors.toList());
         Optional<MethodDeclaration> methodDeclaration = Utils.lookupMethodDeclaration(className, dispatch.id.name, paramsTypes);
         if (!methodDeclaration.isPresent()) {
-            String method = constructMethod(dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
-            reportTypeCheckError("class:" + className + " Method not define error. method:" + method + Utils.errorPos(dispatch.id));
+            String method = Utils.constructMethod(dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
+            reportTypeCheckError("type.error.method.undefined", className, method, Utils.errorPos(dispatch.id));
             dispatch.typeInfo = TypeFactory.noType();
         } else {
             dispatch.typeInfo = TypeFactory.objectType(methodDeclaration.get().returnType, className);
@@ -99,12 +113,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyCaseDef(CaseDef caseDef) {
         int size = caseDef.branchList.stream().map(e -> {
             if (Utils.isSelf(e.id)) {
-                reportTypeCheckError("case expression can allowed to bind name 'self'" + Utils.errorPos(e.id));
+                reportTypeCheckError("type.error.bind.self", Utils.errorPos(e.id));
             }
             return e.type.name;
         }).collect(Collectors.toSet()).size();
         if (caseDef.branchList.size() != size) {
-            reportTypeCheckError("each branch of a case must all have distinct types" + Utils.errorPos(caseDef));
+            reportTypeCheckError("type.error.case.distinct", Utils.errorPos(caseDef));
             caseDef.typeInfo = TypeFactory.noType();
             super.applyCaseDef(caseDef);
         } else {
@@ -126,14 +140,14 @@ public class TypeCheckTreeScanner extends TreeScanner {
         Utils.lookupSymbolTable(className).enterScope();
         methodDef.formals.forEach(e -> {
             if (Utils.isSelf(e.id)) {
-                reportTypeCheckError("parameter name 'self' not allowed" + Utils.errorPos(e.id));
+                reportTypeCheckError("type.error.assign.self", Utils.errorPos(e.id));
             } else {
                 Utils.lookupSymbolTable(className).addId(e.id.name, e.type.name);
             }
         });
         super.applyMethodDef(methodDef);
         if (!Utils.isParent(methodDef.expr.typeInfo, TypeFactory.objectType(methodDef.type.name, className))) {
-            reportTypeCheckError("type check error. return expr type " + methodDef.expr.typeInfo + " is not subclass of " + TypeFactory.objectType(methodDef.type.name, className) + Utils.errorPos(methodDef.type));
+            reportTypeCheckError("type.error.subclass", methodDef.expr.typeInfo.toString(), TypeFactory.objectType(methodDef.type.name, className).toString(), Utils.errorPos(methodDef.type));
         }
         Utils.lookupSymbolTable(className).exitScope();
     }
@@ -145,7 +159,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
             Type t0 = TypeFactory.objectType((String) Utils.lookupSymbolTable(className).lookup(attrDef.id.name).get(), className);
             Type t1 = attrDef.expr.get().typeInfo;
             if (!Utils.isParent(t1, t0)) {
-                reportTypeCheckError("type check error. assign expr type " + t1 + " is not subclass of " + t0 + Utils.errorPos(attrDef));
+                reportTypeCheckError("type.error.subclass", t1.toString(), t0.toString(), Utils.errorPos(attrDef));
             }
         }
     }
@@ -161,12 +175,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyLetAttrDef(LetAttrDef letAttrDef) {
         super.applyLetAttrDef(letAttrDef);
         if (Utils.isSelf(letAttrDef.id)) {
-            reportTypeCheckError("let expression can not allowed to bind name 'self'" + Utils.errorPos(letAttrDef.id));
+            reportTypeCheckError("type.error.bind.self", Utils.errorPos(letAttrDef.id));
         }
         if (letAttrDef.expr.isPresent()) {
             Type t0 = TypeFactory.objectType(letAttrDef.type.name, className);
             if (!Utils.isParent(letAttrDef.expr.get().typeInfo, t0)) {
-                reportTypeCheckError("type check error. assign expr type " + letAttrDef.expr.get().typeInfo + " is not subclass of " + t0 + Utils.errorPos(letAttrDef));
+                reportTypeCheckError("type.error.subclass", letAttrDef.expr.get().typeInfo.toString(), t0.toString(), Utils.errorPos(letAttrDef));
             }
         }
         Utils.lookupSymbolTable(className).addId(letAttrDef.id.name, letAttrDef.type.name);
@@ -174,13 +188,13 @@ public class TypeCheckTreeScanner extends TreeScanner {
 
     public void applyAssign(Assign assign) {
         if (Utils.isSelf(assign.id.tok)) {
-            reportTypeCheckError("not allowed to assign to 'self'" + Utils.errorPos(assign.id));
+            reportTypeCheckError("type.error.assign.self", Utils.errorPos(assign.id));
         }
         super.applyAssign(assign);
         if (Utils.isParent(assign.expr.typeInfo, assign.id.typeInfo)) {
             assign.typeInfo = assign.expr.typeInfo;
         } else {
-            reportTypeCheckError("type check error. type " + assign.expr.typeInfo + " is not subclass of " + assign.id.typeInfo + Utils.errorPos(assign));
+            reportTypeCheckError("type.error.subclass", assign.expr.typeInfo.toString(), assign.id.typeInfo.toString(), Utils.errorPos(assign));
             assign.typeInfo = TypeFactory.noType();
         }
     }
@@ -189,7 +203,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyCond(Cond cond) {
         super.applyCond(cond);
         if (cond.condExpr.typeInfo.type() != TypeEnum.BOOL) {
-            reportTypeCheckError("type check error. condExpr Expected 'Bool' but " + cond.condExpr.typeInfo + Utils.errorPos(cond.condExpr));
+            reportTypeCheckError("type.error.expected", Constant.BOOL, cond.condExpr.typeInfo.toString(), Utils.errorPos(cond.condExpr));
         }
         cond.typeInfo = Utils.lub(Arrays.asList(cond.thenExpr.typeInfo, cond.elseExpr.typeInfo));
     }
@@ -198,7 +212,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyLoop(Loop loop) {
         super.applyLoop(loop);
         if (loop.condExpr.typeInfo.type() != TypeEnum.BOOL) {
-            reportTypeCheckError("type check error. condExpr Expected 'Bool' but " + loop.condExpr.typeInfo + Utils.errorPos(loop.condExpr));
+            reportTypeCheckError("type.error.expected", Constant.BOOL, loop.condExpr.typeInfo.toString(), Utils.errorPos(loop.condExpr));
         }
         loop.typeInfo = TypeFactory.objectType(Constant.OBJECT);
     }
@@ -225,12 +239,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyPlus(Plus plus) {
         super.applyPlus(plus);
         if (plus.left.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + plus.left.typeInfo + Utils.errorPos(plus.left));
+            reportTypeCheckError("type.error.expected", Constant.INT, plus.left.typeInfo.toString(), Utils.errorPos(plus.left));
             plus.typeInfo = TypeFactory.noType();
             return;
         }
         if (plus.right.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + plus.right.typeInfo + Utils.errorPos(plus.right));
+            reportTypeCheckError("type.error.expected", Constant.INT, plus.right.typeInfo.toString(), Utils.errorPos(plus.right));
             plus.typeInfo = TypeFactory.noType();
             return;
         }
@@ -241,12 +255,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applySub(Sub sub) {
         super.applySub(sub);
         if (sub.left.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + sub.left.typeInfo + Utils.errorPos(sub.left));
+            reportTypeCheckError("type.error.expected", Constant.INT, sub.left.typeInfo.toString(), Utils.errorPos(sub.left));
             sub.typeInfo = TypeFactory.noType();
             return;
         }
         if (sub.right.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + sub.right.typeInfo + Utils.errorPos(sub.right));
+            reportTypeCheckError("type.error.expected", Constant.INT, sub.right.typeInfo.toString(), Utils.errorPos(sub.right));
             sub.typeInfo = TypeFactory.noType();
             return;
         }
@@ -257,12 +271,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyMul(Mul mul) {
         super.applyMul(mul);
         if (mul.left.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + mul.left.typeInfo + Utils.errorPos(mul.left));
+            reportTypeCheckError("type.error.expected", Constant.INT, mul.left.typeInfo.toString(), Utils.errorPos(mul.left));
             mul.typeInfo = TypeFactory.noType();
             return;
         }
         if (mul.right.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + mul.right.typeInfo + Utils.errorPos(mul.right));
+            reportTypeCheckError("type.error.expected", Constant.INT, mul.right.typeInfo.toString(), Utils.errorPos(mul.right));
             mul.typeInfo = TypeFactory.noType();
             return;
         }
@@ -273,12 +287,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyDivide(Divide divide) {
         super.applyDivide(divide);
         if (divide.left.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + divide.left.typeInfo + Utils.errorPos(divide.left));
+            reportTypeCheckError("type.error.expected", Constant.INT, divide.left.typeInfo.toString(), Utils.errorPos(divide.left));
             divide.typeInfo = TypeFactory.noType();
             return;
         }
         if (divide.right.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + divide.right.typeInfo + Utils.errorPos(divide.right));
+            reportTypeCheckError("type.error.expected", Constant.INT, divide.right.typeInfo.toString(), Utils.errorPos(divide.right));
             divide.typeInfo = TypeFactory.noType();
             return;
         }
@@ -289,7 +303,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyNeg(Neg neg) {
         super.applyNeg(neg);
         if (neg.expr.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + neg.expr.typeInfo + Utils.errorPos(neg.expr));
+            reportTypeCheckError("type.error.expected", Constant.INT, neg.expr.typeInfo.toString(), Utils.errorPos(neg.expr));
             neg.typeInfo = TypeFactory.noType();
         } else {
             neg.typeInfo = neg.expr.typeInfo;
@@ -300,12 +314,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyLt(Lt lt) {
         super.applyLt(lt);
         if (lt.left.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + lt.left.typeInfo + Utils.errorPos(lt.left));
+            reportTypeCheckError("type.error.expected", Constant.INT, lt.left.typeInfo.toString(), Utils.errorPos(lt.left));
             lt.typeInfo = TypeFactory.noType();
             return;
         }
         if (lt.right.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + lt.right.typeInfo + Utils.errorPos(lt.right));
+            reportTypeCheckError("type.error.expected", Constant.INT, lt.right.typeInfo.toString(), Utils.errorPos(lt.right));
             lt.typeInfo = TypeFactory.noType();
             return;
         }
@@ -316,12 +330,12 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyLtEq(LtEq ltEq) {
         super.applyLtEq(ltEq);
         if (ltEq.left.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + ltEq.left.typeInfo + Utils.errorPos(ltEq.left));
+            reportTypeCheckError("type.error.expected", Constant.INT, ltEq.left.typeInfo.toString(), Utils.errorPos(ltEq.left));
             ltEq.typeInfo = TypeFactory.noType();
             return;
         }
         if (ltEq.right.typeInfo.type() != TypeEnum.INT) {
-            reportTypeCheckError("type check error. Expected 'Int' but " + ltEq.right.typeInfo + Utils.errorPos(ltEq.right));
+            reportTypeCheckError("type.error.expected", Constant.INT, ltEq.right.typeInfo.toString(), Utils.errorPos(ltEq.right));
             ltEq.typeInfo = TypeFactory.noType();
             return;
         }
@@ -336,7 +350,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         } else if (!Utils.isBasicType(comp.left.typeInfo) && !Utils.isBasicType(comp.right.typeInfo)) {
             comp.typeInfo = TypeFactory.booleanType();
         } else {
-            reportTypeCheckError("type check error. type " + comp.left.typeInfo + " is not same as " + comp.right.typeInfo + Utils.errorPos(comp));
+            reportTypeCheckError("type.error.same", comp.left.typeInfo.toString(), comp.right.typeInfo.toString(), Utils.errorPos(comp));
             comp.typeInfo = TypeFactory.noType();
         }
     }
@@ -345,7 +359,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyNot(Not not) {
         super.applyNot(not);
         if (not.expr.typeInfo.type() != TypeEnum.BOOL) {
-            reportTypeCheckError("type check error. Expected 'Bool' but " + not.expr.typeInfo + Utils.errorPos(not.expr));
+            reportTypeCheckError("type.error.expected", Constant.BOOL, not.expr.typeInfo.toString(), Utils.errorPos(not.expr));
             not.typeInfo = TypeFactory.noType();
         } else {
             not.typeInfo = TypeFactory.booleanType();
@@ -358,13 +372,13 @@ public class TypeCheckTreeScanner extends TreeScanner {
         if (type.isPresent()) {
             String typeStr = (String) type.get();
             if (!Utils.isTypeDefined(typeStr)) {
-                reportTypeCheckError("type not defined,type:" + typeStr + Utils.errorPos(idConst));
+                reportTypeCheckError("type.error.type.undefined", className, typeStr, Utils.errorPos(idConst));
                 idConst.typeInfo = TypeFactory.noType();
             } else {
                 idConst.typeInfo = TypeFactory.objectType(typeStr, className);
             }
         } else {
-            reportTypeCheckError("id not defined in class " + className + ",id:" + idConst.tok.name + Utils.errorPos(idConst));
+            reportTypeCheckError("type.error.id.undefined", className, idConst.tok.name, Utils.errorPos(idConst));
             idConst.typeInfo = TypeFactory.noType();
         }
     }
@@ -404,11 +418,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         expr.typeInfo = TypeFactory.noType();
     }
 
-    private void reportTypeCheckError(String message) {
-        errMsgs.add(message);
-    }
-
-    private String constructMethod(String id, List<String> params) {
-        return id + Utils.mkString(params, Optional.of("("), ",", Optional.of(")"));
+    private void reportTypeCheckError(String key, String... params) {
+        errMsgs.add(Utils.errorMsg(key, params));
     }
 }

@@ -13,7 +13,9 @@ import com.leon.cool.lang.util.Stack;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,9 +23,33 @@ import static com.leon.cool.lang.tokenizer.TokenKind.ID;
 import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
 
 /**
- * Created by leon on 15-10-15.
+ * Copyright leon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author leon on 15-10-15
  */
 public class Utils {
+    public static Properties messages = new Properties();
+
+    static {
+        try (InputStream stream = Utils.class.getClassLoader().getResourceAsStream("messages.properties")) {
+            messages.load(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static Map<String, String> classGraph = new HashMap<>();
     private static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
     private static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
@@ -50,7 +76,7 @@ public class Utils {
 
     public static void putToClassGraph(String type, Optional<String> parentType) {
         if (classGraph.containsKey(type)) {
-            Utils.error("class:" + type + " Duplicated class defined.");
+            Utils.error("global.error.class.duplicated", type);
         } else {
             if (parentType.isPresent()) {
                 classGraph.put(type, parentType.get());
@@ -59,7 +85,7 @@ public class Utils {
                 if (Utils.isObjectType(type)) {
                     classGraph.put(type, null);
                 } else {
-                    Utils.error("class:" + type + " Must inherits Object.");
+                    Utils.error("global.error.inherits.object", type);
                 }
             }
         }
@@ -68,7 +94,7 @@ public class Utils {
     public static void putToMethodGraph(String className, MethodDeclaration methodDeclaration) {
         Set<MethodDeclaration> methodDeclarations = methodGraph.get(className);
         if (methodDeclarations.contains(methodDeclaration)) {
-            Utils.error("class:" + className + " Duplicated method declaration " + methodDeclaration.methodName);
+            Utils.error("global.error.method.duplicated", className, constructMethod(methodDeclaration));
         } else {
             methodDeclarations.add(methodDeclaration);
             methodGraph.put(className, methodDeclarations);
@@ -87,7 +113,7 @@ public class Utils {
             for (MethodDeclaration declaration : methodDeclarations) {
                 parentDeclarations.forEach(e -> {
                     if (declaration.equals(e) && !declaration.returnType.equals(e.returnType)) {
-                        Utils.error("class :" + className + " Override error. Difference return type. method :" + declaration);
+                        Utils.error("global.error.override", className, constructMethod(declaration));
                     }
                 });
             }
@@ -113,7 +139,7 @@ public class Utils {
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (Utils.lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
-                    Utils.error("class:" + className + " Type check error. can not redefined attr " + attr.getKey() + " from parent class:" + parentClassName);
+                    Utils.error("global.error.attr.redefined", className, attr.getKey(), parentClassName);
                 } else {
                     Utils.lookupSymbolTable(className).addId(attr.getKey(), attr.getValue().type);
                 }
@@ -124,6 +150,10 @@ public class Utils {
 
 
     public static Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName, List<Type> typeInfo) {
+        if (methodGraph.get(className) == null) {
+            // Type check for NoType.
+            return Optional.empty();
+        }
         List<MethodDeclaration> list = methodGraph.get(className).stream().filter(e -> e.methodName.equals(methodName) && checkType(e.paramTypes, typeInfo, className)).collect(Collectors.toList());
         if (list.isEmpty()) {
             return Optional.empty();
@@ -147,7 +177,7 @@ public class Utils {
         keys.forEach(key -> {
             if (!isObjectType(key)) {
                 if (!keys.contains(classGraph.get(key))) {
-                    error("class:" + classGraph.get(key) + " Undefined.");
+                    error("global.error.class.undefined", classGraph.get(key));
                 }
             }
         });
@@ -265,8 +295,12 @@ public class Utils {
         return reader;
     }
 
-    public static void error(String errMsg) {
-        throw new RuntimeException(errMsg);
+    public static void error(String key, String... params) {
+        throw new RuntimeException(errorMsg(key, params));
+    }
+
+    public static String errorMsg(String key, String... params) {
+        return MessageFormat.format(messages.getProperty(key), params);
     }
 
     public static String errorPos(TreeNode node) {
@@ -279,6 +313,14 @@ public class Utils {
 
     public static String errorPos(Pos startPos, Pos endPos) {
         return " at " + startPos + " to " + endPos;
+    }
+
+    public static String constructMethod(String id, List<String> params) {
+        return id + Utils.mkString(params, Optional.of("("), ",", Optional.of(")"));
+    }
+
+    public static String constructMethod(MethodDeclaration methodDeclaration) {
+        return constructMethod(methodDeclaration.methodName, methodDeclaration.paramTypes);
     }
 
     public static CoolObject newDef(Type type) {
@@ -383,7 +425,7 @@ public class Utils {
         for (MethodDeclaration e : list) {
             for (int i = 0; i < e.paramTypes.size(); i++) {
                 if (!Utils.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(e.paramTypes.get(i), className))) {
-                    Utils.error("class:" + className + " Can't decide which method need to choose. method name " + list);
+                    Utils.error("global.error.overload", className, mkString(list.stream().map(Utils::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
                     return Optional.empty();
                 }
             }
@@ -400,7 +442,7 @@ public class Utils {
                 parent = classGraph.get(parent);
             }
             if (parent != null && parent.equals(key)) {
-                Utils.error("class:" + key + " Circle inherits.");
+                Utils.error("global.error.class.circle", key);
             }
         }
     }

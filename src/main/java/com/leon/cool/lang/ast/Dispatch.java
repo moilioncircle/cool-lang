@@ -68,7 +68,7 @@ public class Dispatch extends Expression {
                         return ObjectFactory.coolString(str);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Utils.error("error read input");
+                        Utils.error("unexpected.error");
                     }
                     return ObjectFactory.coolStringDefault();
                 } else if (methodDeclaration.methodName.equals("in_int")) {
@@ -76,7 +76,7 @@ public class Dispatch extends Expression {
                         String str = Utils.reader().readLine();
                         return ObjectFactory.coolInt(Integer.parseInt(str));
                     } catch (Exception e) {
-                        Utils.error("error read input");
+                        Utils.error("unexpected.error");
                     }
                     return ObjectFactory.coolIntDefault();
                 }
@@ -87,7 +87,7 @@ public class Dispatch extends Expression {
                 } else if (methodDeclaration.methodName.equals("concat")) {
                     return ((CoolString) env.so).concat((CoolString) paramObjects.get(0));
                 } else if (methodDeclaration.methodName.equals("substr")) {
-                    return ((CoolString) env.so).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1));
+                    return ((CoolString) env.so).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1),Utils.errorPos(starPos,endPos));
                 }
                 break;
         }
