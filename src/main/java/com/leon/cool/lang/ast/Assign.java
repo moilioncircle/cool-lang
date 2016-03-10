@@ -46,7 +46,7 @@ public class Assign extends Expression {
     @Override
     public CoolObject eval(Env env) {
         CoolObject object = expr.eval(env);
-        env.env.update(id.tok.name, object);
+        env.symbolTable.update(id.tok.name, object);
         return object;
     }
 }

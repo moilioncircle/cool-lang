@@ -60,19 +60,32 @@ public class StaticDispatch extends Expression {
 
     @Override
     public CoolObject eval(Env env) {
+        /**
+         * 对方法调用的参数求值
+         */
         List<CoolObject> paramObjects = dispatch.params.stream().map(e -> e.eval(env)).collect(Collectors.toList());
+        /**
+         * 对上述参数表达式求得类型
+         */
         List<Type> paramTypes = paramObjects.stream().map(e -> e.type).collect(Collectors.toList());
         MethodDeclaration methodDeclaration;
+        // expr[@TYPE].ID( [ expr [[, expr]] ∗ ] )对第一个expr求值
         CoolObject obj = expr.eval(env);
         if (obj.type.type() == TypeEnum.VOID) {
             Utils.error("runtime.error.dispatch.void", Utils.errorPos(expr));
         }
+        //如果提供type，则根据type查找方法声明
+        //如果没提供type，则根据上述expr值的类型查找方法声明
         if (type.isPresent()) {
             methodDeclaration = Utils.lookupMethodDeclaration(type.get().name, dispatch.id.name, paramTypes).get();
         } else {
             methodDeclaration = Utils.lookupMethodDeclaration(obj.type.className(), dispatch.id.name, paramTypes).get();
         }
 
+        /**
+         * build-in方法求值
+         * =====================================
+         */
         switch (methodDeclaration.belongs) {
             case "Object":
                 if (methodDeclaration.methodName.equals("type_name")) {
@@ -119,13 +132,26 @@ public class StaticDispatch extends Expression {
                 break;
         }
 
-        obj.env.env.enterScope();
+        /**
+         * =====================================
+         */
+        /**
+         * 进入scope,此scope是上述expr值对象的scope
+         */
+        obj.env.symbolTable.enterScope();
         assert paramObjects.size() == methodDeclaration.declaration.formals.size();
+        /**
+         * 绑定形参
+         */
         for (int i = 0; i < methodDeclaration.declaration.formals.size(); i++) {
-            obj.env.env.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
+            obj.env.symbolTable.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
         }
+        //对函数体求值
         CoolObject object = methodDeclaration.declaration.expr.eval(obj.env);
-        obj.env.env.exitScope();
+        /**
+         * 退出scope
+         */
+        obj.env.symbolTable.exitScope();
         return object;
     }
 }

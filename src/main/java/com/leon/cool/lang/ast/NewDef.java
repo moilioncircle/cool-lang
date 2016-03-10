@@ -47,7 +47,7 @@ public class NewDef extends Expression {
     public CoolObject eval(Env env) {
         Type type;
         if (Utils.isSelfType(this.type)) {
-            type = env.so.type;
+            type = env.selfObject.type;
         } else {
             type = TypeFactory.objectType(this.type.name);
         }

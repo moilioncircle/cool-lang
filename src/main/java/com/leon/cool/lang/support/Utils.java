@@ -243,6 +243,12 @@ public class Utils {
         return isBoolType(string) || isIntType(string) || isStringType(string);
     }
 
+    /**
+     * 判断两个类型是否存在父子关系
+     * @param typeInfo 子类型
+     * @param parentTypeInfo 父类型
+     * @return true：存在父子关系；false：不存在父子关系
+     */
     public static boolean isParent(Type typeInfo, Type parentTypeInfo) {
         if (typeInfo.type() == TypeEnum.NO_TYPE) {
             return true;
@@ -327,38 +333,81 @@ public class Utils {
         CoolObject object = ObjectFactory.coolObject();
         object.type = type;
 
+        Env newEnv = new Env();
+        newEnv.selfObject = object;
+        newEnv.symbolTable = new SymbolTable();
+        newEnv.symbolTable.enterScope();
+
         Stack<String> inheritsLinks = new Stack<>();
         String temp = type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
             temp = Utils.classGraph.get(temp);
         }
-
-        Env env1 = new Env();
-        env1.so = object;
-        env1.env = new SymbolTable();
-        env1.env.enterScope();
-
+        /**
+         * 遍历继承树，找到父类中的属性。
+         * 如果父类中的属性是String,Bool,Int类型，则对属性赋默认值.
+         * 如果不是上述类型，则赋值void
+         * String  = ""
+         * Bool = false
+         * Int = 0
+         * Object = void
+         */
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (isStringType(attr.getValue().type)) {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolStringDefault());
+                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolStringDefault());
                 } else if (isBoolType(attr.getValue().type)) {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolBoolDefault());
+                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolBoolDefault());
                 } else if (isIntType(attr.getValue().type)) {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolIntDefault());
+                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolIntDefault());
                 } else {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolVoid());
+                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolVoid());
                 }
             }
         }
-        object.env = env1;
-        initializer(env1);
+        object.env = newEnv;
+        initializer(newEnv);
         return object;
     }
 
+    /**
+     * @see this.newDef(Type)
+     *
+     * 1.把self加入到符号表中。
+     * 2.对有表达式的属性求值，并更新符号表，没有表达式的属性会在newDef中赋初值。
+     *
+     * @param env
+     */
+    private static void initializer(Env env) {
+        env.symbolTable.addId(Constant.SELF, env.selfObject);
+        Stack<String> inheritsLinks = new Stack<>();
+        String temp = env.selfObject.type.className();
+        while (temp != null) {
+            inheritsLinks.push(temp);
+            temp = Utils.classGraph.get(temp);
+        }
+        while (!inheritsLinks.isEmpty()) {
+            String parentClassName = inheritsLinks.pop();
+            Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
+            attrs.entrySet().forEach(attr -> {
+                if (attr.getValue().expr.isPresent()) {
+                    env.symbolTable.addId(attr.getKey(), attr.getValue().expr.get().eval(env));
+                }
+            });
+        }
+    }
+
+    /**
+     * 求多个类型的最小公共父类型
+     * @see com.leon.cool.lang.tree.TypeCheckTreeScanner
+     * @see com.leon.cool.lang.ast.CaseDef
+     * @see com.leon.cool.lang.ast.Cond
+     * @param types
+     * @return 最小公共父类型
+     */
     public static Type lub(List<Type> types) {
         return types.stream().reduce(TypeFactory.noType(), (type1, type2) -> {
             if (type1.type() == TypeEnum.NO_TYPE) {
@@ -389,25 +438,6 @@ public class Utils {
             list2.add(temp);
         }
         return TypeFactory.objectType(list1.stream().filter(list2::contains).findFirst().get());
-    }
-
-    private static void initializer(Env env) {
-        env.env.addId(Constant.SELF, env.so);
-        Stack<String> inheritsLinks = new Stack<>();
-        String temp = env.so.type.className();
-        while (temp != null) {
-            inheritsLinks.push(temp);
-            temp = Utils.classGraph.get(temp);
-        }
-        while (!inheritsLinks.isEmpty()) {
-            String parentClassName = inheritsLinks.pop();
-            Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
-            attrs.entrySet().forEach(attr -> {
-                if (attr.getValue().expr.isPresent()) {
-                    env.env.addId(attr.getKey(), attr.getValue().expr.get().eval(env));
-                }
-            });
-        }
     }
 
     private static Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {

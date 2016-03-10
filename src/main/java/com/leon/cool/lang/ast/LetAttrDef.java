@@ -54,18 +54,18 @@ public class LetAttrDef extends Expression {
     @Override
     public CoolObject eval(Env env) {
         if (expr.isPresent()) {
-            env.env.addId(id.name, expr.get().eval(env));
+            env.symbolTable.addId(id.name, expr.get().eval(env));
         } else {
             if (Utils.isStringType(type)) {
-                env.env.addId(id.name, ObjectFactory.coolStringDefault());
+                env.symbolTable.addId(id.name, ObjectFactory.coolStringDefault());
             } else if (Utils.isIntType(type)) {
-                env.env.addId(id.name, ObjectFactory.coolIntDefault());
+                env.symbolTable.addId(id.name, ObjectFactory.coolIntDefault());
             } else if (Utils.isBoolType(type)) {
-                env.env.addId(id.name, ObjectFactory.coolBoolDefault());
+                env.symbolTable.addId(id.name, ObjectFactory.coolBoolDefault());
             } else {
-                env.env.addId(id.name, ObjectFactory.coolVoid());
+                env.symbolTable.addId(id.name, ObjectFactory.coolVoid());
             }
         }
-        return env.so;
+        return env.selfObject;
     }
 }

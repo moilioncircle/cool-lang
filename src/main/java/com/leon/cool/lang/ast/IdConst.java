@@ -43,6 +43,6 @@ public class IdConst extends Expression {
 
     @Override
     public CoolObject eval(Env env) {
-        return (CoolObject) env.env.lookup(tok.name).get();
+        return (CoolObject) env.symbolTable.lookup(tok.name).get();
     }
 }

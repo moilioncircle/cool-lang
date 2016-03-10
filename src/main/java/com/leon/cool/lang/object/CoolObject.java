@@ -26,6 +26,10 @@ import com.leon.cool.lang.util.Constant;
  */
 public class CoolObject {
     public Type type = TypeFactory.objectType(Constant.OBJECT);
+
+    /**
+     * 对象中的环境
+     */
     public Env env = new Env();
 
     public CoolObject() {

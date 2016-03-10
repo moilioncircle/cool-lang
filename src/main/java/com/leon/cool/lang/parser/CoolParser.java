@@ -206,7 +206,7 @@ public class CoolParser {
 
     /*
     expr ::= ID <- expr
-        | ID( [ expr [[, expr]] ∗ ] )
+        | ID( [ expr [[, expr]] ∗ ] ) //dispatch
         | ID
         | if expr then expr else expr fi
         | while expr loop expr pool
@@ -224,7 +224,7 @@ public class CoolParser {
         | false
 
         -- left recursive
-        | expr[@TYPE].ID( [ expr [[, expr]] ∗ ] )
+        | expr[@TYPE].ID( [ expr [[, expr]] ∗ ] ) //static dispatch
         | expr + expr
         | expr − expr
         | expr ∗ expr

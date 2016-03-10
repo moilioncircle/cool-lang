@@ -41,16 +41,27 @@ public class Dispatch extends Expression {
 
     @Override
     public CoolObject eval(Env env) {
+        /**
+         * 对方法调用的参数求值
+         */
         List<CoolObject> paramObjects = params.stream().map(e -> e.eval(env)).collect(Collectors.toList());
+        /**
+         * 对上述参数表达式求得类型
+         */
         List<Type> paramTypes = paramObjects.stream().map(e -> e.type).collect(Collectors.toList());
-        CoolObject obj = env.so;
+        CoolObject obj = env.selfObject;
+        //根据类型，方法名称，类名lookup方法声明
         MethodDeclaration methodDeclaration = Utils.lookupMethodDeclaration(obj.type.className(), id.name, paramTypes).get();
+        /**
+         * build-in方法求值
+         * =====================================
+         */
         switch (methodDeclaration.belongs) {
             case "Object":
                 if (methodDeclaration.methodName.equals("type_name")) {
-                    return ObjectFactory.coolString(env.so.type.className());
+                    return ObjectFactory.coolString(env.selfObject.type.className());
                 } else if (methodDeclaration.methodName.equals("copy")) {
-                    return env.so.copy();
+                    return env.selfObject.copy();
                 } else if (methodDeclaration.methodName.equals("abort")) {
                     return ObjectFactory.coolObject().abort();
                 }
@@ -58,10 +69,10 @@ public class Dispatch extends Expression {
             case "IO":
                 if (methodDeclaration.methodName.equals("out_string")) {
                     System.out.print(((CoolString) paramObjects.get(0)).str);
-                    return env.so;
+                    return env.selfObject;
                 } else if (methodDeclaration.methodName.equals("out_int")) {
                     System.out.print(((CoolInt) paramObjects.get(0)).val);
-                    return env.so;
+                    return env.selfObject;
                 } else if (methodDeclaration.methodName.equals("in_string")) {
                     try {
                         String str = Utils.reader().readLine();
@@ -83,21 +94,35 @@ public class Dispatch extends Expression {
                 break;
             case "String":
                 if (methodDeclaration.methodName.equals("length")) {
-                    return ((CoolString) env.so).length();
+                    return ((CoolString) env.selfObject).length();
                 } else if (methodDeclaration.methodName.equals("concat")) {
-                    return ((CoolString) env.so).concat((CoolString) paramObjects.get(0));
+                    return ((CoolString) env.selfObject).concat((CoolString) paramObjects.get(0));
                 } else if (methodDeclaration.methodName.equals("substr")) {
-                    return ((CoolString) env.so).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1),Utils.errorPos(starPos,endPos));
+                    return ((CoolString) env.selfObject).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1),Utils.errorPos(starPos,endPos));
                 }
                 break;
         }
-        env.env.enterScope();
+        /**
+         * =====================================
+         */
+        /**
+         * 进入scope
+         *
+         */
+        env.symbolTable.enterScope();
         assert paramObjects.size() == methodDeclaration.declaration.formals.size();
+        /**
+         * 绑定形参
+         */
         for (int i = 0; i < methodDeclaration.declaration.formals.size(); i++) {
-            env.env.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
+            env.symbolTable.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
         }
+        //对函数体求值
         CoolObject object = methodDeclaration.declaration.expr.eval(env);
-        env.env.exitScope();
+        /**
+         * 退出scope
+         */
+        env.symbolTable.exitScope();
         return object;
     }
 }

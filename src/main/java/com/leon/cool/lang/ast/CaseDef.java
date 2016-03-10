@@ -58,10 +58,10 @@ public class CaseDef extends Expression {
             Optional<Branch> branchOpt = branchList.stream().filter(e -> e.type.name.equals(filterStr)).findFirst();
             if (branchOpt.isPresent()) {
                 Branch branch = branchOpt.get();
-                env.env.enterScope();
-                env.env.addId(branch.id.name, object);
+                env.symbolTable.enterScope();
+                env.symbolTable.addId(branch.id.name, object);
                 CoolObject returnVal = branch.expr.eval(env);
-                env.env.exitScope();
+                env.symbolTable.exitScope();
                 if (returnVal.type.type() == TypeEnum.VOID) {
                     Utils.error("runtime.error.void", Utils.errorPos(branch.expr));
                 }

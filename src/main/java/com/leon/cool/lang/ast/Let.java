@@ -47,10 +47,10 @@ public class Let extends Expression {
 
     @Override
     public CoolObject eval(Env env) {
-        env.env.enterScope();
+        env.symbolTable.enterScope();
         attrDefs.forEach(e -> e.eval(env));
         CoolObject object = expr.eval(env);
-        env.env.exitScope();
+        env.symbolTable.exitScope();
         return object;
     }
 }
