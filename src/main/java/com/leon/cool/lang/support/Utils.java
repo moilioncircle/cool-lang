@@ -112,6 +112,7 @@ public class Utils {
             Set<MethodDeclaration> parentDeclarations = methodGraph.get(parentClassName);
             for (MethodDeclaration declaration : methodDeclarations) {
                 parentDeclarations.forEach(e -> {
+                    //仅返回类型不同的话override错误
                     if (declaration.equals(e) && !declaration.returnType.equals(e.returnType)) {
                         Utils.error("global.error.override", className, constructMethod(declaration));
                     }
@@ -138,6 +139,7 @@ public class Utils {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
+                //参数重定义
                 if (Utils.lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
                     Utils.error("global.error.attr.redefined", className, attr.getKey(), parentClassName);
                 } else {
@@ -158,10 +160,34 @@ public class Utils {
         if (list.isEmpty()) {
             return Optional.empty();
         } else if (list.size() > 1) {
+            //包含多个方法（重载方法），则在重载方法中进一步选择
             return Utils.minimumMethodDeclaration(list, className, typeInfo);
         } else {
             return Optional.of(list.get(0));
         }
+    }
+
+    private static Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
+        MethodDeclaration min = new MethodDeclaration();
+        min.paramTypes = typeInfo.stream().map(e -> Constant.OBJECT).collect(Collectors.toList());
+        label:
+        for (MethodDeclaration declaration : list) {
+            for (int i = 0; i < declaration.paramTypes.size(); i++) {
+                if (!Utils.isParent(TypeFactory.objectType(declaration.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
+                    continue label;
+                }
+            }
+            min = declaration;
+        }
+        for (MethodDeclaration declaration : list) {
+            for (int i = 0; i < declaration.paramTypes.size(); i++) {
+                if (!Utils.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(declaration.paramTypes.get(i), className))) {
+                    Utils.error("global.error.overload", className, mkString(list.stream().map(Utils::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
+                    return Optional.empty();
+                }
+            }
+        }
+        return Optional.of(min);
     }
 
     public static Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName) {
@@ -439,30 +465,6 @@ public class Utils {
         }
         return TypeFactory.objectType(list1.stream().filter(list2::contains).findFirst().get());
     }
-
-    private static Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
-        MethodDeclaration min = new MethodDeclaration();
-        min.paramTypes = typeInfo.stream().map(e -> Constant.OBJECT).collect(Collectors.toList());
-        label:
-        for (MethodDeclaration e : list) {
-            for (int i = 0; i < e.paramTypes.size(); i++) {
-                if (!Utils.isParent(TypeFactory.objectType(e.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
-                    continue label;
-                }
-            }
-            min = e;
-        }
-        for (MethodDeclaration e : list) {
-            for (int i = 0; i < e.paramTypes.size(); i++) {
-                if (!Utils.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(e.paramTypes.get(i), className))) {
-                    Utils.error("global.error.overload", className, mkString(list.stream().map(Utils::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
-                    return Optional.empty();
-                }
-            }
-        }
-        return Optional.of(min);
-    }
-
 
     private static void checkCircleInherits(Map<String, String> classGraph) {
         Set<String> keys = classGraph.keySet();

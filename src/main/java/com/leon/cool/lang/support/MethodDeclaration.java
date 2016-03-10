@@ -29,6 +29,11 @@ public class MethodDeclaration {
     public MethodDef declaration;
     public String belongs;
 
+    /**
+     * 方法名以及形参类型相同，则比较成功，不包含（returnType，declaration，belongs）
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
