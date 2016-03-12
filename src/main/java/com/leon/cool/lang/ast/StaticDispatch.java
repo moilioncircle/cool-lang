@@ -1,9 +1,6 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.object.CoolString;
 import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.MethodDeclaration;
 import com.leon.cool.lang.support.Utils;
@@ -82,59 +79,9 @@ public class StaticDispatch extends Expression {
             methodDeclaration = Utils.lookupMethodDeclaration(obj.type.className(), dispatch.id.name, paramTypes).get();
         }
 
-        /**
-         * build-in方法求值
-         * =====================================
-         */
-        switch (methodDeclaration.belongs) {
-            case "Object":
-                if (methodDeclaration.methodName.equals("type_name")) {
-                    return ObjectFactory.coolString(obj.type.className());
-                } else if (methodDeclaration.methodName.equals("copy")) {
-                    return obj.copy();
-                } else if (methodDeclaration.methodName.equals("abort")) {
-                    return ObjectFactory.coolObject().abort();
-                }
-                break;
-            case "IO":
-                if (methodDeclaration.methodName.equals("out_string")) {
-                    System.out.print(((CoolString) paramObjects.get(0)).str);
-                    return obj;
-                } else if (methodDeclaration.methodName.equals("out_int")) {
-                    System.out.print(((CoolInt) paramObjects.get(0)).val);
-                    return obj;
-                } else if (methodDeclaration.methodName.equals("in_string")) {
-                    try {
-                        String str = Utils.reader().readLine();
-                        return ObjectFactory.coolString(str);
-                    } catch (Exception e) {
-                        Utils.error("unexpected.error");
-                    }
-                    return ObjectFactory.coolStringDefault();
-                } else if (methodDeclaration.methodName.equals("in_int")) {
-                    try {
-                        String str = Utils.reader().readLine();
-                        return ObjectFactory.coolInt(Integer.parseInt(str));
-                    } catch (Exception e) {
-                        Utils.error("unexpected.error");
-                    }
-                    return ObjectFactory.coolIntDefault();
-                }
-                break;
-            case "String":
-                if (methodDeclaration.methodName.equals("length")) {
-                    return ((CoolString) obj).length();
-                } else if (methodDeclaration.methodName.equals("concat")) {
-                    return ((CoolString) obj).concat((CoolString) paramObjects.get(0));
-                } else if (methodDeclaration.methodName.equals("substr")) {
-                    return ((CoolString) obj).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1), Utils.errorPos(starPos, endPos));
-                }
-                break;
-        }
+        CoolObject str = Utils.buildIn(paramObjects, obj, methodDeclaration, Utils.errorPos(starPos, endPos));
+        if (str != null) return str;
 
-        /**
-         * =====================================
-         */
         /**
          * 进入scope,此scope是上述expr值对象的scope
          */

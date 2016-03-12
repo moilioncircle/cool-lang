@@ -3,7 +3,9 @@ package com.leon.cool.lang.support;
 import com.leon.cool.lang.ast.TreeNode;
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.factory.TypeFactory;
+import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
+import com.leon.cool.lang.object.CoolString;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
@@ -24,13 +26,13 @@ import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
 
 /**
  * Copyright leon
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -271,7 +273,8 @@ public class Utils {
 
     /**
      * 判断两个类型是否存在父子关系
-     * @param typeInfo 子类型
+     *
+     * @param typeInfo       子类型
      * @param parentTypeInfo 父类型
      * @return true：存在父子关系；false：不存在父子关系
      */
@@ -396,12 +399,10 @@ public class Utils {
     }
 
     /**
-     * @see this.newDef(Type)
-     *
-     * 1.把self加入到符号表中。
-     * 2.对有表达式的属性求值，并更新符号表，没有表达式的属性会在newDef中赋初值。
-     *
      * @param object
+     * @see this.newDef(Type)
+     * <p>
+     * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
      */
     private static void initializer(CoolObject object) {
         Stack<String> inheritsLinks = new Stack<>();
@@ -410,7 +411,7 @@ public class Utils {
             inheritsLinks.push(temp);
             temp = Utils.classGraph.get(temp);
         }
-        Context context = new Context(object,object.variables);
+        Context context = new Context(object, object.variables);
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
@@ -423,12 +424,72 @@ public class Utils {
     }
 
     /**
+     * build-in方法求值
+     *
+     * @param paramObjects
+     * @param obj
+     * @param methodDeclaration
+     * @param pos
+     * @return CoolObject
+     */
+    public static CoolObject buildIn(List<CoolObject> paramObjects, CoolObject obj, MethodDeclaration methodDeclaration, String pos) {
+        switch (methodDeclaration.belongs) {
+            case "Object":
+                if (methodDeclaration.methodName.equals("type_name")) {
+                    return ObjectFactory.coolString(obj.type.className());
+                } else if (methodDeclaration.methodName.equals("copy")) {
+                    return obj.copy();
+                } else if (methodDeclaration.methodName.equals("abort")) {
+                    return ObjectFactory.coolObject().abort();
+                }
+                break;
+            case "IO":
+                if (methodDeclaration.methodName.equals("out_string")) {
+                    System.out.print(((CoolString) paramObjects.get(0)).str);
+                    return obj;
+                } else if (methodDeclaration.methodName.equals("out_int")) {
+                    System.out.print(((CoolInt) paramObjects.get(0)).val);
+                    return obj;
+                } else if (methodDeclaration.methodName.equals("in_string")) {
+                    try {
+                        String str = Utils.reader().readLine();
+                        return ObjectFactory.coolString(str);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Utils.error("unexpected.error");
+                    }
+                    return ObjectFactory.coolStringDefault();
+                } else if (methodDeclaration.methodName.equals("in_int")) {
+                    try {
+                        String str = Utils.reader().readLine();
+                        return ObjectFactory.coolInt(Integer.parseInt(str));
+                    } catch (Exception e) {
+                        Utils.error("unexpected.error");
+                    }
+                    return ObjectFactory.coolIntDefault();
+                }
+                break;
+            case "String":
+                if (methodDeclaration.methodName.equals("length")) {
+                    return ((CoolString) obj).length();
+                } else if (methodDeclaration.methodName.equals("concat")) {
+                    return ((CoolString) obj).concat((CoolString) paramObjects.get(0));
+                } else if (methodDeclaration.methodName.equals("substr")) {
+                    return ((CoolString) obj).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1), pos);
+                }
+                break;
+        }
+        return null;
+    }
+
+    /**
      * 求多个类型的最小公共父类型
+     *
+     * @param types
+     * @return 最小公共父类型
      * @see com.leon.cool.lang.tree.TypeCheckTreeScanner
      * @see com.leon.cool.lang.ast.CaseDef
      * @see com.leon.cool.lang.ast.Cond
-     * @param types
-     * @return 最小公共父类型
      */
     public static Type lub(List<Type> types) {
         return types.stream().reduce(TypeFactory.noType(), (type1, type2) -> {
