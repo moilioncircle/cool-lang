@@ -404,7 +404,6 @@ public class Utils {
      * @param object
      */
     private static void initializer(CoolObject object) {
-//        object.variables.addId(Constant.SELF, object);
         Stack<String> inheritsLinks = new Stack<>();
         String temp = object.type.className();
         while (temp != null) {

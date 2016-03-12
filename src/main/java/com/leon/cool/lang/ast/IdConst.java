@@ -49,6 +49,5 @@ public class IdConst extends Expression {
         }else{
             return (CoolObject) context.environment.lookup(tok.name).get();
         }
-//        return (CoolObject) context.environment.lookup(tok.name).get();
     }
 }
