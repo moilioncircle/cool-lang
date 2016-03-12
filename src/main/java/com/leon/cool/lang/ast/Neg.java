@@ -1,7 +1,7 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
@@ -43,8 +43,8 @@ public class Neg extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        CoolInt val = (CoolInt) expr.eval(env);
+    public CoolObject eval(Context context) {
+        CoolInt val = (CoolInt) expr.eval(context);
         return ObjectFactory.coolInt(-val.val);
     }
 }

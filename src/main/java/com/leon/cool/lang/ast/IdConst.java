@@ -1,6 +1,6 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.tokenizer.Token;
@@ -42,7 +42,7 @@ public class IdConst extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        return (CoolObject) env.symbolTable.lookup(tok.name).get();
+    public CoolObject eval(Context context) {
+        return (CoolObject) context.environment.lookup(tok.name).get();
     }
 }

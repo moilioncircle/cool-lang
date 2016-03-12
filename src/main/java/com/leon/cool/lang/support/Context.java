@@ -19,23 +19,14 @@ import com.leon.cool.lang.object.CoolObject;
  *
  * @author leon on 15-10-28
  */
-public class Env {
-    /**
-     * caller CoolObject
-     */
+public class Context {
+
     public CoolObject selfObject;
 
-    /**
-     * @see Utils
-     * 环境内的符号表
-     * 树状关系
-     * obj
-     *   |
-     *   ------inner_obj:CoolObject = obj.env.symbolTable.lookup("inner")
-     *             |
-     *             ------inner_inner_obj:CoolObject = inner_obj.env.symbolTable.lookup("inner_inner")
-     *                       |
-     *                       -------........
-     */
-    public SymbolTable symbolTable;
+    public SymbolTable environment;
+
+    public Context(CoolObject selfObject, SymbolTable environment){
+        this.selfObject = selfObject;
+        this.environment = environment;
+    }
 }

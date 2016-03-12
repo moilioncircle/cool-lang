@@ -2,7 +2,7 @@ package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tree.TreeVisitor;
@@ -44,10 +44,10 @@ public class NewDef extends Expression {
         visitor.applyNewDef(this);
     }
 
-    public CoolObject eval(Env env) {
+    public CoolObject eval(Context context) {
         Type type;
         if (Utils.isSelfType(this.type)) {
-            type = env.selfObject.type;
+            type = context.selfObject.type;
         } else {
             type = TypeFactory.objectType(this.type.name);
         }

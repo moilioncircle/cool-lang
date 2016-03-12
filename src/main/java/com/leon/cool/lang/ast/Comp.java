@@ -5,7 +5,7 @@ import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tree.TreeVisitor;
 
@@ -49,9 +49,9 @@ public class Comp extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        CoolObject l = left.eval(env);
-        CoolObject r = right.eval(env);
+    public CoolObject eval(Context context) {
+        CoolObject l = left.eval(context);
+        CoolObject r = right.eval(context);
         if (Utils.isBasicType(l.type) && Utils.isBasicType(r.type)) {
             if (l instanceof CoolString && r instanceof CoolString) {
                 return ObjectFactory.coolBool(((CoolString) l).str.equals(((CoolString) r).str));

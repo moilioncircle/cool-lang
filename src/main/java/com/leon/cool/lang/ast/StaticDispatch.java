@@ -4,7 +4,7 @@ import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.MethodDeclaration;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.Token;
@@ -59,18 +59,18 @@ public class StaticDispatch extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
+    public CoolObject eval(Context context) {
         /**
          * 对方法调用的参数求值
          */
-        List<CoolObject> paramObjects = dispatch.params.stream().map(e -> e.eval(env)).collect(Collectors.toList());
+        List<CoolObject> paramObjects = dispatch.params.stream().map(e -> e.eval(context)).collect(Collectors.toList());
         /**
          * 对上述参数表达式求得类型
          */
         List<Type> paramTypes = paramObjects.stream().map(e -> e.type).collect(Collectors.toList());
         MethodDeclaration methodDeclaration;
         // expr[@TYPE].ID( [ expr [[, expr]] ∗ ] )对第一个expr求值
-        CoolObject obj = expr.eval(env);
+        CoolObject obj = expr.eval(context);
         if (obj.type.type() == TypeEnum.VOID) {
             Utils.error("runtime.error.dispatch.void", Utils.errorPos(expr));
         }
@@ -138,20 +138,20 @@ public class StaticDispatch extends Expression {
         /**
          * 进入scope,此scope是上述expr值对象的scope
          */
-        obj.env.symbolTable.enterScope();
+        obj.variables.enterScope();
         assert paramObjects.size() == methodDeclaration.declaration.formals.size();
         /**
          * 绑定形参
          */
         for (int i = 0; i < methodDeclaration.declaration.formals.size(); i++) {
-            obj.env.symbolTable.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
+            obj.variables.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
         }
         //对函数体求值
-        CoolObject object = methodDeclaration.declaration.expr.eval(obj.env);
+        CoolObject object = methodDeclaration.declaration.expr.eval(new Context(obj,obj.variables));
         /**
          * 退出scope
          */
-        obj.env.symbolTable.exitScope();
+        obj.variables.exitScope();
         return object;
     }
 }

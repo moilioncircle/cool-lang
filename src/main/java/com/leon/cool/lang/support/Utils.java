@@ -359,10 +359,7 @@ public class Utils {
         CoolObject object = ObjectFactory.coolObject();
         object.type = type;
 
-        Env newEnv = new Env();
-        newEnv.selfObject = object;
-        newEnv.symbolTable = new SymbolTable();
-        newEnv.symbolTable.enterScope();
+        object.variables.enterScope();
 
         Stack<String> inheritsLinks = new Stack<>();
         String temp = type.className();
@@ -384,18 +381,17 @@ public class Utils {
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (isStringType(attr.getValue().type)) {
-                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolStringDefault());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolStringDefault());
                 } else if (isBoolType(attr.getValue().type)) {
-                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolBoolDefault());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolBoolDefault());
                 } else if (isIntType(attr.getValue().type)) {
-                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolIntDefault());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolIntDefault());
                 } else {
-                    newEnv.symbolTable.addId(attr.getKey(), ObjectFactory.coolVoid());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolVoid());
                 }
             }
         }
-        object.env = newEnv;
-        initializer(newEnv);
+        initializer(object);
         return object;
     }
 
@@ -405,22 +401,23 @@ public class Utils {
      * 1.把self加入到符号表中。
      * 2.对有表达式的属性求值，并更新符号表，没有表达式的属性会在newDef中赋初值。
      *
-     * @param env
+     * @param object
      */
-    private static void initializer(Env env) {
-        env.symbolTable.addId(Constant.SELF, env.selfObject);
+    private static void initializer(CoolObject object) {
+        object.variables.addId(Constant.SELF, object);
         Stack<String> inheritsLinks = new Stack<>();
-        String temp = env.selfObject.type.className();
+        String temp = object.type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
             temp = Utils.classGraph.get(temp);
         }
+        Context context = new Context(object,object.variables);
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             attrs.entrySet().forEach(attr -> {
                 if (attr.getValue().expr.isPresent()) {
-                    env.symbolTable.addId(attr.getKey(), attr.getValue().expr.get().eval(env));
+                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().eval(context));
                 }
             });
         }

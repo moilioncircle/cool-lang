@@ -2,7 +2,7 @@ package com.leon.cool.lang.object;
 
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.SymbolTable;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.util.Constant;
@@ -28,9 +28,9 @@ public class CoolObject {
     public Type type = TypeFactory.objectType(Constant.OBJECT);
 
     /**
-     * 对象中的环境
+     * 对象内变量
      */
-    public Env env = new Env();
+    public SymbolTable variables = new SymbolTable();
 
     public CoolObject() {
 
@@ -47,7 +47,7 @@ public class CoolObject {
     public CoolObject copy() {
         CoolObject object = ObjectFactory.coolObject();
         object.type = this.type;
-        object.env = this.env;
+        object.variables = this.variables;
         return object;
     }
 }

@@ -2,7 +2,7 @@ package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.type.TypeEnum;
@@ -50,18 +50,18 @@ public class CaseDef extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        CoolObject object = caseExpr.eval(env);
+    public CoolObject eval(Context context) {
+        CoolObject object = caseExpr.eval(context);
         String temp = object.type.className();
         while (temp != null) {
             final String filterStr = temp;
             Optional<Branch> branchOpt = branchList.stream().filter(e -> e.type.name.equals(filterStr)).findFirst();
             if (branchOpt.isPresent()) {
                 Branch branch = branchOpt.get();
-                env.symbolTable.enterScope();
-                env.symbolTable.addId(branch.id.name, object);
-                CoolObject returnVal = branch.expr.eval(env);
-                env.symbolTable.exitScope();
+                context.environment.enterScope();
+                context.environment.addId(branch.id.name, object);
+                CoolObject returnVal = branch.expr.eval(context);
+                context.environment.exitScope();
                 if (returnVal.type.type() == TypeEnum.VOID) {
                     Utils.error("runtime.error.void", Utils.errorPos(branch.expr));
                 }

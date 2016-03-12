@@ -4,7 +4,7 @@ import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.MethodDeclaration;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.Token;
@@ -40,16 +40,16 @@ public class Dispatch extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
+    public CoolObject eval(Context context) {
         /**
          * 对方法调用的参数求值
          */
-        List<CoolObject> paramObjects = params.stream().map(e -> e.eval(env)).collect(Collectors.toList());
+        List<CoolObject> paramObjects = params.stream().map(e -> e.eval(context)).collect(Collectors.toList());
         /**
          * 对上述参数表达式求得类型
          */
         List<Type> paramTypes = paramObjects.stream().map(e -> e.type).collect(Collectors.toList());
-        CoolObject obj = env.selfObject;
+        CoolObject obj = context.selfObject;
         //根据类型，方法名称，类名lookup方法声明
         MethodDeclaration methodDeclaration = Utils.lookupMethodDeclaration(obj.type.className(), id.name, paramTypes).get();
         /**
@@ -59,9 +59,9 @@ public class Dispatch extends Expression {
         switch (methodDeclaration.belongs) {
             case "Object":
                 if (methodDeclaration.methodName.equals("type_name")) {
-                    return ObjectFactory.coolString(env.selfObject.type.className());
+                    return ObjectFactory.coolString(context.selfObject.type.className());
                 } else if (methodDeclaration.methodName.equals("copy")) {
-                    return env.selfObject.copy();
+                    return context.selfObject.copy();
                 } else if (methodDeclaration.methodName.equals("abort")) {
                     return ObjectFactory.coolObject().abort();
                 }
@@ -69,10 +69,10 @@ public class Dispatch extends Expression {
             case "IO":
                 if (methodDeclaration.methodName.equals("out_string")) {
                     System.out.print(((CoolString) paramObjects.get(0)).str);
-                    return env.selfObject;
+                    return context.selfObject;
                 } else if (methodDeclaration.methodName.equals("out_int")) {
                     System.out.print(((CoolInt) paramObjects.get(0)).val);
-                    return env.selfObject;
+                    return context.selfObject;
                 } else if (methodDeclaration.methodName.equals("in_string")) {
                     try {
                         String str = Utils.reader().readLine();
@@ -94,11 +94,11 @@ public class Dispatch extends Expression {
                 break;
             case "String":
                 if (methodDeclaration.methodName.equals("length")) {
-                    return ((CoolString) env.selfObject).length();
+                    return ((CoolString) context.selfObject).length();
                 } else if (methodDeclaration.methodName.equals("concat")) {
-                    return ((CoolString) env.selfObject).concat((CoolString) paramObjects.get(0));
+                    return ((CoolString) context.selfObject).concat((CoolString) paramObjects.get(0));
                 } else if (methodDeclaration.methodName.equals("substr")) {
-                    return ((CoolString) env.selfObject).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1),Utils.errorPos(starPos,endPos));
+                    return ((CoolString) context.selfObject).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1),Utils.errorPos(starPos,endPos));
                 }
                 break;
         }
@@ -109,20 +109,20 @@ public class Dispatch extends Expression {
          * 进入scope
          *
          */
-        env.symbolTable.enterScope();
+        context.environment.enterScope();
         assert paramObjects.size() == methodDeclaration.declaration.formals.size();
         /**
          * 绑定形参
          */
         for (int i = 0; i < methodDeclaration.declaration.formals.size(); i++) {
-            env.symbolTable.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
+            context.environment.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
         }
         //对函数体求值
-        CoolObject object = methodDeclaration.declaration.expr.eval(env);
+        CoolObject object = methodDeclaration.declaration.expr.eval(context);
         /**
          * 退出scope
          */
-        env.symbolTable.exitScope();
+        context.environment.exitScope();
         return object;
     }
 }

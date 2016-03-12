@@ -1,6 +1,6 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolObject;
@@ -48,11 +48,11 @@ public class Cond extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        if (((CoolBool) condExpr.eval(env)).val) {
-            return thenExpr.eval(env);
+    public CoolObject eval(Context context) {
+        if (((CoolBool) condExpr.eval(context)).val) {
+            return thenExpr.eval(context);
         } else {
-            return elseExpr.eval(env);
+            return elseExpr.eval(context);
         }
     }
 }

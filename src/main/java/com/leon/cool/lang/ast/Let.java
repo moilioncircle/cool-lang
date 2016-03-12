@@ -1,6 +1,6 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
 
@@ -46,11 +46,11 @@ public class Let extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        env.symbolTable.enterScope();
-        attrDefs.forEach(e -> e.eval(env));
-        CoolObject object = expr.eval(env);
-        env.symbolTable.exitScope();
+    public CoolObject eval(Context context) {
+        context.environment.enterScope();
+        attrDefs.forEach(e -> e.eval(context));
+        CoolObject object = expr.eval(context);
+        context.environment.exitScope();
         return object;
     }
 }
