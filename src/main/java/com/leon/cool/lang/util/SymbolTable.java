@@ -1,4 +1,4 @@
-package com.leon.cool.lang.support;
+package com.leon.cool.lang.util;
 
 import com.leon.cool.lang.util.Stack;
 
@@ -29,7 +29,7 @@ public class SymbolTable<T> {
         if (tbl.isEmpty()) {
             System.out.println("addId: can't add a symbol without a scope.");
         }
-        ((LinkedHashMap) tbl.top()).put(id, info);
+        tbl.top().put(id, info);
     }
 
     public Optional<T> lookup(String sym) {

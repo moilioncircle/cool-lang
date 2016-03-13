@@ -1,4 +1,4 @@
-package com.leon.cool.lang.support;
+package com.leon.cool.lang.util;
 
 import com.leon.cool.lang.object.CoolObject;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @author leon on 16-3-13
  */
 public class Heap {
-    public static Map<CoolObject, Boolean> heap = new HashMap<>();
+    private static Map<CoolObject, Boolean> heap = new HashMap<>();
 
     public static void add(CoolObject obj) {
         System.out.println("$$add to heap:"+obj.type+"@"+obj.toString());

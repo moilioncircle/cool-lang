@@ -18,5 +18,5 @@ package com.leon.cool.lang.support;
  * @author leon on 15-10-11
  */
 public interface Dumpable {
-    public void dump();
+    void dump();
 }

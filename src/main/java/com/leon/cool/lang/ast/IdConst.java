@@ -47,7 +47,7 @@ public class IdConst extends Expression {
         if(tok.name.equals(Constant.SELF)){
             return context.selfObject;
         }else{
-            return (CoolObject) context.environment.lookup(tok.name).get();
+            return context.environment.lookup(tok.name).get();
         }
     }
 }

@@ -731,6 +731,7 @@ public class CoolParser {
         return (Expression) stack.pop();
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T getGenericElement(Stack<Object> stack) {
         try {
             return (T) stack.pop();

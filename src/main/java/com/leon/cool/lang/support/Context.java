@@ -1,6 +1,7 @@
 package com.leon.cool.lang.support;
 
 import com.leon.cool.lang.object.CoolObject;
+import com.leon.cool.lang.util.SymbolTable;
 
 /**
  * Copyright leon
@@ -21,9 +22,9 @@ import com.leon.cool.lang.object.CoolObject;
  */
 public class Context {
 
-    public CoolObject selfObject;
+    public final CoolObject selfObject;
 
-    public SymbolTable<CoolObject> environment;
+    public final SymbolTable<CoolObject> environment;
 
     public Context(CoolObject selfObject, SymbolTable<CoolObject> environment){
         this.selfObject = selfObject;

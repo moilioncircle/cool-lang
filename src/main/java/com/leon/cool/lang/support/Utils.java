@@ -9,8 +9,7 @@ import com.leon.cool.lang.object.CoolString;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
-import com.leon.cool.lang.util.Constant;
-import com.leon.cool.lang.util.Pos;
+import com.leon.cool.lang.util.*;
 import com.leon.cool.lang.util.Stack;
 
 import java.io.BufferedReader;
@@ -42,7 +41,7 @@ import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
  * @author leon on 15-10-15
  */
 public class Utils {
-    public static Properties messages = new Properties();
+    private static final Properties messages = new Properties();
 
     static {
         try (InputStream stream = Utils.class.getClassLoader().getResourceAsStream("messages.properties")) {
@@ -329,7 +328,7 @@ public class Utils {
         }
     }
 
-    public static BufferedReader reader() {
+    private static BufferedReader reader() {
         if (reader == null) {
             reader = new BufferedReader(new InputStreamReader(System.in));
         }
@@ -360,7 +359,7 @@ public class Utils {
         return id + Utils.mkString(params, Optional.of("("), ",", Optional.of(")"));
     }
 
-    public static String constructMethod(MethodDeclaration methodDeclaration) {
+    private static String constructMethod(MethodDeclaration methodDeclaration) {
         return constructMethod(methodDeclaration.methodName, methodDeclaration.paramTypes);
     }
 
@@ -604,7 +603,7 @@ public class Utils {
         return mkString(tks, Optional.<String>empty(), split, Optional.<String>empty());
     }
 
-    public static <T> String mkString(List<T> tks, Optional<String> beforeOpt, String split, Optional<String> endOpt) {
+    private static <T> String mkString(List<T> tks, Optional<String> beforeOpt, String split, Optional<String> endOpt) {
         Iterator<T> it = tks.iterator();
         StringBuilder sb = new StringBuilder();
         if (beforeOpt.isPresent()) {

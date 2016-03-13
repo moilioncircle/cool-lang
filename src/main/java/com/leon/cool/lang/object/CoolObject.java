@@ -2,7 +2,7 @@ package com.leon.cool.lang.object;
 
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.support.SymbolTable;
+import com.leon.cool.lang.util.SymbolTable;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.util.Constant;
