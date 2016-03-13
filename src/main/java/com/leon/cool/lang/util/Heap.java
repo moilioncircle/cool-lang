@@ -55,9 +55,9 @@ public class Heap {
      * 删除不可达对象，并将可达对象重新设置成false
      */
     public static void clearUnreachable() {
-        LOGGER.info("total object size:"+heap.size());
+        LOGGER.info("*Mark-Sweep GC* total object size:"+heap.size());
         Set<Map.Entry<CoolObject, Boolean>> sets = heap.entrySet().stream().filter(e -> e.getValue()).collect(Collectors.toSet());
-        LOGGER.info("reachable object size:"+sets.size());
+        LOGGER.info("*Mark-Sweep GC* reachable object size:"+sets.size());
         heap = new HashMap<>();
         sets.stream().forEach(e -> heap.put(e.getKey(), false));
     }
