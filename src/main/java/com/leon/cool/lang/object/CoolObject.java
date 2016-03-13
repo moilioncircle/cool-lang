@@ -30,7 +30,7 @@ public class CoolObject {
     /**
      * 对象内变量
      */
-    public SymbolTable variables = new SymbolTable();
+    public SymbolTable<CoolObject> variables = new SymbolTable<>();
 
     public CoolObject() {
 

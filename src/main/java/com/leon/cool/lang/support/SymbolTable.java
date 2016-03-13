@@ -7,8 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class SymbolTable {
-    private final Stack<HashMap<String, Object>> tbl;
+public class SymbolTable<T> {
+    private final Stack<HashMap<String, T>> tbl;
 
     public SymbolTable() {
         tbl = new Stack<>();
@@ -25,36 +25,44 @@ public class SymbolTable {
         tbl.pop();
     }
 
-    public void addId(String id, Object info) {
+    public void addId(String id, T info) {
         if (tbl.isEmpty()) {
             System.out.println("addId: can't add a symbol without a scope.");
         }
         ((LinkedHashMap) tbl.top()).put(id, info);
     }
 
-    public Optional<Object> lookup(String sym) {
+    public Optional<T> lookup(String sym) {
         if (tbl.isEmpty()) {
             System.out.println("lookup: no scope in symbol table.");
         }
         for (int i = 0; i < tbl.size(); i++) {
-            Object info = ((LinkedHashMap) tbl.elementAt(i)).get(sym);
+            T info = tbl.elementAt(i).get(sym);
             if (info != null) return Optional.of(info);
         }
         return Optional.empty();
     }
 
-    public void update(String sym, Object obj) {
+    public void update(String sym, T obj) {
         if (tbl.isEmpty()) {
             System.out.println("lookup: no scope in symbol table.");
         }
         for (int i = 0; i < tbl.size(); i++) {
-            if (((LinkedHashMap) tbl.elementAt(i)).containsKey(sym)) {
-                ((LinkedHashMap) tbl.elementAt(i)).put(sym, obj);
+            if (tbl.elementAt(i).containsKey(sym)) {
+                tbl.elementAt(i).put(sym, obj);
             }
         }
     }
 
-    public Optional<Map<String, Object>> topStack() {
+    public HashMap<String, T> elementAt(int index) {
+        return tbl.elementAt(index);
+    }
+
+    public int size() {
+        return tbl.size();
+    }
+
+    public Optional<Map<String, T>> topStack() {
         if (tbl.isEmpty()) {
             return Optional.empty();
         } else {

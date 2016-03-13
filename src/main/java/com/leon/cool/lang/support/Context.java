@@ -23,9 +23,9 @@ public class Context {
 
     public CoolObject selfObject;
 
-    public SymbolTable environment;
+    public SymbolTable<CoolObject> environment;
 
-    public Context(CoolObject selfObject, SymbolTable environment){
+    public Context(CoolObject selfObject, SymbolTable<CoolObject> environment){
         this.selfObject = selfObject;
         this.environment = environment;
     }

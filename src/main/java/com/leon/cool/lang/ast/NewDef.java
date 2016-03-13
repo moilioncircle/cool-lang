@@ -51,6 +51,6 @@ public class NewDef extends Expression {
         } else {
             type = TypeFactory.objectType(this.type.name);
         }
-        return Utils.newDef(type);
+        return Utils.newDef(type,context);
     }
 }

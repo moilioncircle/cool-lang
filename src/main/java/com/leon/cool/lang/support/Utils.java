@@ -55,12 +55,12 @@ public class Utils {
     public static Map<String, String> classGraph = new HashMap<>();
     private static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
     private static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
-    private static Map<String, SymbolTable> symbolTables = new HashMap<>();
+    private static Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
     private static BufferedReader reader;
 
     public static void createSymbolTable(String className) {
         if (!symbolTables.containsKey(className)) {
-            symbolTables.put(className, new SymbolTable());
+            symbolTables.put(className, new SymbolTable<>());
         }
     }
 
@@ -196,7 +196,7 @@ public class Utils {
         return methodGraph.get(className).stream().filter(e -> e.methodName.equals(methodName)).findFirst();
     }
 
-    public static SymbolTable lookupSymbolTable(String className) {
+    public static SymbolTable<String> lookupSymbolTable(String className) {
         return symbolTables.get(className);
     }
 
@@ -255,6 +255,11 @@ public class Utils {
         return name.equals(Constant.OBJECT);
     }
 
+    private static boolean isObjectType(Type typeInfo) {
+        return typeInfo.type() == TypeEnum.OBJECT;
+    }
+
+
     public static boolean isSelf(Token token) {
         return token.kind == ID && token.name.equals(Constant.SELF);
     }
@@ -310,6 +315,7 @@ public class Utils {
         methodGraph = new HashMap<>();
         attrGraph = new HashMap<>();
         symbolTables = new HashMap<>();
+        Heap.clear();
     }
 
     public static void close() {
@@ -358,7 +364,12 @@ public class Utils {
         return constructMethod(methodDeclaration.methodName, methodDeclaration.paramTypes);
     }
 
-    public static CoolObject newDef(Type type) {
+    /**
+     * @param type
+     * @param context
+     * @return
+     */
+    public static CoolObject newDef(Type type, Context context) {
         CoolObject object = ObjectFactory.coolObject();
         object.type = type;
 
@@ -395,7 +406,47 @@ public class Utils {
             }
         }
         initializer(object);
+        //垃圾回收
+//        gc(context);
+//        Heap.add(object);
         return object;
+    }
+
+    /**
+     * Mark-Sweep GC
+     *
+     * @param context
+     */
+    public static void gc(Context context) {
+        if (Heap.size() < Constant.GC_HEAP_SIZE) {
+            return;
+        }
+        SymbolTable<CoolObject> environment = context.environment;
+
+        //Mark
+        List<CoolObject> rootObjects = new ArrayList<>();
+        for (int i = 0; i < environment.size(); i++) {
+            rootObjects.addAll(environment.elementAt(i).values().stream().filter(e->isObjectType(e.type)).collect(Collectors.toList()));
+        }
+
+        while (!rootObjects.isEmpty()) {
+            CoolObject obj = rootObjects.remove(0);
+            Heap.canReach(obj);
+            SymbolTable<CoolObject> variables = obj.variables;
+            if (variables != null) {
+                for (int i = 0; i < variables.size(); i++) {
+                    Collection<CoolObject> values = variables.elementAt(i).values();
+                    for(CoolObject variable : values){
+                        //防止循环引用
+                        if(isObjectType(variable.type) && !Heap.isReach(variable)){
+                            rootObjects.add(variable);
+                        }
+                    }
+                }
+            }
+        }
+        //Sweep
+        Heap.clearUnreachable();
     }
 
     /**
