@@ -28,22 +28,23 @@ public class Heap {
     private static Map<CoolObject, Boolean> heap = new HashMap<>();
 
     public static void add(CoolObject obj) {
-        System.out.println("$$add to heap:"+obj.type+"@"+obj.toString());
         heap.put(obj, false);
     }
 
     public static void canReach(CoolObject obj) {
         if (heap.containsKey(obj)) {
             heap.put(obj, true);
+            return;
         }
-        System.out.println("$$can reach not found:"+obj.type+"@"+obj.toString());
     }
 
     public static boolean isReach(CoolObject obj){
         if(heap.containsKey(obj)){
             return heap.get(obj);
         }
-        System.out.println("$$is reach not found:"+obj.type+"@"+obj.toString());
+        /**
+         * 这里找不到必须返回true，如果返回false的话会有循环引用产生的死循环
+         */
         return true;
     }
 
@@ -51,15 +52,11 @@ public class Heap {
      * 删除不可达对象，并将可达对象重新设置成false
      */
     public static void clearUnreachable() {
-        System.out.println("total object size:"+heap.size());
+//        System.out.println("total object size:"+heap.size());
         Set<Map.Entry<CoolObject, Boolean>> sets = heap.entrySet().stream().filter(e -> e.getValue()).collect(Collectors.toSet());
-        System.out.println("reachable object size:"+sets.size());
+//        System.out.println("reachable object size:"+sets.size());
         heap = new HashMap<>();
         sets.stream().forEach(e -> heap.put(e.getKey(), false));
-    }
-
-    public static void dump() {
-        heap.entrySet().stream().forEach(System.out::println);
     }
 
     public static int size() {

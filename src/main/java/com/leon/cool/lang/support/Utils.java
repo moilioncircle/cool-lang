@@ -406,8 +406,8 @@ public class Utils {
         }
         initializer(object);
         //垃圾回收
-//        gc(context);
-//        Heap.add(object);
+        gc(context);
+        Heap.add(object);
         return object;
     }
 
