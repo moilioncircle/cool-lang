@@ -5,6 +5,7 @@ import com.leon.cool.lang.object.CoolObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
  * @author leon on 16-3-13
  */
 public class Heap {
+    private static final Logger LOGGER = Logger.getLogger(Heap.class.getName());
+
     private static Map<CoolObject, Boolean> heap = new HashMap<>();
 
     public static void add(CoolObject obj) {
@@ -52,9 +55,9 @@ public class Heap {
      * 删除不可达对象，并将可达对象重新设置成false
      */
     public static void clearUnreachable() {
-//        System.out.println("total object size:"+heap.size());
+        LOGGER.info("total object size:"+heap.size());
         Set<Map.Entry<CoolObject, Boolean>> sets = heap.entrySet().stream().filter(e -> e.getValue()).collect(Collectors.toSet());
-//        System.out.println("reachable object size:"+sets.size());
+        LOGGER.info("reachable object size:"+sets.size());
         heap = new HashMap<>();
         sets.stream().forEach(e -> heap.put(e.getKey(), false));
     }
