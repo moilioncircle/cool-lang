@@ -1,7 +1,7 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
@@ -41,9 +41,9 @@ public class Mul extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        CoolInt l = (CoolInt) left.eval(env);
-        CoolInt r = (CoolInt) right.eval(env);
+    public CoolObject eval(Context context) {
+        CoolInt l = (CoolInt) left.eval(context);
+        CoolInt r = (CoolInt) right.eval(context);
         return ObjectFactory.coolInt(l.val * r.val);
     }
 

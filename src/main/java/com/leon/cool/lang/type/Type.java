@@ -18,9 +18,9 @@ package com.leon.cool.lang.type;
  * @author leon on 15-10-14
  */
 public interface Type {
-    public abstract TypeEnum type();
+    TypeEnum type();
 
-    public abstract Type replace();
+    Type replace();
 
-    public abstract String className();
+    String className();
 }

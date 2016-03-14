@@ -156,7 +156,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyAttrDef(AttrDef attrDef) {
         super.applyAttrDef(attrDef);
         if (attrDef.expr.isPresent()) {
-            Type t0 = TypeFactory.objectType((String) Utils.lookupSymbolTable(className).lookup(attrDef.id.name).get(), className);
+            Type t0 = TypeFactory.objectType(Utils.lookupSymbolTable(className).lookup(attrDef.id.name).get(), className);
             Type t1 = attrDef.expr.get().typeInfo;
             if (!Utils.isParent(t1, t0)) {
                 reportTypeCheckError("type.error.subclass", t1.toString(), t0.toString(), Utils.errorPos(attrDef));
@@ -368,9 +368,9 @@ public class TypeCheckTreeScanner extends TreeScanner {
     }
 
     public void applyIdConst(IdConst idConst) {
-        Optional<Object> type = Utils.lookupSymbolTable(className).lookup(idConst.tok.name);
+        Optional<String> type = Utils.lookupSymbolTable(className).lookup(idConst.tok.name);
         if (type.isPresent()) {
-            String typeStr = (String) type.get();
+            String typeStr = type.get();
             if (!Utils.isTypeDefined(typeStr)) {
                 reportTypeCheckError("type.error.type.undefined", className, typeStr, Utils.errorPos(idConst));
                 idConst.typeInfo = TypeFactory.noType();

@@ -1,6 +1,6 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.tokenizer.Token;
@@ -43,7 +43,7 @@ public class Program extends TreeNode {
 
     public CoolObject run() {
         Expression staticDispatch = new StaticDispatch(new NewDef(new Token("Main", TokenKind.TYPE)), Optional.<Token>empty(), new StaticDispatchBody(new Token("main", TokenKind.ID), new ArrayList<>()));
-        return staticDispatch.eval(new Env());
+        return staticDispatch.eval(new Context(null,null));
     }
 
     @Override

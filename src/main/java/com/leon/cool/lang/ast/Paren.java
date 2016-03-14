@@ -1,6 +1,6 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
 
@@ -41,7 +41,7 @@ public class Paren extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        return expr.eval(env);
+    public CoolObject eval(Context context) {
+        return expr.eval(context);
     }
 }

@@ -1,7 +1,7 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolObject;
@@ -43,8 +43,8 @@ public class Not extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        CoolBool bool = (CoolBool) expr.eval(env);
+    public CoolObject eval(Context context) {
+        CoolBool bool = (CoolBool) expr.eval(context);
         return ObjectFactory.coolBool(!bool.val);
     }
 }

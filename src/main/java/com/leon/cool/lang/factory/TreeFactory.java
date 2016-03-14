@@ -34,6 +34,7 @@ public class TreeFactory {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends TreeNode> T setPos(TreeNode node) {
         node.starPos = this.startPos;
         node.endPos = this.endPos;

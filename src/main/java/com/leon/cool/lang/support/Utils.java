@@ -3,12 +3,13 @@ package com.leon.cool.lang.support;
 import com.leon.cool.lang.ast.TreeNode;
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.factory.TypeFactory;
+import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
+import com.leon.cool.lang.object.CoolString;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
-import com.leon.cool.lang.util.Constant;
-import com.leon.cool.lang.util.Pos;
+import com.leon.cool.lang.util.*;
 import com.leon.cool.lang.util.Stack;
 
 import java.io.BufferedReader;
@@ -24,13 +25,13 @@ import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
 
 /**
  * Copyright leon
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +41,7 @@ import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
  * @author leon on 15-10-15
  */
 public class Utils {
-    public static Properties messages = new Properties();
+    private static final Properties messages = new Properties();
 
     static {
         try (InputStream stream = Utils.class.getClassLoader().getResourceAsStream("messages.properties")) {
@@ -53,12 +54,12 @@ public class Utils {
     public static Map<String, String> classGraph = new HashMap<>();
     private static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
     private static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
-    private static Map<String, SymbolTable> symbolTables = new HashMap<>();
+    private static Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
     private static BufferedReader reader;
 
     public static void createSymbolTable(String className) {
         if (!symbolTables.containsKey(className)) {
-            symbolTables.put(className, new SymbolTable());
+            symbolTables.put(className, new SymbolTable<>());
         }
     }
 
@@ -112,6 +113,7 @@ public class Utils {
             Set<MethodDeclaration> parentDeclarations = methodGraph.get(parentClassName);
             for (MethodDeclaration declaration : methodDeclarations) {
                 parentDeclarations.forEach(e -> {
+                    //仅返回类型不同的话override错误
                     if (declaration.equals(e) && !declaration.returnType.equals(e.returnType)) {
                         Utils.error("global.error.override", className, constructMethod(declaration));
                     }
@@ -138,6 +140,7 @@ public class Utils {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
+                //参数重定义
                 if (Utils.lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
                     Utils.error("global.error.attr.redefined", className, attr.getKey(), parentClassName);
                 } else {
@@ -158,17 +161,41 @@ public class Utils {
         if (list.isEmpty()) {
             return Optional.empty();
         } else if (list.size() > 1) {
+            //包含多个方法（重载方法），则在重载方法中进一步选择
             return Utils.minimumMethodDeclaration(list, className, typeInfo);
         } else {
             return Optional.of(list.get(0));
         }
     }
 
+    private static Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
+        MethodDeclaration min = new MethodDeclaration();
+        min.paramTypes = typeInfo.stream().map(e -> Constant.OBJECT).collect(Collectors.toList());
+        label:
+        for (MethodDeclaration declaration : list) {
+            for (int i = 0; i < declaration.paramTypes.size(); i++) {
+                if (!Utils.isParent(TypeFactory.objectType(declaration.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
+                    continue label;
+                }
+            }
+            min = declaration;
+        }
+        for (MethodDeclaration declaration : list) {
+            for (int i = 0; i < declaration.paramTypes.size(); i++) {
+                if (!Utils.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(declaration.paramTypes.get(i), className))) {
+                    Utils.error("global.error.overload", className, mkString(list.stream().map(Utils::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
+                    return Optional.empty();
+                }
+            }
+        }
+        return Optional.of(min);
+    }
+
     public static Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName) {
         return methodGraph.get(className).stream().filter(e -> e.methodName.equals(methodName)).findFirst();
     }
 
-    public static SymbolTable lookupSymbolTable(String className) {
+    public static SymbolTable<String> lookupSymbolTable(String className) {
         return symbolTables.get(className);
     }
 
@@ -227,6 +254,11 @@ public class Utils {
         return name.equals(Constant.OBJECT);
     }
 
+    private static boolean isObjectType(Type typeInfo) {
+        return typeInfo.type() == TypeEnum.OBJECT;
+    }
+
+
     public static boolean isSelf(Token token) {
         return token.kind == ID && token.name.equals(Constant.SELF);
     }
@@ -243,6 +275,13 @@ public class Utils {
         return isBoolType(string) || isIntType(string) || isStringType(string);
     }
 
+    /**
+     * 判断两个类型是否存在父子关系
+     *
+     * @param typeInfo       子类型
+     * @param parentTypeInfo 父类型
+     * @return true：存在父子关系；false：不存在父子关系
+     */
     public static boolean isParent(Type typeInfo, Type parentTypeInfo) {
         if (typeInfo.type() == TypeEnum.NO_TYPE) {
             return true;
@@ -275,6 +314,7 @@ public class Utils {
         methodGraph = new HashMap<>();
         attrGraph = new HashMap<>();
         symbolTables = new HashMap<>();
+        Heap.clear();
     }
 
     public static void close() {
@@ -288,7 +328,7 @@ public class Utils {
         }
     }
 
-    public static BufferedReader reader() {
+    private static BufferedReader reader() {
         if (reader == null) {
             reader = new BufferedReader(new InputStreamReader(System.in));
         }
@@ -319,13 +359,20 @@ public class Utils {
         return id + Utils.mkString(params, Optional.of("("), ",", Optional.of(")"));
     }
 
-    public static String constructMethod(MethodDeclaration methodDeclaration) {
+    private static String constructMethod(MethodDeclaration methodDeclaration) {
         return constructMethod(methodDeclaration.methodName, methodDeclaration.paramTypes);
     }
 
-    public static CoolObject newDef(Type type) {
+    /**
+     * @param type
+     * @param context
+     * @return
+     */
+    public static CoolObject newDef(Type type, Context context) {
         CoolObject object = ObjectFactory.coolObject();
         object.type = type;
+
+        object.variables.enterScope();
 
         Stack<String> inheritsLinks = new Stack<>();
         String temp = type.className();
@@ -333,32 +380,167 @@ public class Utils {
             inheritsLinks.push(temp);
             temp = Utils.classGraph.get(temp);
         }
-
-        Env env1 = new Env();
-        env1.so = object;
-        env1.env = new SymbolTable();
-        env1.env.enterScope();
-
+        /**
+         * 遍历继承树，找到父类中的属性。
+         * 如果父类中的属性是String,Bool,Int类型，则对属性赋默认值.
+         * 如果不是上述类型，则赋值void
+         * String  = ""
+         * Bool = false
+         * Int = 0
+         * Object = void
+         */
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (isStringType(attr.getValue().type)) {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolStringDefault());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolStringDefault());
                 } else if (isBoolType(attr.getValue().type)) {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolBoolDefault());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolBoolDefault());
                 } else if (isIntType(attr.getValue().type)) {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolIntDefault());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolIntDefault());
                 } else {
-                    env1.env.addId(attr.getKey(), ObjectFactory.coolVoid());
+                    object.variables.addId(attr.getKey(), ObjectFactory.coolVoid());
                 }
             }
         }
-        object.env = env1;
-        initializer(env1);
+        initializer(object);
+        //垃圾回收
+        gc(context);
+        Heap.add(object);
         return object;
     }
 
+    /**
+     * Mark-Sweep GC
+     *
+     * @param context
+     */
+    public static void gc(Context context) {
+        if (Heap.size() < Constant.GC_HEAP_SIZE) {
+            return;
+        }
+        SymbolTable<CoolObject> environment = context.environment;
+
+        //Mark
+        List<CoolObject> rootObjects = new ArrayList<>();
+        for (int i = 0; i < environment.size(); i++) {
+            rootObjects.addAll(environment.elementAt(i).values().stream().filter(e->isObjectType(e.type)).collect(Collectors.toList()));
+        }
+
+        while (!rootObjects.isEmpty()) {
+            CoolObject obj = rootObjects.remove(0);
+            Heap.canReach(obj);
+            SymbolTable<CoolObject> variables = obj.variables;
+            if (variables != null) {
+                for (int i = 0; i < variables.size(); i++) {
+                    Collection<CoolObject> values = variables.elementAt(i).values();
+                    for(CoolObject variable : values){
+                        //防止循环引用
+                        if(isObjectType(variable.type) && !Heap.isReach(variable)){
+                            rootObjects.add(variable);
+                        }
+                    }
+                }
+            }
+        }
+        //Sweep
+        Heap.clearUnreachable();
+    }
+
+    /**
+     * @param object
+     * @see this.newDef(Type)
+     * <p>
+     * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
+     */
+    private static void initializer(CoolObject object) {
+        Stack<String> inheritsLinks = new Stack<>();
+        String temp = object.type.className();
+        while (temp != null) {
+            inheritsLinks.push(temp);
+            temp = Utils.classGraph.get(temp);
+        }
+        Context context = new Context(object, object.variables);
+        while (!inheritsLinks.isEmpty()) {
+            String parentClassName = inheritsLinks.pop();
+            Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
+            attrs.entrySet().forEach(attr -> {
+                if (attr.getValue().expr.isPresent()) {
+                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().eval(context));
+                }
+            });
+        }
+    }
+
+    /**
+     * build-in方法求值
+     *
+     * @param paramObjects
+     * @param obj
+     * @param methodDeclaration
+     * @param pos
+     * @return CoolObject
+     */
+    public static CoolObject buildIn(List<CoolObject> paramObjects, CoolObject obj, MethodDeclaration methodDeclaration, String pos) {
+        switch (methodDeclaration.belongs) {
+            case "Object":
+                if (methodDeclaration.methodName.equals("type_name")) {
+                    return ObjectFactory.coolString(obj.type.className());
+                } else if (methodDeclaration.methodName.equals("copy")) {
+                    return obj.copy();
+                } else if (methodDeclaration.methodName.equals("abort")) {
+                    return ObjectFactory.coolObject().abort();
+                }
+                break;
+            case "IO":
+                if (methodDeclaration.methodName.equals("out_string")) {
+                    System.out.print(((CoolString) paramObjects.get(0)).str);
+                    return obj;
+                } else if (methodDeclaration.methodName.equals("out_int")) {
+                    System.out.print(((CoolInt) paramObjects.get(0)).val);
+                    return obj;
+                } else if (methodDeclaration.methodName.equals("in_string")) {
+                    try {
+                        String str = Utils.reader().readLine();
+                        return ObjectFactory.coolString(str);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Utils.error("unexpected.error");
+                    }
+                    return ObjectFactory.coolStringDefault();
+                } else if (methodDeclaration.methodName.equals("in_int")) {
+                    try {
+                        String str = Utils.reader().readLine();
+                        return ObjectFactory.coolInt(Integer.parseInt(str));
+                    } catch (Exception e) {
+                        Utils.error("unexpected.error");
+                    }
+                    return ObjectFactory.coolIntDefault();
+                }
+                break;
+            case "String":
+                if (methodDeclaration.methodName.equals("length")) {
+                    return ((CoolString) obj).length();
+                } else if (methodDeclaration.methodName.equals("concat")) {
+                    return ((CoolString) obj).concat((CoolString) paramObjects.get(0));
+                } else if (methodDeclaration.methodName.equals("substr")) {
+                    return ((CoolString) obj).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1), pos);
+                }
+                break;
+        }
+        return null;
+    }
+
+    /**
+     * 求多个类型的最小公共父类型
+     *
+     * @param types
+     * @return 最小公共父类型
+     * @see com.leon.cool.lang.tree.TypeCheckTreeScanner
+     * @see com.leon.cool.lang.ast.CaseDef
+     * @see com.leon.cool.lang.ast.Cond
+     */
     public static Type lub(List<Type> types) {
         return types.stream().reduce(TypeFactory.noType(), (type1, type2) -> {
             if (type1.type() == TypeEnum.NO_TYPE) {
@@ -391,49 +573,6 @@ public class Utils {
         return TypeFactory.objectType(list1.stream().filter(list2::contains).findFirst().get());
     }
 
-    private static void initializer(Env env) {
-        env.env.addId(Constant.SELF, env.so);
-        Stack<String> inheritsLinks = new Stack<>();
-        String temp = env.so.type.className();
-        while (temp != null) {
-            inheritsLinks.push(temp);
-            temp = Utils.classGraph.get(temp);
-        }
-        while (!inheritsLinks.isEmpty()) {
-            String parentClassName = inheritsLinks.pop();
-            Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
-            attrs.entrySet().forEach(attr -> {
-                if (attr.getValue().expr.isPresent()) {
-                    env.env.addId(attr.getKey(), attr.getValue().expr.get().eval(env));
-                }
-            });
-        }
-    }
-
-    private static Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
-        MethodDeclaration min = new MethodDeclaration();
-        min.paramTypes = typeInfo.stream().map(e -> Constant.OBJECT).collect(Collectors.toList());
-        label:
-        for (MethodDeclaration e : list) {
-            for (int i = 0; i < e.paramTypes.size(); i++) {
-                if (!Utils.isParent(TypeFactory.objectType(e.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
-                    continue label;
-                }
-            }
-            min = e;
-        }
-        for (MethodDeclaration e : list) {
-            for (int i = 0; i < e.paramTypes.size(); i++) {
-                if (!Utils.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(e.paramTypes.get(i), className))) {
-                    Utils.error("global.error.overload", className, mkString(list.stream().map(Utils::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
-                    return Optional.empty();
-                }
-            }
-        }
-        return Optional.of(min);
-    }
-
-
     private static void checkCircleInherits(Map<String, String> classGraph) {
         Set<String> keys = classGraph.keySet();
         for (String key : keys) {
@@ -464,7 +603,7 @@ public class Utils {
         return mkString(tks, Optional.<String>empty(), split, Optional.<String>empty());
     }
 
-    public static <T> String mkString(List<T> tks, Optional<String> beforeOpt, String split, Optional<String> endOpt) {
+    private static <T> String mkString(List<T> tks, Optional<String> beforeOpt, String split, Optional<String> endOpt) {
         Iterator<T> it = tks.iterator();
         StringBuilder sb = new StringBuilder();
         if (beforeOpt.isPresent()) {

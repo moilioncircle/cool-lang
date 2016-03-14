@@ -1,10 +1,7 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.object.CoolString;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.MethodDeclaration;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.Token;
@@ -59,73 +56,49 @@ public class StaticDispatch extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        List<CoolObject> paramObjects = dispatch.params.stream().map(e -> e.eval(env)).collect(Collectors.toList());
+    public CoolObject eval(Context context) {
+        /**
+         * 对方法调用的参数求值
+         */
+        List<CoolObject> paramObjects = dispatch.params.stream().map(e -> e.eval(context)).collect(Collectors.toList());
+        /**
+         * 对上述参数表达式求得类型
+         */
         List<Type> paramTypes = paramObjects.stream().map(e -> e.type).collect(Collectors.toList());
         MethodDeclaration methodDeclaration;
-        CoolObject obj = expr.eval(env);
+        // expr[@TYPE].ID( [ expr [[, expr]] ∗ ] )对第一个expr求值
+        CoolObject obj = expr.eval(context);
         if (obj.type.type() == TypeEnum.VOID) {
             Utils.error("runtime.error.dispatch.void", Utils.errorPos(expr));
         }
+        //如果提供type，则根据type查找方法声明
+        //如果没提供type，则根据上述expr值的类型查找方法声明
         if (type.isPresent()) {
             methodDeclaration = Utils.lookupMethodDeclaration(type.get().name, dispatch.id.name, paramTypes).get();
         } else {
             methodDeclaration = Utils.lookupMethodDeclaration(obj.type.className(), dispatch.id.name, paramTypes).get();
         }
 
-        switch (methodDeclaration.belongs) {
-            case "Object":
-                if (methodDeclaration.methodName.equals("type_name")) {
-                    return ObjectFactory.coolString(obj.type.className());
-                } else if (methodDeclaration.methodName.equals("copy")) {
-                    return obj.copy();
-                } else if (methodDeclaration.methodName.equals("abort")) {
-                    return ObjectFactory.coolObject().abort();
-                }
-                break;
-            case "IO":
-                if (methodDeclaration.methodName.equals("out_string")) {
-                    System.out.print(((CoolString) paramObjects.get(0)).str);
-                    return obj;
-                } else if (methodDeclaration.methodName.equals("out_int")) {
-                    System.out.print(((CoolInt) paramObjects.get(0)).val);
-                    return obj;
-                } else if (methodDeclaration.methodName.equals("in_string")) {
-                    try {
-                        String str = Utils.reader().readLine();
-                        return ObjectFactory.coolString(str);
-                    } catch (Exception e) {
-                        Utils.error("unexpected.error");
-                    }
-                    return ObjectFactory.coolStringDefault();
-                } else if (methodDeclaration.methodName.equals("in_int")) {
-                    try {
-                        String str = Utils.reader().readLine();
-                        return ObjectFactory.coolInt(Integer.parseInt(str));
-                    } catch (Exception e) {
-                        Utils.error("unexpected.error");
-                    }
-                    return ObjectFactory.coolIntDefault();
-                }
-                break;
-            case "String":
-                if (methodDeclaration.methodName.equals("length")) {
-                    return ((CoolString) obj).length();
-                } else if (methodDeclaration.methodName.equals("concat")) {
-                    return ((CoolString) obj).concat((CoolString) paramObjects.get(0));
-                } else if (methodDeclaration.methodName.equals("substr")) {
-                    return ((CoolString) obj).substr((CoolInt) paramObjects.get(0), (CoolInt) paramObjects.get(1), Utils.errorPos(starPos, endPos));
-                }
-                break;
-        }
+        CoolObject str = Utils.buildIn(paramObjects, obj, methodDeclaration, Utils.errorPos(starPos, endPos));
+        if (str != null) return str;
 
-        obj.env.env.enterScope();
+        /**
+         * 进入scope,此scope是上述expr值对象的scope
+         */
+        obj.variables.enterScope();
         assert paramObjects.size() == methodDeclaration.declaration.formals.size();
+        /**
+         * 绑定形参
+         */
         for (int i = 0; i < methodDeclaration.declaration.formals.size(); i++) {
-            obj.env.env.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
+            obj.variables.addId(methodDeclaration.declaration.formals.get(i).id.name, paramObjects.get(i));
         }
-        CoolObject object = methodDeclaration.declaration.expr.eval(obj.env);
-        obj.env.env.exitScope();
+        //对函数体求值
+        CoolObject object = methodDeclaration.declaration.expr.eval(new Context(obj,obj.variables));
+        /**
+         * 退出scope
+         */
+        obj.variables.exitScope();
         return object;
     }
 }

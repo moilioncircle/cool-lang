@@ -29,4 +29,6 @@ public class Constant {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
 
+    public static final int GC_HEAP_SIZE = 10;
+
 }

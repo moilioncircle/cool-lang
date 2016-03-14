@@ -2,7 +2,7 @@ package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tree.TreeVisitor;
@@ -52,20 +52,20 @@ public class LetAttrDef extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
+    public CoolObject eval(Context context) {
         if (expr.isPresent()) {
-            env.env.addId(id.name, expr.get().eval(env));
+            context.environment.addId(id.name, expr.get().eval(context));
         } else {
             if (Utils.isStringType(type)) {
-                env.env.addId(id.name, ObjectFactory.coolStringDefault());
+                context.environment.addId(id.name, ObjectFactory.coolStringDefault());
             } else if (Utils.isIntType(type)) {
-                env.env.addId(id.name, ObjectFactory.coolIntDefault());
+                context.environment.addId(id.name, ObjectFactory.coolIntDefault());
             } else if (Utils.isBoolType(type)) {
-                env.env.addId(id.name, ObjectFactory.coolBoolDefault());
+                context.environment.addId(id.name, ObjectFactory.coolBoolDefault());
             } else {
-                env.env.addId(id.name, ObjectFactory.coolVoid());
+                context.environment.addId(id.name, ObjectFactory.coolVoid());
             }
         }
-        return env.so;
+        return context.selfObject;
     }
 }

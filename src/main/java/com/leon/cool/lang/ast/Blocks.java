@@ -1,7 +1,7 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
 
@@ -44,10 +44,10 @@ public class Blocks extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
+    public CoolObject eval(Context context) {
         CoolObject object = ObjectFactory.coolVoid();
         for (Expression expr : exprs) {
-            object = expr.eval(env);
+            object = expr.eval(context);
         }
         return object;
     }

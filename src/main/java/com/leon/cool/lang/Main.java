@@ -28,29 +28,33 @@ import com.leon.cool.lang.util.FileUtils;
  */
 public class Main {
     public static void run(String str) {
-        CoolTokenizer tokenizer = new CoolTokenizer(str.toCharArray());
-        CoolScanner scanner = new CoolScanner(tokenizer);
-        CoolParser parser = new CoolParser(scanner, new TreeFactory());
-        Program expr = parser.parseProgram();
-        if (!parser.errMsgs.isEmpty()) {
-            parser.errMsgs.forEach(System.err::println);
-            return;
+        try{
+            CoolTokenizer tokenizer = new CoolTokenizer(str.toCharArray());
+            CoolScanner scanner = new CoolScanner(tokenizer);
+            CoolParser parser = new CoolParser(scanner, new TreeFactory());
+            Program expr = parser.parseProgram();
+            if (!parser.errMsgs.isEmpty()) {
+                parser.errMsgs.forEach(System.err::println);
+                return;
+            }
+            expr.accept(new ClassGraphTreeScanner());
+            expr.accept(new MethodDefTreeScanner());
+            expr.accept(new ParentMethodDefTreeScanner());
+            expr.accept(new AttrDefTreeScanner());
+            expr.accept(new ParentAttrDefTreeScanner());
+            TypeCheckTreeScanner typeCheckTreeScanner = new TypeCheckTreeScanner();
+            expr.accept(typeCheckTreeScanner);
+            if (!typeCheckTreeScanner.errMsgs.isEmpty()) {
+                typeCheckTreeScanner.errMsgs.forEach(System.err::println);
+                return;
+            }
+            //expr.accept(new PrintTypeInfoTreeScanner());
+            expr.run();
+        }finally {
+            Utils.clear();
+            Utils.close();
         }
-        expr.accept(new ClassGraphTreeScanner());
-        expr.accept(new MethodDefTreeScanner());
-        expr.accept(new ParentMethodDefTreeScanner());
-        expr.accept(new AttrDefTreeScanner());
-        expr.accept(new ParentAttrDefTreeScanner());
-        TypeCheckTreeScanner typeCheckTreeScanner = new TypeCheckTreeScanner();
-        expr.accept(typeCheckTreeScanner);
-        if (!typeCheckTreeScanner.errMsgs.isEmpty()) {
-            typeCheckTreeScanner.errMsgs.forEach(System.err::println);
-            return;
-        }
-        //expr.accept(new PrintTypeInfoTreeScanner());
-        expr.run();
-        Utils.clear();
-        Utils.close();
+
     }
 
     public static void main(String[] args) {

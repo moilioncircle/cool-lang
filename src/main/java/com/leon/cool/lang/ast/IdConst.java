@@ -1,9 +1,10 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.support.Env;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.tokenizer.Token;
+import com.leon.cool.lang.util.Constant;
 
 /**
  * Copyright leon
@@ -42,7 +43,11 @@ public class IdConst extends Expression {
     }
 
     @Override
-    public CoolObject eval(Env env) {
-        return (CoolObject) env.env.lookup(tok.name).get();
+    public CoolObject eval(Context context) {
+        if(tok.name.equals(Constant.SELF)){
+            return context.selfObject;
+        }else{
+            return context.environment.lookup(tok.name).get();
+        }
     }
 }
