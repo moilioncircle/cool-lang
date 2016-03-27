@@ -6,14 +6,28 @@ import com.leon.cool.lang.ast.Feature;
 import com.leon.cool.lang.factory.TreeFactory;
 import com.leon.cool.lang.tokenizer.Token;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.leon.cool.lang.tokenizer.TokenKind.ID;
 import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
 
+/**
+ * Copyright leon
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author leon on 15-10-28
+ */
 public class ClassTable {
     private final TreeFactory f = new TreeFactory();
 
@@ -43,20 +57,21 @@ public class ClassTable {
      *     substr(Int,Int):String
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<ClassDef> installBasicClasses() {
         List<ClassDef> classDefs = new ArrayList<>();
         List<Feature> features = new ArrayList<>();
-        features.add(f.methodDef(new Token("abort", ID), Arrays.asList(), new Token("Object", TYPE), f.noExpression()));
-        features.add(f.methodDef(new Token("type_name", ID), Arrays.asList(), new Token("String", TYPE), f.noExpression()));
-        features.add(f.methodDef(new Token("copy", ID), Arrays.asList(), new Token("SELF_TYPE", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("abort", ID), Collections.EMPTY_LIST, new Token("Object", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("type_name", ID), Collections.EMPTY_LIST, new Token("String", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("copy", ID), Collections.EMPTY_LIST, new Token("SELF_TYPE", TYPE), f.noExpression()));
         ClassDef objectDef = f.classDef(new Token("Object", TYPE), Optional.<Token>empty(), features);
         classDefs.add(objectDef);
 
         features = new ArrayList<>();
-        features.add(f.methodDef(new Token("out_string", ID), Arrays.asList(f.formal(new Token("arg", ID), new Token("String", TYPE))), new Token("SELF_TYPE", TYPE), f.noExpression()));
-        features.add(f.methodDef(new Token("out_int", ID), Arrays.asList(f.formal(new Token("arg", ID), new Token("Int", TYPE))), new Token("SELF_TYPE", TYPE), f.noExpression()));
-        features.add(f.methodDef(new Token("in_string", ID), Arrays.asList(), new Token("String", TYPE), f.noExpression()));
-        features.add(f.methodDef(new Token("in_int", ID), Arrays.asList(), new Token("Int", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("out_string", ID), Collections.singletonList(f.formal(new Token("arg", ID), new Token("String", TYPE))), new Token("SELF_TYPE", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("out_int", ID), Collections.singletonList(f.formal(new Token("arg", ID), new Token("Int", TYPE))), new Token("SELF_TYPE", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("in_string", ID), Collections.EMPTY_LIST, new Token("String", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("in_int", ID), Collections.EMPTY_LIST, new Token("Int", TYPE), f.noExpression()));
         ClassDef ioDef = f.classDef(new Token("IO", TYPE), Optional.of(new Token("Object", TYPE)), features);
         classDefs.add(ioDef);
 
@@ -73,8 +88,8 @@ public class ClassTable {
         features = new ArrayList<>();
         features.add(f.attrDef(new Token("val", ID), new Token("Int", TYPE), Optional.<Expression>empty()));
         features.add(f.attrDef(new Token("str_field", ID), new Token("String", TYPE), Optional.<Expression>empty()));
-        features.add(f.methodDef(new Token("length", ID), Arrays.asList(), new Token("Int", TYPE), f.noExpression()));
-        features.add(f.methodDef(new Token("concat", ID), Arrays.asList(f.formal(new Token("arg", ID), new Token("String", TYPE))), new Token("String", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("length", ID), Collections.EMPTY_LIST, new Token("Int", TYPE), f.noExpression()));
+        features.add(f.methodDef(new Token("concat", ID), Collections.singletonList(f.formal(new Token("arg", ID), new Token("String", TYPE))), new Token("String", TYPE), f.noExpression()));
         features.add(f.methodDef(new Token("substr", ID), Arrays.asList(f.formal(new Token("arg", ID), new Token("Int", TYPE)), f.formal(new Token("arg2", ID), new Token("Int", TYPE))), new Token("String", TYPE), f.noExpression()));
         ClassDef stringDef = f.classDef(new Token("String", TYPE), Optional.of(new Token("Object", TYPE)), features);
         classDefs.add(stringDef);

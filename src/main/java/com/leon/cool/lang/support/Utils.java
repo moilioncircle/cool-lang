@@ -7,6 +7,7 @@ import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
 import com.leon.cool.lang.tokenizer.Token;
+import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
 import com.leon.cool.lang.util.*;
@@ -335,11 +336,11 @@ public class Utils {
         return reader;
     }
 
-    public static void error(String key, String... params) {
+    public static void error(String key, Object... params) {
         throw new RuntimeException(errorMsg(key, params));
     }
 
-    public static String errorMsg(String key, String... params) {
+    public static String errorMsg(String key, Object... params) {
         return MessageFormat.format(messages.getProperty(key), params);
     }
 
@@ -364,11 +365,12 @@ public class Utils {
     }
 
     /**
+     * @param visitor
      * @param type
      * @param context
      * @return
      */
-    public static CoolObject newDef(Type type, Context context) {
+    public static CoolObject newDef(EvalTreeVisitor visitor,Type type, Context context) {
         CoolObject object = ObjectFactory.coolObject();
         object.type = type;
 
@@ -404,7 +406,7 @@ public class Utils {
                 }
             }
         }
-        initializer(object);
+        initializer(visitor,object);
         //垃圾回收
         gc(context);
         Heap.add(object);
@@ -449,12 +451,13 @@ public class Utils {
     }
 
     /**
+     * @param visitor
      * @param object
      * @see this.newDef(Type)
      * <p>
      * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
      */
-    private static void initializer(CoolObject object) {
+    private static void initializer(EvalTreeVisitor visitor,CoolObject object) {
         Stack<String> inheritsLinks = new Stack<>();
         String temp = object.type.className();
         while (temp != null) {
@@ -467,7 +470,7 @@ public class Utils {
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             attrs.entrySet().forEach(attr -> {
                 if (attr.getValue().expr.isPresent()) {
-                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().eval(context));
+                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().accept(visitor,context));
                 }
             });
         }

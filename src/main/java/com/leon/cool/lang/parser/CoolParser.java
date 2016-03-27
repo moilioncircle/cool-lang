@@ -21,13 +21,13 @@ import static com.leon.cool.lang.tokenizer.TokenKind.*;
 
 /**
  * Copyright leon
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -452,8 +452,7 @@ public class CoolParser {
                     } while (isToken(COMMA));
                     accept(IN);
                     expr = parseExpr();
-                    Expression letExpr = f.at(startPos, expr.endPos).let(attrDefs, expr);
-                    returnExpr = letExpr;
+                    returnExpr = f.at(startPos, expr.endPos).let(attrDefs, expr);
                 }
                 break;
             case LBRACE:
@@ -640,6 +639,7 @@ public class CoolParser {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
                             Token type = this.getGenericElement(stack);
                             Expression expr = this.getGenericElement(stack);
+                            assert type != null;
                             stack.push(f.at(startPos, endPos).staticDispatch(expr, Optional.of(type), dispatch));
                             i++;
                         } else {
@@ -647,6 +647,7 @@ public class CoolParser {
                             Expression expr = this.getGenericElement(stack);
                             // self.doSomething() equals to doSomething(). this is totally for simple tail-recursive optimization.
                             if (expr instanceof IdConst && Utils.isSelf(((IdConst) expr).tok)) {
+                                assert dispatch != null;
                                 stack.push(f.at(startPos, endPos).dispatch(dispatch.id, dispatch.params));
                             } else {
                                 stack.push(f.at(startPos, endPos).staticDispatch(expr, Optional.empty(), dispatch));
@@ -818,11 +819,13 @@ public class CoolParser {
                 tk3.accepts(scanner.token(lookAhead + 3).kind);
     }
 
-    private boolean peekToken(Filter<TokenKind>... kinds) {
+    @SafeVarargs
+    private final boolean peekToken(Filter<TokenKind>... kinds) {
         return peekToken(0, kinds);
     }
 
-    private boolean peekToken(int lookAhead, Filter<TokenKind>... kinds) {
+    @SafeVarargs
+    private final boolean peekToken(int lookAhead, Filter<TokenKind>... kinds) {
         for (; lookAhead < kinds.length; lookAhead++) {
             if (!kinds[lookAhead].accepts(scanner.token(lookAhead + 1).kind)) {
                 return false;

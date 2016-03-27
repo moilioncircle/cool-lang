@@ -3,6 +3,7 @@ package com.leon.cool.lang;
 import com.leon.cool.lang.ast.Program;
 import com.leon.cool.lang.factory.TreeFactory;
 import com.leon.cool.lang.parser.CoolParser;
+import com.leon.cool.lang.support.Context;
 import com.leon.cool.lang.support.Utils;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.CoolTokenizer;
@@ -11,13 +12,13 @@ import com.leon.cool.lang.util.FileUtils;
 
 /**
  * Copyright leon
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +29,7 @@ import com.leon.cool.lang.util.FileUtils;
  */
 public class Main {
     public static void run(String str) {
-        try{
+        try {
             CoolTokenizer tokenizer = new CoolTokenizer(str.toCharArray());
             CoolScanner scanner = new CoolScanner(tokenizer);
             CoolParser parser = new CoolParser(scanner, new TreeFactory());
@@ -49,8 +50,8 @@ public class Main {
                 return;
             }
             //expr.accept(new PrintTypeInfoTreeScanner());
-            expr.run();
-        }finally {
+            expr.accept(new EvalTreeScanner(), new Context(null, null));
+        } finally {
             Utils.clear();
             Utils.close();
         }
