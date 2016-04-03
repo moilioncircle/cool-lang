@@ -370,7 +370,7 @@ public class Utils {
      * @param context
      * @return
      */
-    public static CoolObject newDef(EvalTreeVisitor visitor,Type type, Context context) {
+    public static CoolObject newDef(EvalTreeVisitor visitor, Type type, Context context) {
         CoolObject object = ObjectFactory.coolObject();
         object.type = type;
 
@@ -393,7 +393,7 @@ public class Utils {
          */
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
-            Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
+            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (isStringType(attr.getValue().type)) {
                     object.variables.addId(attr.getKey(), ObjectFactory.coolStringDefault());
@@ -406,7 +406,7 @@ public class Utils {
                 }
             }
         }
-        initializer(visitor,object);
+        initializer(visitor, object);
         //垃圾回收
         gc(context);
         Heap.add(object);
@@ -427,7 +427,7 @@ public class Utils {
         //Mark
         List<CoolObject> rootObjects = new ArrayList<>();
         for (int i = 0; i < environment.size(); i++) {
-            rootObjects.addAll(environment.elementAt(i).values().stream().filter(e->isObjectType(e.type)).collect(Collectors.toList()));
+            rootObjects.addAll(environment.elementAt(i).values().stream().filter(e -> isObjectType(e.type)).collect(Collectors.toList()));
         }
 
         while (!rootObjects.isEmpty()) {
@@ -437,9 +437,9 @@ public class Utils {
             if (variables != null) {
                 for (int i = 0; i < variables.size(); i++) {
                     Collection<CoolObject> values = variables.elementAt(i).values();
-                    for(CoolObject variable : values){
+                    for (CoolObject variable : values) {
                         //防止循环引用
-                        if(isObjectType(variable.type) && !Heap.isReach(variable)){
+                        if (isObjectType(variable.type) && !Heap.isReach(variable)) {
                             rootObjects.add(variable);
                         }
                     }
@@ -457,7 +457,7 @@ public class Utils {
      * <p>
      * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
      */
-    private static void initializer(EvalTreeVisitor visitor,CoolObject object) {
+    private static void initializer(EvalTreeVisitor visitor, CoolObject object) {
         Stack<String> inheritsLinks = new Stack<>();
         String temp = object.type.className();
         while (temp != null) {
@@ -467,10 +467,10 @@ public class Utils {
         Context context = new Context(object, object.variables);
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
-            Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
+            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
             attrs.entrySet().forEach(attr -> {
                 if (attr.getValue().expr.isPresent()) {
-                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().accept(visitor,context));
+                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().accept(visitor, context));
                 }
             });
         }
