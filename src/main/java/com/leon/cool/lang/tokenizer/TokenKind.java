@@ -1,7 +1,6 @@
 package com.leon.cool.lang.tokenizer;
 
 import com.leon.cool.lang.parser.Assoc;
-import com.leon.cool.lang.support.Dumpable;
 
 /**
  * Copyright leon
@@ -20,7 +19,7 @@ import com.leon.cool.lang.support.Dumpable;
  *
  * @author leon on 15-10-7
  */
-public enum TokenKind implements Filter<TokenKind>, Dumpable {
+public enum TokenKind implements Filter<TokenKind> {
     //
     ID(TokenTag.NAME), TYPE(TokenTag.TYPE), STRING(TokenTag.STR), INTEGER(TokenTag.NUM), COMMENT(TokenTag.COMMENT),
     //KEY WORDS
@@ -67,11 +66,6 @@ public enum TokenKind implements Filter<TokenKind>, Dumpable {
     @Override
     public boolean accepts(TokenKind that) {
         return this == that;
-    }
-
-    @Override
-    public void dump() {
-        System.out.println(this.toString());
     }
 
     @Override
