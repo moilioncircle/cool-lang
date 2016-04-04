@@ -38,7 +38,7 @@ public class TestPalindrome {
     public void test() {
         systemInMock.provideText("aabaa");
         String str = FileUtils.readJarFile("palindrome.cl");
-        Main.run(str);
+        Main.run("palindrome.cl",str);
         assertEquals("enter a string\n" +
                 "that was a palindrome\n",systemOutRule.getLog());
     }

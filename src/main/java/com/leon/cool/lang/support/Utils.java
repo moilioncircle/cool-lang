@@ -42,6 +42,11 @@ import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
  * @author leon on 15-10-15
  */
 public class Utils {
+
+    public static int STRING_INDEX = 0;
+
+    public static int INT_INDEX = 0;
+
     private static final Properties messages = new Properties();
 
     static {
@@ -53,8 +58,8 @@ public class Utils {
     }
 
     public static Map<String, String> classGraph = new HashMap<>();
-    private static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
-    private static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
+    public static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
+    public static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
     private static Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
     private static BufferedReader reader;
 
@@ -239,23 +244,23 @@ public class Utils {
         return name.equals(Constant.SELF_TYPE);
     }
 
-    private static boolean isStringType(String name) {
+    public static boolean isStringType(String name) {
         return name.equals(Constant.STRING);
     }
 
-    private static boolean isIntType(String name) {
+    public static boolean isIntType(String name) {
         return name.equals(Constant.INT);
     }
 
-    private static boolean isBoolType(String name) {
+    public static boolean isBoolType(String name) {
         return name.equals(Constant.BOOL);
     }
 
-    private static boolean isObjectType(String name) {
+    public static boolean isObjectType(String name) {
         return name.equals(Constant.OBJECT);
     }
 
-    private static boolean isObjectType(Type typeInfo) {
+    public static boolean isObjectType(Type typeInfo) {
         return typeInfo.type() == TypeEnum.OBJECT;
     }
 
@@ -272,7 +277,7 @@ public class Utils {
         return isBasicType(token.name);
     }
 
-    private static boolean isBasicType(String string) {
+    public static boolean isBasicType(String string) {
         return isBoolType(string) || isIntType(string) || isStringType(string);
     }
 
@@ -311,6 +316,8 @@ public class Utils {
 
     //clear method
     public static void clear() {
+        STRING_INDEX = 0;
+        INT_INDEX = 0;
         classGraph = new HashMap<>();
         methodGraph = new HashMap<>();
         attrGraph = new HashMap<>();

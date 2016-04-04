@@ -33,7 +33,7 @@ public class TestNewComplex {
     @Test
     public void test() {
         String str = FileUtils.readJarFile("new_complex.cl");
-        Main.run(str);
+        Main.run("new_complex.cl",str);
         assertEquals("=)\n" +
                 "=)\n",systemOutRule.getLog());
     }

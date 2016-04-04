@@ -53,7 +53,7 @@ public class TestCodeGenTreeScanner {
     @Test
     public void testApplySub() throws Exception {
         String str = FileUtils.readJarFile("tree/sub.cl");
-        Main.run(str);
+        Main.run("sub.cl",str);
     }
 
     @Test

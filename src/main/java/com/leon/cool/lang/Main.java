@@ -28,7 +28,8 @@ import com.leon.cool.lang.util.FileUtils;
  * @author leon on 15-10-8
  */
 public class Main {
-    public static void run(String str) {
+
+    public static void run(String fileName,String str) {
         try {
             CoolTokenizer tokenizer = new CoolTokenizer(str.toCharArray());
             CoolScanner scanner = new CoolScanner(tokenizer);
@@ -51,6 +52,8 @@ public class Main {
             }
             //expr.accept(new PrintTypeInfoTreeScanner());
             expr.accept(new EvalTreeScanner(), new Context(null, null));
+            expr.accept(new CodeConstantGenTreeScanner(fileName));
+            expr.accept(new CodeGenTreeScanner(fileName));
         } finally {
             Utils.clear();
             Utils.close();
@@ -61,6 +64,6 @@ public class Main {
     public static void main(String[] args) {
         System.out.println(args[0]);
         String str = FileUtils.readFile(args[0]);
-        Main.run(str);
+        Main.run(args[0],str);
     }
 }

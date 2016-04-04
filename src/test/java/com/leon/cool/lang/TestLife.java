@@ -38,6 +38,6 @@ public class TestLife {
     @Test
     public void test() throws InterruptedException {
         String str = FileUtils.readJarFile("life.cl");
-        Main.run(str);
+        Main.run("life.cl",str);
     }
 }

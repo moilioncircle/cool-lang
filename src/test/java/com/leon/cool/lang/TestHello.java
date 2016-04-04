@@ -32,7 +32,7 @@ public class TestHello {
     @org.junit.Test
     public void test() {
         String str = FileUtils.readJarFile("hello.cl");
-        Main.run(str);
+        Main.run("hello.cl",str);
         assertEquals("Hello, world! chen bao yi\n", systemOutRule.getLog());
     }
 }

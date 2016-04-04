@@ -37,7 +37,7 @@ public class TestArith {
     public void test() {
         systemInMock.provideText("q");
         String str = FileUtils.readJarFile("arith.cl");
-        Main.run(str);
+        Main.run("arith.cl",str);
         assertEquals("number 0 is even!\n" +
                 "Class type is now A\n" +
                 "\n" +

@@ -33,7 +33,7 @@ public class TestList {
     @Test
     public void test() {
         String str = FileUtils.readJarFile("list.cl");
-        Main.run(str);
+        Main.run("list.cl",str);
         assertEquals("5 4 3 2 1 \n" +
                 "4 3 2 1 \n" +
                 "3 2 1 \n" +

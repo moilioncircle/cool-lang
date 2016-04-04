@@ -33,7 +33,7 @@ public class TestIO {
     @Test
     public void test() {
         String str = FileUtils.readJarFile("io.cl");
-        Main.run(str);
+        Main.run("io.cl",str);
         assertEquals("A: Hello world\n" +
                 "B: Hello world\n" +
                 "C: Hello world\n" +

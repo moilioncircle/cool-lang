@@ -32,7 +32,7 @@ public class TestBookList {
     @org.junit.Test
     public void test() {
         String str = FileUtils.readJarFile("book_list.cl");
-        Main.run(str);
+        Main.run("book_list.cl",str);
         assertEquals("title:      The Top 100 CD_ROMs\n" +
                 "author:     Ulanoff\n" +
                 "periodical:  PC Magazine\n" +

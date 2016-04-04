@@ -21,6 +21,8 @@ public class Pos {
     public final int column;
     public final int row;
 
+    public static final Pos constPos = new Pos(-1, -1);
+
     public Pos(int column, int row) {
         this.column = column;
         this.row = row;

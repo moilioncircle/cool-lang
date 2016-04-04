@@ -38,7 +38,7 @@ public class TestFactorial {
     public void test() {
         systemInMock.provideLines("10");
         String str = FileUtils.readJarFile("factorial.cl");
-        Main.run(str);
+        Main.run("factorial.cl",str);
         assertEquals("Enter an integer greater-than or equal-to 0: The factorial of 10 is 3628800\n", systemOutRule.getLog());
     }
 }

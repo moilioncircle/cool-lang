@@ -20,9 +20,11 @@ package com.leon.cool.lang.util;
 public class Constant {
 
     public static final String OBJECT = "Object";
+    public static final String IO = "IO";
     public static final String STRING = "String";
     public static final String INT = "Int";
     public static final String BOOL = "Bool";
+    public static final String MAIN = "Main";
     public static final String SELF_TYPE = "SELF_TYPE";
 
     public static final String SELF = "self";
@@ -31,5 +33,17 @@ public class Constant {
     public static final String FALSE = "false";
 
     public static final int GC_HEAP_SIZE = 10;
+
+    public static final int INT_TAG = 2;
+
+    public static final int BOOL_TAG = 3;
+
+    public static final int STRING_TAG = 4;
+
+    public static final int OBJECT_TAG = 0;
+
+    public static final int IO_TAG = 1;
+
+    public static final int SELF_DEFINE_TAG = 5;
 
 }

@@ -1,26 +1,34 @@
 package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.*;
+import com.leon.cool.lang.support.AttrDeclaration;
+import com.leon.cool.lang.support.CgenSupport;
+import com.leon.cool.lang.support.ConstantPool;
+import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.util.Constant;
+import com.leon.cool.lang.util.Stack;
+
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.Map;
 
 /**
- * Copyright leon
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @author leon on 16-04-03
+ * Created by leon on 4/4/16.
  */
 public class CodeGenTreeScanner extends TreeScanner {
-    
+
+    private final PrintStream str;
+
+    public CodeGenTreeScanner(String fileName) {
+        str = System.err;
+        codeConstants();
+        codeClassNameTab();
+        codeClassObjTab();
+        codeDispTab();
+        codeProtObj();
+        codeGlobalText();
+    }
+
     @Override
     public void applyAssign(Assign assign) {
 
@@ -92,21 +100,6 @@ public class CodeGenTreeScanner extends TreeScanner {
     }
 
     @Override
-    public void applyStringConst(StringConst stringConst) {
-
-    }
-
-    @Override
-    public void applyBoolConst(BoolConst boolConst) {
-
-    }
-
-    @Override
-    public void applyIntConst(IntConst intConst) {
-
-    }
-
-    @Override
     public void applyParen(Paren paren) {
 
     }
@@ -159,5 +152,179 @@ public class CodeGenTreeScanner extends TreeScanner {
     @Override
     public void applyLetAttrDef(LetAttrDef letAttrDef) {
 
+    }
+
+    private void codeConstants() {
+        ConstantPool.getInstance().genConstantPool(str);
+    }
+
+    private void codeGlobalText() {
+        str.println(CgenSupport.GLOBAL + CgenSupport.HEAP_START);
+        str.print(CgenSupport.HEAP_START + CgenSupport.LABEL);
+        str.println(CgenSupport.WORD + 0);
+        str.println("\t.text");
+        str.print(CgenSupport.GLOBAL);
+        CgenSupport.emitInitRef("Main", str);
+        str.println("");
+        str.print(CgenSupport.GLOBAL);
+        CgenSupport.emitInitRef("Int", str);
+        str.println("");
+        str.print(CgenSupport.GLOBAL);
+        CgenSupport.emitInitRef("String", str);
+        str.println("");
+        str.print(CgenSupport.GLOBAL);
+        CgenSupport.emitInitRef("Bool", str);
+        str.println("");
+        str.print(CgenSupport.GLOBAL);
+        CgenSupport.emitMethodRef("Main", "main", str);
+        str.println("");
+    }
+
+    private void codeClassNameTab() {
+        str.print(CgenSupport.CLASSNAMETAB + CgenSupport.LABEL);
+        Utils.classGraph.keySet().forEach(e -> {
+            str.print(CgenSupport.WORD); // tag
+            ConstantPool.getInstance().addString(e).codeRef(str);
+            str.println();
+        });
+    }
+
+    private void codeClassObjTab() {
+        str.print(CgenSupport.CLASSOBJTAB + CgenSupport.LABEL);
+        Utils.classGraph.keySet().forEach(e -> {
+            str.print(CgenSupport.WORD);
+            CgenSupport.emitProtObjRef(e, str);
+            str.println();
+            str.print(CgenSupport.WORD);
+            CgenSupport.emitInitRef(e, str);
+            str.println();
+        });
+    }
+
+    private void codeDispTab() {
+        Utils.methodGraph.entrySet().forEach(e -> {
+            String className = e.getKey();
+            CgenSupport.emitDispTableRef(className, str);
+            str.print(CgenSupport.LABEL);
+
+            e.getValue().forEach(m -> {
+                str.print(CgenSupport.WORD);
+                CgenSupport.emitMethodRef(m.belongs, m.methodName, str);
+                str.println();
+            });
+        });
+    }
+
+    private void codeProtObj() {
+        // 0 Object
+        // 1 IO
+        // 2 Int
+        // 3 Bool
+        // 4 String
+        // 5+ self define class tag
+        int index = Constant.SELF_DEFINE_TAG;
+        for (String className : Utils.classGraph.keySet()) {
+            switch (className) {
+                case Constant.INT:
+                    str.println(CgenSupport.WORD + "-1");
+                    CgenSupport.emitProtObjRef(className, str);
+                    str.print(CgenSupport.LABEL);
+                    str.println(CgenSupport.WORD + Constant.INT_TAG); //tag
+                    str.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + CgenSupport.INT_SLOTS));
+                    str.println(CgenSupport.WORD + className + CgenSupport.DISPTAB_SUFFIX);
+                    str.println(CgenSupport.WORD + 0);
+                    break;
+                case Constant.BOOL:
+                    str.println(CgenSupport.WORD + "-1");
+                    CgenSupport.emitProtObjRef(className, str);
+                    str.print(CgenSupport.LABEL);
+                    str.println(CgenSupport.WORD + Constant.BOOL_TAG); //tag
+                    str.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + CgenSupport.BOOL_SLOTS));
+                    str.println(CgenSupport.WORD + className + CgenSupport.DISPTAB_SUFFIX);
+                    str.println(CgenSupport.WORD + 0);
+                    break;
+                case Constant.STRING:
+                    str.println(CgenSupport.WORD + "-1");
+                    CgenSupport.emitProtObjRef(className, str);
+                    str.print(CgenSupport.LABEL);
+                    str.println(CgenSupport.WORD + Constant.STRING_TAG); //tag
+                    str.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + CgenSupport.STRING_SLOTS + ("".length() + 4) / 4));
+                    str.println(CgenSupport.WORD + className + CgenSupport.DISPTAB_SUFFIX);
+                    //.word	int_const0
+                    IntConst intConst = ConstantPool.getInstance().addInt(0);
+                    str.print(CgenSupport.WORD);
+                    intConst.codeRef(str);
+                    str.println();
+                    str.println(CgenSupport.WORD + 0);
+                    break;
+                case Constant.OBJECT:
+                    str.println(CgenSupport.WORD + "-1");
+                    CgenSupport.emitProtObjRef(className, str);
+                    str.print(CgenSupport.LABEL);
+                    str.println(CgenSupport.WORD + Constant.OBJECT_TAG); //tag
+                    str.println(CgenSupport.WORD + CgenSupport.DEFAULT_OBJFIELDS);
+                    str.println(CgenSupport.WORD + className + CgenSupport.DISPTAB_SUFFIX);
+                    break;
+                case Constant.IO:
+                    str.println(CgenSupport.WORD + "-1");
+                    CgenSupport.emitProtObjRef(className, str);
+                    str.print(CgenSupport.LABEL);
+                    str.println(CgenSupport.WORD + Constant.IO_TAG); //tag
+                    str.println(CgenSupport.WORD + CgenSupport.DEFAULT_OBJFIELDS);
+                    str.println(CgenSupport.WORD + className + CgenSupport.DISPTAB_SUFFIX);
+                    break;
+                default:
+                    Stack<String> inheritsLinks = new Stack<>();
+                    String temp = className;
+                    int attrSize = 0;
+                    while (temp != null) {
+                        attrSize += Utils.attrGraph.get(temp).values().size();
+                        inheritsLinks.push(temp);
+                        temp = Utils.classGraph.get(temp);
+                    }
+
+                    str.println(CgenSupport.WORD + "-1");
+                    CgenSupport.emitProtObjRef(className, str);
+                    str.print(CgenSupport.LABEL);
+                    str.println(CgenSupport.WORD + index++); //tag
+                    str.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + attrSize));
+                    str.println(CgenSupport.WORD + className + CgenSupport.DISPTAB_SUFFIX);
+
+                    /**
+                     * 遍历继承树，找到父类中的属性。
+                     * 如果父类中的属性是String,Bool,Int类型，则对属性赋默认值.
+                     * 如果不是上述类型，则赋值void
+                     * String  = ""
+                     * Bool = false
+                     * Int = 0
+                     * Object = void
+                     */
+                    while (!inheritsLinks.isEmpty()) {
+                        String parentClassName = inheritsLinks.pop();
+                        Map<String, AttrDeclaration> attrs = Utils.attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
+                        for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
+                            if (Utils.isStringType(attr.getValue().type)) {
+                                StringConst stringConst = ConstantPool.getInstance().addString("");
+                                str.print(CgenSupport.WORD);
+                                stringConst.codeRef(str);
+                                str.println();
+                            } else if (Utils.isBoolType(attr.getValue().type)) {
+                                BoolConst boolConst = ConstantPool.getInstance().addBool(false);
+                                str.print(CgenSupport.WORD);
+                                boolConst.codeRef(str);
+                                str.println();
+                            } else if (Utils.isIntType(attr.getValue().type)) {
+                                intConst = ConstantPool.getInstance().addInt(0);
+                                str.print(CgenSupport.WORD);
+                                intConst.codeRef(str);
+                                str.println();
+                            } else {
+                                str.println(CgenSupport.WORD + 0);
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
     }
 }

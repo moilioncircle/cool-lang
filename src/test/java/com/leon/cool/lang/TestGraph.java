@@ -26,6 +26,6 @@ public class TestGraph {
     @Test
     public void test() {
         String str = FileUtils.readJarFile("graph.cl");
-        Main.run(str);
+        Main.run("graph.cl",str);
     }
 }
