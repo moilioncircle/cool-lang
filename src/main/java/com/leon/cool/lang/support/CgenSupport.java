@@ -349,15 +349,6 @@ public class CgenSupport {
     }
 
     /**
-     * Emits a call to gc_assign.
-     *
-     * @param s the output stream
-     */
-    public static void emitGCAssign(PrintStream s) {
-        s.println(JAL + "_GenGC_Assign");
-    }
-
-    /**
      * Emits a reference to dispatch table.
      *
      * @param sym the name of the class
@@ -562,31 +553,6 @@ public class CgenSupport {
      */
     public static void emitStoreInt(String source, String dest, PrintStream s) {
         emitStore(source, DEFAULT_OBJFIELDS, dest, s);
-    }
-
-    /**
-     * Emits code to manipulate garbage collector
-     *
-     * @param s the output stream
-     */
-    public static void emitTestCollector(PrintStream s) {
-        emitPush(ACC, s);
-        emitMove(ACC, SP, s);
-        emitMove(A1, ZERO, s);
-        //FIXME
-        //s.println(JAL + gcCollectNames[Flags.cgen_Memmgr]);
-        emitAddiu(SP, SP, 4, s);
-        emitLoad(ACC, 0, SP, s);
-    }
-
-    /**
-     * Emits code to check the garbage collector
-     *
-     * @param s the output stream
-     */
-    public static void emitGCCheck(String source, PrintStream s) {
-        if (source != A1) emitMove(A1, source, s);
-        s.println(JAL + "_gc_check");
     }
 
     private static boolean ascii = false;
