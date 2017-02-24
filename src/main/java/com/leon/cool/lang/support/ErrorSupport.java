@@ -1,8 +1,8 @@
 package com.leon.cool.lang.support;
 
 import com.leon.cool.lang.ast.TreeNode;
+import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tokenizer.Token;
-import com.leon.cool.lang.util.Pos;
 
 import java.io.IOException;
 import java.io.InputStream;

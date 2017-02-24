@@ -6,11 +6,10 @@ import com.leon.cool.lang.factory.TreeFactory;
 import com.leon.cool.lang.support.ErrorSupport;
 import com.leon.cool.lang.support.TypeSupport;
 import com.leon.cool.lang.support.infrastructure.ClassTable;
+import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tokenizer.CoolScanner;
-import com.leon.cool.lang.tokenizer.Filter;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tokenizer.TokenKind;
-import com.leon.cool.lang.util.Pos;
 import com.leon.cool.lang.util.Stack;
 import com.leon.cool.lang.util.StringUtil;
 
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.leon.cool.lang.tokenizer.TokenKind.*;
 
@@ -794,42 +794,42 @@ public class CoolParser {
         token = scanner.token();
     }
 
-    private boolean peekToken(Filter<TokenKind> tk) {
+    private boolean peekToken(Predicate<TokenKind> tk) {
         return peekToken(0, tk);
     }
 
-    private boolean peekToken(int lookAhead, Filter<TokenKind> tk) {
-        return tk.accepts(scanner.token(lookAhead + 1).kind);
+    private boolean peekToken(int lookAhead, Predicate<TokenKind> tk) {
+        return tk.test(scanner.token(lookAhead + 1).kind);
     }
 
-    private boolean peekToken(Filter<TokenKind> tk1, Filter<TokenKind> tk2) {
+    private boolean peekToken(Predicate<TokenKind> tk1, Predicate<TokenKind> tk2) {
         return peekToken(0, tk1, tk2);
     }
 
-    private boolean peekToken(int lookAhead, Filter<TokenKind> tk1, Filter<TokenKind> tk2) {
-        return tk1.accepts(scanner.token(lookAhead + 1).kind) &&
-                tk2.accepts(scanner.token(lookAhead + 2).kind);
+    private boolean peekToken(int lookAhead, Predicate<TokenKind> tk1, Predicate<TokenKind> tk2) {
+        return tk1.test(scanner.token(lookAhead + 1).kind) &&
+                tk2.test(scanner.token(lookAhead + 2).kind);
     }
 
-    private boolean peekToken(Filter<TokenKind> tk1, Filter<TokenKind> tk2, Filter<TokenKind> tk3) {
+    private boolean peekToken(Predicate<TokenKind> tk1, Predicate<TokenKind> tk2, Predicate<TokenKind> tk3) {
         return peekToken(0, tk1, tk2, tk3);
     }
 
-    private boolean peekToken(int lookAhead, Filter<TokenKind> tk1, Filter<TokenKind> tk2, Filter<TokenKind> tk3) {
-        return tk1.accepts(scanner.token(lookAhead + 1).kind) &&
-                tk2.accepts(scanner.token(lookAhead + 2).kind) &&
-                tk3.accepts(scanner.token(lookAhead + 3).kind);
+    private boolean peekToken(int lookAhead, Predicate<TokenKind> tk1, Predicate<TokenKind> tk2, Predicate<TokenKind> tk3) {
+        return tk1.test(scanner.token(lookAhead + 1).kind) &&
+                tk2.test(scanner.token(lookAhead + 2).kind) &&
+                tk3.test(scanner.token(lookAhead + 3).kind);
     }
 
     @SafeVarargs
-    private final boolean peekToken(Filter<TokenKind>... kinds) {
+    private final boolean peekToken(Predicate<TokenKind>... kinds) {
         return peekToken(0, kinds);
     }
 
     @SafeVarargs
-    private final boolean peekToken(int lookAhead, Filter<TokenKind>... kinds) {
+    private final boolean peekToken(int lookAhead, Predicate<TokenKind>... kinds) {
         for (; lookAhead < kinds.length; lookAhead++) {
-            if (!kinds[lookAhead].accepts(scanner.token(lookAhead + 1).kind)) {
+            if (!kinds[lookAhead].test(scanner.token(lookAhead + 1).kind)) {
                 return false;
             }
         }

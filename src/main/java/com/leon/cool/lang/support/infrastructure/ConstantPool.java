@@ -5,7 +5,6 @@ import com.leon.cool.lang.ast.IntConst;
 import com.leon.cool.lang.ast.StringConst;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tokenizer.TokenKind;
-import com.leon.cool.lang.util.Pos;
 
 import java.io.PrintStream;
 import java.util.LinkedHashMap;

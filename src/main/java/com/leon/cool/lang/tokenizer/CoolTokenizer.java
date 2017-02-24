@@ -2,7 +2,7 @@ package com.leon.cool.lang.tokenizer;
 
 import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.support.ErrorSupport;
-import com.leon.cool.lang.util.Pos;
+import com.leon.cool.lang.support.infrastructure.Pos;
 
 import java.util.ArrayList;
 import java.util.List;

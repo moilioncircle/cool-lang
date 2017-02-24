@@ -1,5 +1,7 @@
 package com.leon.cool.lang.type;
 
+import static com.leon.cool.lang.Constant.NO_TYPE;
+
 /**
  * Copyright leon
  * <p>
@@ -36,6 +38,6 @@ public class NoType implements Type {
 
     @Override
     public String toString() {
-        return "NoType";
+        return NO_TYPE;
     }
 }

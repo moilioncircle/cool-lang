@@ -72,7 +72,7 @@ public class CodeConstantGenTreeScanner extends TreeScanner {
         str.print("\t.data\n" + CgenSupport.ALIGN);
         str.println(CgenSupport.GLOBAL + CgenSupport.CLASSNAMETAB);
         str.print(CgenSupport.GLOBAL);
-        CgenSupport.emitProtObjRef(Constant.MAIN, str);
+        CgenSupport.emitProtObjRef(Constant.MAIN_CLASS, str);
         str.println();
         str.print(CgenSupport.GLOBAL);
         CgenSupport.emitProtObjRef(Constant.INT, str);

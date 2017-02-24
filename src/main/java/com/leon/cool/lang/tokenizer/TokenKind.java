@@ -2,6 +2,8 @@ package com.leon.cool.lang.tokenizer;
 
 import com.leon.cool.lang.parser.Assoc;
 
+import java.util.function.Predicate;
+
 /**
  * Copyright leon
  * <p>
@@ -19,7 +21,7 @@ import com.leon.cool.lang.parser.Assoc;
  *
  * @author leon on 15-10-7
  */
-public enum TokenKind implements Filter<TokenKind> {
+public enum TokenKind implements Predicate<TokenKind> {
     //
     ID(TokenTag.NAME), TYPE(TokenTag.TYPE), STRING(TokenTag.STR), INTEGER(TokenTag.NUM), COMMENT(TokenTag.COMMENT),
     //KEY WORDS
@@ -64,7 +66,7 @@ public enum TokenKind implements Filter<TokenKind> {
     }
 
     @Override
-    public boolean accepts(TokenKind that) {
+    public boolean test(TokenKind that) {
         return this == that;
     }
 

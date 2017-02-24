@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.leon.cool.lang.Constant.MAIN_CLASS;
+import static com.leon.cool.lang.Constant.MAIN_METHOD;
+
 /**
  * Copyright leon
  * <p>
@@ -49,7 +52,7 @@ public class Program extends TreeNode {
 
     @Override
     public CoolObject accept(EvalTreeVisitor visitor, Context context) {
-        Expression staticDispatch = new StaticDispatch(new NewDef(new Token("Main", TokenKind.TYPE)), Optional.<Token>empty(), new StaticDispatchBody(new Token("main", TokenKind.ID), new ArrayList<>()));
+        Expression staticDispatch = new StaticDispatch(new NewDef(new Token(MAIN_CLASS, TokenKind.TYPE)), Optional.empty(), new StaticDispatchBody(new Token(MAIN_METHOD, TokenKind.ID), new ArrayList<>()));
         return staticDispatch.accept(visitor, context);
     }
 }

@@ -1,4 +1,4 @@
-package com.leon.cool.lang.util;
+package com.leon.cool.lang.support.infrastructure;
 
 /**
  * Copyright leon

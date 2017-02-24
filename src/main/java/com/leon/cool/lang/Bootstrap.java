@@ -39,13 +39,13 @@ public class Bootstrap {
                 parser.errMsgs.forEach(System.err::println);
                 return;
             }
+            TypeCheckTreeScanner typeCheckTreeScanner;
             expr.accept(new ClassGraphTreeScanner(scannerSupport));
             expr.accept(new MethodDefTreeScanner(scannerSupport));
             expr.accept(new ParentMethodDefTreeScanner(scannerSupport));
             expr.accept(new AttrDefTreeScanner(scannerSupport));
             expr.accept(new ParentAttrDefTreeScanner(scannerSupport));
-            TypeCheckTreeScanner typeCheckTreeScanner = new TypeCheckTreeScanner(scannerSupport);
-            expr.accept(typeCheckTreeScanner);
+            expr.accept(typeCheckTreeScanner = new TypeCheckTreeScanner(scannerSupport));
             if (!typeCheckTreeScanner.errMsgs.isEmpty()) {
                 typeCheckTreeScanner.errMsgs.forEach(System.err::println);
                 return;

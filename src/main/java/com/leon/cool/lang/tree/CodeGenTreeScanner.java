@@ -13,6 +13,8 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.leon.cool.lang.Constant.*;
+
 /**
  * Created by leon on 4/4/16.
  */
@@ -166,19 +168,19 @@ public class CodeGenTreeScanner extends TreeScanner {
         str.println(CgenSupport.WORD + 0);
         str.println("\t.text");
         str.print(CgenSupport.GLOBAL);
-        CgenSupport.emitInitRef("Main", str);
+        CgenSupport.emitInitRef(MAIN_CLASS, str);
         str.println("");
         str.print(CgenSupport.GLOBAL);
-        CgenSupport.emitInitRef("Int", str);
+        CgenSupport.emitInitRef(INT, str);
         str.println("");
         str.print(CgenSupport.GLOBAL);
-        CgenSupport.emitInitRef("String", str);
+        CgenSupport.emitInitRef(STRING, str);
         str.println("");
         str.print(CgenSupport.GLOBAL);
-        CgenSupport.emitInitRef("Bool", str);
+        CgenSupport.emitInitRef(BOOL, str);
         str.println("");
         str.print(CgenSupport.GLOBAL);
-        CgenSupport.emitMethodRef("Main", "main", str);
+        CgenSupport.emitMethodRef(MAIN_CLASS, MAIN_METHOD, str);
         str.println("");
     }
 

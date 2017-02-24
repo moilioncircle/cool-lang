@@ -11,7 +11,7 @@ import java.util.Optional;
  */
 public class StringUtil {
     public static <T> String mkString(List<T> tks, String split) {
-        return mkString(tks, Optional.<String>empty(), split, Optional.<String>empty());
+        return mkString(tks, Optional.empty(), split, Optional.empty());
     }
 
     public static <T> String mkString(List<T> tks, Optional<String> beforeOpt, String split, Optional<String> endOpt) {

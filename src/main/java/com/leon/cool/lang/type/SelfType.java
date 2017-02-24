@@ -3,6 +3,8 @@ package com.leon.cool.lang.type;
 import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.support.ErrorSupport;
 
+import static com.leon.cool.lang.Constant.SELF_TYPE;
+
 /**
  * Copyright leon
  * <p>
@@ -61,6 +63,6 @@ public class SelfType implements Type {
 
     @Override
     public String toString() {
-        return "SELF_TYPE(" + type + ')';
+        return SELF_TYPE + "(" + type + ')';
     }
 }

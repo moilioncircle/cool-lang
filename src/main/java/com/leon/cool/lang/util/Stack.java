@@ -41,17 +41,12 @@ public class Stack<T> {
     }
 
     public T pop() {
-        if (isEmpty()) {
-            return null;
-        }
-
+        if (isEmpty()) return null;
         return list.remove(0);
     }
 
     public T top() {
-        if (isEmpty()) {
-            return null;
-        }
+        if (isEmpty()) return null;
         return list.get(0);
     }
 

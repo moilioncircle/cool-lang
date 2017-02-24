@@ -24,13 +24,17 @@ public class Constant {
     public static final String STRING = "String";
     public static final String INT = "Int";
     public static final String BOOL = "Bool";
-    public static final String MAIN = "Bootstrap";
     public static final String SELF_TYPE = "SELF_TYPE";
+    public static final String NO_TYPE = "NoType";
+    public static final String VOID = "Void";
 
     public static final String SELF = "self";
 
     public static final String TRUE = "true";
     public static final String FALSE = "false";
+
+    public static final String MAIN_CLASS = "Main";
+    public static final String MAIN_METHOD = "main";
 
     public static final int GC_HEAP_SIZE = 10;
 
