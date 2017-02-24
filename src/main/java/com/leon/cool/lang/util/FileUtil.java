@@ -23,48 +23,20 @@ public class FileUtil {
 
     public static String readJarFile(String fileName) {
         StringBuilder sb = new StringBuilder();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(FileUtil.class.getClassLoader().getResourceAsStream(fileName)));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(FileUtil.class.getClassLoader().getResourceAsStream(fileName)))) {
+            String line; while ((line = br.readLine()) != null) sb.append(line).append("\n");
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return sb.toString();
     }
 
     public static String readFile(String fileName) {
         StringBuilder sb = new StringBuilder();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName))));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName))))) {
+            String line; while ((line = br.readLine()) != null) sb.append(line).append("\n");
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return sb.toString();
     }

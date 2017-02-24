@@ -115,9 +115,7 @@ public class ScannerSupport implements Closeable {
                 });
             }
             parentDeclarations.stream().forEach(e -> {
-                if (!methodDeclarations.contains(e)) {
-                    methodDeclarations.add(e);
-                }
+                if (!methodDeclarations.contains(e)) methodDeclarations.add(e);
             });
             methodGraph.put(className, methodDeclarations);
             parentClassName = classGraph.get(parentClassName);

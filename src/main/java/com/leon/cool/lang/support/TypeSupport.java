@@ -99,13 +99,9 @@ public class TypeSupport {
         } else if (typeInfo.type() != TypeEnum.SELF_TYPE && parentTypeInfo.type() != TypeEnum.SELF_TYPE) {
             Type temp = typeInfo;
             while (temp != null) {
-                if (temp.type() == parentTypeInfo.type()) {
-                    return true;
-                }
+                if (temp.type() == parentTypeInfo.type()) return true;
                 String parentType = classGraph.get(temp.className());
-                if (parentType == null) {
-                    return false;
-                }
+                if (parentType == null) return false;
                 temp = TypeFactory.objectType(parentType);
             }
             return false;
