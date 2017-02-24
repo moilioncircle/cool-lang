@@ -47,9 +47,9 @@ import static com.leon.cool.lang.support.TypeSupport.*;
 public class ScannerSupport implements Closeable {
 
     public Map<String, String> classGraph = new HashMap<>();
+    public Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
     public Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
     public Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
-    public Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
     public BufferedReader reader;
 
     public void createSymbolTable(String className) {
@@ -253,7 +253,7 @@ public class ScannerSupport implements Closeable {
          */
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
-            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
+            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (isStringType(attr.getValue().type)) {
                     object.variables.addId(attr.getKey(), ObjectFactory.coolStringDefault());
@@ -279,9 +279,7 @@ public class ScannerSupport implements Closeable {
      * @param context
      */
     public void gc(Context context) {
-        if (Heap.size() < Constant.GC_HEAP_SIZE) {
-            return;
-        }
+        if (Heap.size() < Constant.GC_HEAP_SIZE) return;
         SymbolTable<CoolObject> environment = context.environment;
 
         //Mark
@@ -294,14 +292,13 @@ public class ScannerSupport implements Closeable {
             CoolObject obj = rootObjects.remove(0);
             Heap.canReach(obj);
             SymbolTable<CoolObject> variables = obj.variables;
-            if (variables != null) {
-                for (int i = 0; i < variables.size(); i++) {
-                    Collection<CoolObject> values = variables.elementAt(i).values();
-                    for (CoolObject variable : values) {
-                        //防止循环引用
-                        if (isObjectType(variable.type) && !Heap.isReach(variable)) {
-                            rootObjects.add(variable);
-                        }
+            if (variables == null) continue;
+            for (int i = 0; i < variables.size(); i++) {
+                Collection<CoolObject> values = variables.elementAt(i).values();
+                for (CoolObject variable : values) {
+                    //防止循环引用
+                    if (isObjectType(variable.type) && !Heap.isReach(variable)) {
+                        rootObjects.add(variable);
                     }
                 }
             }
@@ -327,7 +324,7 @@ public class ScannerSupport implements Closeable {
         Context context = new Context(object, object.variables);
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
-            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
+            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
             attrs.entrySet().forEach(attr -> {
                 if (attr.getValue().expr.isPresent()) {
                     object.variables.addId(attr.getKey(), attr.getValue().expr.get().accept(visitor, context));

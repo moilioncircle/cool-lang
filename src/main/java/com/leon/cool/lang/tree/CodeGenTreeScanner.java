@@ -305,7 +305,7 @@ public class CodeGenTreeScanner extends TreeScanner {
                      */
                     while (!inheritsLinks.isEmpty()) {
                         String parentClassName = inheritsLinks.pop();
-                        Map<String, AttrDeclaration> attrs = scannerSupport.attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
+                        Map<String, AttrDeclaration> attrs = scannerSupport.attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
                         for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                             if (TypeSupport.isStringType(attr.getValue().type)) {
                                 StringConst stringConst = ConstantPool.getInstance().addString("");
