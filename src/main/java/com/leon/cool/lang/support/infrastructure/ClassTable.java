@@ -32,30 +32,30 @@ public class ClassTable {
     private final TreeFactory f = new TreeFactory();
 
     /**
+     * @return
      * @see com.leon.cool.lang.ast.StaticDispatch
      * @see com.leon.cool.lang.ast.Dispatch
-     *
+     * <p>
      * 初始化build-in 类
      * Object:
-     *     abort():Object
-     *     type_name():String
-     *     copy():SELF_TYPE
+     * abort():Object
+     * type_name():String
+     * copy():SELF_TYPE
      * IO:
-     *     out_string(String):SELF_TYPE
-     *     out_int(Int):SELF_TYPE
-     *     in_string():String
-     *     in_int():Int
+     * out_string(String):SELF_TYPE
+     * out_int(Int):SELF_TYPE
+     * in_string():String
+     * in_int():Int
      * Int:
-     *     val:Int
+     * val:Int
      * Bool:
-     *     val:Bool
+     * val:Bool
      * String：
-     *     val:String
-     *     str_field:String
-     *     length():Int
-     *     concat(String):String
-     *     substr(Int,Int):String
-     * @return
+     * val:String
+     * str_field:String
+     * length():Int
+     * concat(String):String
+     * substr(Int,Int):String
      */
     @SuppressWarnings("unchecked")
     public List<ClassDef> builtInClasses() {

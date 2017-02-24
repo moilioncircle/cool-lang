@@ -1,4 +1,3 @@
-
 package com.leon.cool.lang.util;
 
 import java.io.*;

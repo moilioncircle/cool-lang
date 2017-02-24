@@ -18,5 +18,5 @@ package com.leon.cool.lang.tokenizer;
  * @author leon on 15-10-7
  */
 public enum TokenTag {
-    DEFAULT,NAME,STR,NUM,TYPE,COMMENT
+    DEFAULT, NAME, STR, NUM, TYPE, COMMENT
 }

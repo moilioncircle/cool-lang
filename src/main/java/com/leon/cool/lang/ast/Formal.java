@@ -1,7 +1,7 @@
 package com.leon.cool.lang.ast;
 
-import com.leon.cool.lang.tree.TreeVisitor;
 import com.leon.cool.lang.tokenizer.Token;
+import com.leon.cool.lang.tree.TreeVisitor;
 
 /**
  * Copyright leon
