@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -31,8 +31,8 @@ public class TestBookList {
 
     @org.junit.Test
     public void test() {
-        String str = FileUtils.readJarFile("book_list.cl");
-        Main.run("book_list.cl",str);
+        String str = FileUtil.readJarFile("book_list.cl");
+        Bootstrap.run("book_list.cl", str);
         assertEquals("title:      The Top 100 CD_ROMs\n" +
                 "author:     Ulanoff\n" +
                 "periodical:  PC Magazine\n" +

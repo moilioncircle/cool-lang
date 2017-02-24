@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -37,7 +37,7 @@ public class TestLife {
 
     @Test
     public void test() throws InterruptedException {
-        String str = FileUtils.readJarFile("life.cl");
-        Main.run("life.cl",str);
+        String str = FileUtil.readJarFile("life.cl");
+        Bootstrap.run("life.cl", str);
     }
 }

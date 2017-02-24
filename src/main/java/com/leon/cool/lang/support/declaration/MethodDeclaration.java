@@ -1,4 +1,4 @@
-package com.leon.cool.lang.support;
+package com.leon.cool.lang.support.declaration;
 
 import com.leon.cool.lang.ast.MethodDef;
 

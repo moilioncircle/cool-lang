@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +32,8 @@ public class TestCool {
 
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("cool.cl");
-        Main.run("cool.cl",str);
+        String str = FileUtil.readJarFile("cool.cl");
+        Bootstrap.run("cool.cl", str);
         assertEquals("cool\n", systemOutRule.getLog());
     }
 

@@ -1,15 +1,15 @@
-package com.leon.cool.lang.support;
+package com.leon.cool.lang.support.infrastructure;
 
 import com.leon.cool.lang.ast.BoolConst;
 import com.leon.cool.lang.ast.IntConst;
 import com.leon.cool.lang.ast.StringConst;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tokenizer.TokenKind;
-import com.leon.cool.lang.util.Constant;
 import com.leon.cool.lang.util.Pos;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Copyright leon
@@ -29,6 +29,10 @@ import java.util.*;
  * @author leon on 15-10-28
  */
 public class ConstantPool {
+
+    public static int STRING_INDEX = 0;
+
+    public static int INT_INDEX = 0;
 
     private Map<Integer, IntConst> intPool = new LinkedHashMap<>();
 
@@ -55,7 +59,7 @@ public class ConstantPool {
             return intPool.get(i);
         }
         IntConst intConst = new IntConst(new Token(String.valueOf(i), TokenKind.INTEGER, Pos.constPos));
-        intConst.index = Utils.INT_INDEX++;
+        intConst.index = INT_INDEX++;
         intPool.put(i, intConst);
         return intConst;
     }
@@ -65,7 +69,7 @@ public class ConstantPool {
             return stringPool.get(str);
         }
         StringConst stringConst = new StringConst(new Token(str, TokenKind.STRING, Pos.constPos));
-        stringConst.index = Utils.STRING_INDEX++;
+        stringConst.index = STRING_INDEX++;
         stringPool.put(str, stringConst);
         return stringConst;
     }
@@ -79,5 +83,10 @@ public class ConstantPool {
         intPool.values().stream().forEach(e -> e.codeDef(s));
         falseBool.codeDef(s);
         trueBool.codeDef(s);
+    }
+
+    public void clear() {
+        STRING_INDEX = 0;
+        INT_INDEX = 0;
     }
 }

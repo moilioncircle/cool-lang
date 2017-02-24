@@ -1,28 +1,31 @@
 package com.leon.cool.lang.support;
 
-import com.leon.cool.lang.ast.TreeNode;
+import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
-import com.leon.cool.lang.tokenizer.Token;
+import com.leon.cool.lang.support.declaration.AttrDeclaration;
+import com.leon.cool.lang.support.declaration.MethodDeclaration;
+import com.leon.cool.lang.support.infrastructure.ConstantPool;
+import com.leon.cool.lang.support.infrastructure.Context;
+import com.leon.cool.lang.support.infrastructure.Heap;
+import com.leon.cool.lang.support.infrastructure.SymbolTable;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
-import com.leon.cool.lang.util.*;
 import com.leon.cool.lang.util.Stack;
+import com.leon.cool.lang.util.StringUtil;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.leon.cool.lang.tokenizer.TokenKind.ID;
-import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
+import static com.leon.cool.lang.support.TypeSupport.*;
 
 /**
  * Copyright leon
@@ -41,79 +44,65 @@ import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
  *
  * @author leon on 15-10-15
  */
-public class Utils {
+public class ScannerSupport implements Closeable {
 
-    public static int STRING_INDEX = 0;
+    public Map<String, String> classGraph = new HashMap<>();
+    public Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
+    public Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
+    public Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
+    public BufferedReader reader;
 
-    public static int INT_INDEX = 0;
-
-    private static final Properties messages = new Properties();
-
-    static {
-        try (InputStream stream = Utils.class.getClassLoader().getResourceAsStream("messages.properties")) {
-            messages.load(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Map<String, String> classGraph = new HashMap<>();
-    public static Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
-    public static Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
-    private static Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
-    private static BufferedReader reader;
-
-    public static void createSymbolTable(String className) {
+    public void createSymbolTable(String className) {
         if (!symbolTables.containsKey(className)) {
             symbolTables.put(className, new SymbolTable<>());
         }
     }
 
-    public static void createAttrGraph(String className) {
+    public void createAttrGraph(String className) {
         if (!attrGraph.containsKey(className)) {
             attrGraph.put(className, new LinkedHashMap<>());
         }
     }
 
-    public static void createMethodGraph(String className) {
+    public void createMethodGraph(String className) {
         if (!methodGraph.containsKey(className)) {
             methodGraph.put(className, new LinkedHashSet<>());
         }
     }
 
-    public static void putToClassGraph(String type, Optional<String> parentType) {
+    public void putToClassGraph(String type, Optional<String> parentType) {
         if (classGraph.containsKey(type)) {
-            Utils.error("global.error.class.duplicated", type);
+            ErrorSupport.error("global.error.class.duplicated", type);
         } else {
             if (parentType.isPresent()) {
                 classGraph.put(type, parentType.get());
                 checkCircleInherits(classGraph);
             } else {
-                if (Utils.isObjectType(type)) {
+                if (isObjectType(type)) {
                     classGraph.put(type, null);
                 } else {
-                    Utils.error("global.error.inherits.object", type);
+                    ErrorSupport.error("global.error.inherits.object", type);
                 }
             }
         }
     }
 
-    public static void putToMethodGraph(String className, MethodDeclaration methodDeclaration) {
+    public void putToMethodGraph(String className, MethodDeclaration methodDeclaration) {
         Set<MethodDeclaration> methodDeclarations = methodGraph.get(className);
         if (methodDeclarations.contains(methodDeclaration)) {
-            Utils.error("global.error.method.duplicated", className, constructMethod(methodDeclaration));
+            ErrorSupport.error("global.error.method.duplicated", className, StringUtil.constructMethod(methodDeclaration));
         } else {
             methodDeclarations.add(methodDeclaration);
             methodGraph.put(className, methodDeclarations);
         }
     }
 
-    public static void putToAttrGraph(String className, String id, AttrDeclaration attrDeclaration) {
+    public void putToAttrGraph(String className, String id, AttrDeclaration attrDeclaration) {
         attrGraph.get(className).put(id, attrDeclaration);
     }
 
-    public static void mergeMethodGraph(String className) {
-        String parentClassName = Utils.classGraph.get(className);
+    public void mergeMethodGraph(String className) {
+        String parentClassName = classGraph.get(className);
         while (parentClassName != null) {
             Set<MethodDeclaration> methodDeclarations = methodGraph.get(className);
             Set<MethodDeclaration> parentDeclarations = methodGraph.get(parentClassName);
@@ -121,7 +110,7 @@ public class Utils {
                 parentDeclarations.forEach(e -> {
                     //仅返回类型不同的话override错误
                     if (declaration.equals(e) && !declaration.returnType.equals(e.returnType)) {
-                        Utils.error("global.error.override", className, constructMethod(declaration));
+                        ErrorSupport.error("global.error.override", className, StringUtil.constructMethod(declaration));
                     }
                 });
             }
@@ -131,34 +120,33 @@ public class Utils {
                 }
             });
             methodGraph.put(className, methodDeclarations);
-            parentClassName = Utils.classGraph.get(parentClassName);
+            parentClassName = classGraph.get(parentClassName);
         }
     }
 
-    public static void mergeAttrGraph(String className) {
+    public void mergeAttrGraph(String className) {
         Stack<String> inheritsLinks = new Stack<>();
         String temp = className;
         while (temp != null) {
             inheritsLinks.push(temp);
-            temp = Utils.classGraph.get(temp);
+            temp = classGraph.get(temp);
         }
         while (!inheritsLinks.isEmpty()) {
             String parentClassName = inheritsLinks.pop();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 //参数重定义
-                if (Utils.lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
-                    Utils.error("global.error.attr.redefined", className, attr.getKey(), parentClassName);
+                if (lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
+                    ErrorSupport.error("global.error.attr.redefined", className, attr.getKey(), parentClassName);
                 } else {
-                    Utils.lookupSymbolTable(className).addId(attr.getKey(), attr.getValue().type);
+                    lookupSymbolTable(className).addId(attr.getKey(), attr.getValue().type);
                 }
             }
         }
-        Utils.lookupSymbolTable(className).addId(Constant.SELF, Constant.SELF_TYPE);
+        lookupSymbolTable(className).addId(Constant.SELF, Constant.SELF_TYPE);
     }
 
-
-    public static Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName, List<Type> typeInfo) {
+    public Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName, List<Type> typeInfo) {
         if (methodGraph.get(className) == null) {
             // Type check for NoType.
             return Optional.empty();
@@ -168,19 +156,19 @@ public class Utils {
             return Optional.empty();
         } else if (list.size() > 1) {
             //包含多个方法（重载方法），则在重载方法中进一步选择
-            return Utils.minimumMethodDeclaration(list, className, typeInfo);
+            return minimumMethodDeclaration(list, className, typeInfo);
         } else {
             return Optional.of(list.get(0));
         }
     }
 
-    private static Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
+    private Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
         MethodDeclaration min = new MethodDeclaration();
         min.paramTypes = typeInfo.stream().map(e -> Constant.OBJECT).collect(Collectors.toList());
         label:
         for (MethodDeclaration declaration : list) {
             for (int i = 0; i < declaration.paramTypes.size(); i++) {
-                if (!Utils.isParent(TypeFactory.objectType(declaration.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
+                if (!isParent(classGraph, TypeFactory.objectType(declaration.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
                     continue label;
                 }
             }
@@ -188,8 +176,8 @@ public class Utils {
         }
         for (MethodDeclaration declaration : list) {
             for (int i = 0; i < declaration.paramTypes.size(); i++) {
-                if (!Utils.isParent(TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(declaration.paramTypes.get(i), className))) {
-                    Utils.error("global.error.overload", className, mkString(list.stream().map(Utils::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
+                if (!isParent(classGraph, TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(declaration.paramTypes.get(i), className))) {
+                    ErrorSupport.error("global.error.overload", className, StringUtil.mkString(list.stream().map(StringUtil::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
                     return Optional.empty();
                 }
             }
@@ -197,135 +185,26 @@ public class Utils {
         return Optional.of(min);
     }
 
-    public static Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName) {
+    public Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName) {
         return methodGraph.get(className).stream().filter(e -> e.methodName.equals(methodName)).findFirst();
     }
 
-    public static SymbolTable<String> lookupSymbolTable(String className) {
+    public SymbolTable<String> lookupSymbolTable(String className) {
         return symbolTables.get(className);
     }
 
-    public static void checkUndefinedClass() {
+    public void checkUndefinedClass() {
         Set<String> keys = classGraph.keySet();
         keys.forEach(key -> {
             if (!isObjectType(key)) {
                 if (!keys.contains(classGraph.get(key))) {
-                    error("global.error.class.undefined", classGraph.get(key));
+                    ErrorSupport.error("global.error.class.undefined", classGraph.get(key));
                 }
             }
         });
     }
 
-    public static boolean isSelfType(Token token) {
-        return token.kind == TYPE && isSelfType(token.name);
-    }
-
-    public static boolean isStringType(Token token) {
-        return token.kind == TYPE && isStringType(token.name);
-    }
-
-    public static boolean isIntType(Token token) {
-        return token.kind == TYPE && isIntType(token.name);
-    }
-
-    public static boolean isBoolType(Token token) {
-        return token.kind == TYPE && isBoolType(token.name);
-    }
-
-    public static boolean isTypeDefined(Token token) {
-        return !isSelfType(token) && !classGraph.containsKey(token.name);
-    }
-
-    public static boolean isTypeDefined(String name) {
-        return isSelfType(name) || classGraph.containsKey(name);
-    }
-
-    public static boolean isSelfType(String name) {
-        return name.equals(Constant.SELF_TYPE);
-    }
-
-    public static boolean isStringType(String name) {
-        return name.equals(Constant.STRING);
-    }
-
-    public static boolean isIntType(String name) {
-        return name.equals(Constant.INT);
-    }
-
-    public static boolean isBoolType(String name) {
-        return name.equals(Constant.BOOL);
-    }
-
-    public static boolean isObjectType(String name) {
-        return name.equals(Constant.OBJECT);
-    }
-
-    public static boolean isObjectType(Type typeInfo) {
-        return typeInfo.type() == TypeEnum.OBJECT;
-    }
-
-
-    public static boolean isSelf(Token token) {
-        return token.kind == ID && token.name.equals(Constant.SELF);
-    }
-
-    public static boolean isBasicType(Type typeInfo) {
-        return typeInfo.type() == TypeEnum.BOOL || typeInfo.type() == TypeEnum.INT || typeInfo.type() == TypeEnum.STRING;
-    }
-
-    public static boolean isBasicType(Token token) {
-        return isBasicType(token.name);
-    }
-
-    public static boolean isBasicType(String string) {
-        return isBoolType(string) || isIntType(string) || isStringType(string);
-    }
-
-    /**
-     * 判断两个类型是否存在父子关系
-     *
-     * @param typeInfo       子类型
-     * @param parentTypeInfo 父类型
-     * @return true：存在父子关系；false：不存在父子关系
-     */
-    public static boolean isParent(Type typeInfo, Type parentTypeInfo) {
-        if (typeInfo.type() == TypeEnum.NO_TYPE) {
-            return true;
-        } else if (typeInfo.type() == TypeEnum.SELF_TYPE && parentTypeInfo.type() == TypeEnum.SELF_TYPE) {
-            return typeInfo.replace().type() == parentTypeInfo.replace().type();
-        } else if (typeInfo.type() != TypeEnum.SELF_TYPE && parentTypeInfo.type() == TypeEnum.SELF_TYPE) {
-            return false;
-        } else if (typeInfo.type() == TypeEnum.SELF_TYPE && parentTypeInfo.type() != TypeEnum.SELF_TYPE) {
-            return isParent(typeInfo.replace(), parentTypeInfo);
-        } else if (typeInfo.type() != TypeEnum.SELF_TYPE && parentTypeInfo.type() != TypeEnum.SELF_TYPE) {
-            Type temp = typeInfo;
-            while (temp != null) {
-                if (temp.type() == parentTypeInfo.type()) {
-                    return true;
-                }
-                String parentType = classGraph.get(temp.className());
-                if (parentType == null) {
-                    return false;
-                }
-                temp = TypeFactory.objectType(parentType);
-            }
-            return false;
-        }
-        return false;
-    }
-
-    //clear method
-    public static void clear() {
-        STRING_INDEX = 0;
-        INT_INDEX = 0;
-        classGraph = new HashMap<>();
-        methodGraph = new HashMap<>();
-        attrGraph = new HashMap<>();
-        symbolTables = new HashMap<>();
-        Heap.clear();
-    }
-
-    public static void close() {
+    public void close() {
         try {
             if (reader != null) {
                 reader.close();
@@ -334,41 +213,15 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Heap.clear();
+        ConstantPool.getInstance().clear();
     }
 
-    private static BufferedReader reader() {
+    private BufferedReader reader() {
         if (reader == null) {
             reader = new BufferedReader(new InputStreamReader(System.in));
         }
         return reader;
-    }
-
-    public static void error(String key, Object... params) {
-        throw new RuntimeException(errorMsg(key, params));
-    }
-
-    public static String errorMsg(String key, Object... params) {
-        return MessageFormat.format(messages.getProperty(key), params);
-    }
-
-    public static String errorPos(TreeNode node) {
-        return errorPos(node.starPos, node.endPos);
-    }
-
-    public static String errorPos(Token token) {
-        return errorPos(token.startPos, token.endPos);
-    }
-
-    public static String errorPos(Pos startPos, Pos endPos) {
-        return " at " + startPos + " to " + endPos;
-    }
-
-    public static String constructMethod(String id, List<String> params) {
-        return id + Utils.mkString(params, Optional.of("("), ",", Optional.of(")"));
-    }
-
-    private static String constructMethod(MethodDeclaration methodDeclaration) {
-        return constructMethod(methodDeclaration.methodName, methodDeclaration.paramTypes);
     }
 
     /**
@@ -377,7 +230,7 @@ public class Utils {
      * @param context
      * @return
      */
-    public static CoolObject newDef(EvalTreeVisitor visitor, Type type, Context context) {
+    public CoolObject newDef(EvalTreeVisitor visitor, Type type, Context context) {
         CoolObject object = ObjectFactory.coolObject();
         object.type = type;
 
@@ -387,7 +240,7 @@ public class Utils {
         String temp = type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
-            temp = Utils.classGraph.get(temp);
+            temp = classGraph.get(temp);
         }
         /**
          * 遍历继承树，找到父类中的属性。
@@ -425,7 +278,7 @@ public class Utils {
      *
      * @param context
      */
-    public static void gc(Context context) {
+    public void gc(Context context) {
         if (Heap.size() < Constant.GC_HEAP_SIZE) {
             return;
         }
@@ -464,12 +317,12 @@ public class Utils {
      * <p>
      * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
      */
-    private static void initializer(EvalTreeVisitor visitor, CoolObject object) {
+    private void initializer(EvalTreeVisitor visitor, CoolObject object) {
         Stack<String> inheritsLinks = new Stack<>();
         String temp = object.type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
-            temp = Utils.classGraph.get(temp);
+            temp = classGraph.get(temp);
         }
         Context context = new Context(object, object.variables);
         while (!inheritsLinks.isEmpty()) {
@@ -492,7 +345,7 @@ public class Utils {
      * @param pos
      * @return CoolObject
      */
-    public static CoolObject buildIn(List<CoolObject> paramObjects, CoolObject obj, MethodDeclaration methodDeclaration, String pos) {
+    public CoolObject buildIn(List<CoolObject> paramObjects, CoolObject obj, MethodDeclaration methodDeclaration, String pos) {
         switch (methodDeclaration.belongs) {
             case "Object":
                 if (methodDeclaration.methodName.equals("type_name")) {
@@ -512,19 +365,19 @@ public class Utils {
                     return obj;
                 } else if (methodDeclaration.methodName.equals("in_string")) {
                     try {
-                        String str = Utils.reader().readLine();
+                        String str = reader().readLine();
                         return ObjectFactory.coolString(str);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Utils.error("unexpected.error");
+                        ErrorSupport.error("unexpected.error");
                     }
                     return ObjectFactory.coolStringDefault();
                 } else if (methodDeclaration.methodName.equals("in_int")) {
                     try {
-                        String str = Utils.reader().readLine();
+                        String str = reader().readLine();
                         return ObjectFactory.coolInt(Integer.parseInt(str));
                     } catch (Exception e) {
-                        Utils.error("unexpected.error");
+                        ErrorSupport.error("unexpected.error");
                     }
                     return ObjectFactory.coolIntDefault();
                 }
@@ -551,7 +404,7 @@ public class Utils {
      * @see com.leon.cool.lang.ast.CaseDef
      * @see com.leon.cool.lang.ast.Cond
      */
-    public static Type lub(List<Type> types) {
+    public Type lub(List<Type> types) {
         return types.stream().reduce(TypeFactory.noType(), (type1, type2) -> {
             if (type1.type() == TypeEnum.NO_TYPE) {
                 return type2;
@@ -565,7 +418,7 @@ public class Utils {
         });
     }
 
-    private static Type lub(Type type1, Type type2) {
+    private Type lub(Type type1, Type type2) {
         List<String> list1 = new ArrayList<>();
         list1.add(type1.className());
         String temp = type1.className();
@@ -583,7 +436,7 @@ public class Utils {
         return TypeFactory.objectType(list1.stream().filter(list2::contains).findFirst().get());
     }
 
-    private static void checkCircleInherits(Map<String, String> classGraph) {
+    private void checkCircleInherits(Map<String, String> classGraph) {
         Set<String> keys = classGraph.keySet();
         for (String key : keys) {
             String parent = classGraph.get(key);
@@ -591,17 +444,17 @@ public class Utils {
                 parent = classGraph.get(parent);
             }
             if (parent != null && parent.equals(key)) {
-                Utils.error("global.error.class.circle", key);
+                ErrorSupport.error("global.error.class.circle", key);
             }
         }
     }
 
-    private static boolean checkType(List<String> paramTypes, List<Type> typeInfos, String className) {
+    private boolean checkType(List<String> paramTypes, List<Type> typeInfos, String className) {
         if (paramTypes.size() != typeInfos.size()) {
             return false;
         } else {
             for (int i = 0; i < typeInfos.size(); i++) {
-                if (!Utils.isParent(typeInfos.get(i), TypeFactory.objectType(paramTypes.get(i), className))) {
+                if (!isParent(classGraph, typeInfos.get(i), TypeFactory.objectType(paramTypes.get(i), className))) {
                     return false;
                 }
             }
@@ -609,26 +462,4 @@ public class Utils {
         return true;
     }
 
-    public static <T> String mkString(List<T> tks, String split) {
-        return mkString(tks, Optional.<String>empty(), split, Optional.<String>empty());
-    }
-
-    private static <T> String mkString(List<T> tks, Optional<String> beforeOpt, String split, Optional<String> endOpt) {
-        Iterator<T> it = tks.iterator();
-        StringBuilder sb = new StringBuilder();
-        if (beforeOpt.isPresent()) {
-            sb.append(beforeOpt.get());
-        }
-        while (it.hasNext()) {
-            sb.append(it.next());
-            if (!it.hasNext()) {
-                break;
-            }
-            sb.append(split);
-        }
-        if (endOpt.isPresent()) {
-            sb.append(endOpt.get());
-        }
-        return sb.toString();
-    }
 }

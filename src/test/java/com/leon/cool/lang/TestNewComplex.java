@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +32,8 @@ public class TestNewComplex {
 
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("new_complex.cl");
-        Main.run("new_complex.cl",str);
+        String str = FileUtil.readJarFile("new_complex.cl");
+        Bootstrap.run("new_complex.cl", str);
         assertEquals("=)\n" +
                 "=)\n",systemOutRule.getLog());
     }

@@ -1,7 +1,7 @@
 package com.leon.cool.lang.error;
 
-import com.leon.cool.lang.Main;
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.Bootstrap;
+import com.leon.cool.lang.util.FileUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
@@ -31,9 +31,9 @@ public class TestErrorCool {
 
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("error/cool.cl");
-        Main.run("cool.cl",str);
-        assertEquals("Expected Type but actual ID at Pos{row=4, column=25}.\n" +
-                "Expected Type but actual ID at Pos{row=12, column=29}.\n", systemErrRule.getLog());
+        String str = FileUtil.readJarFile("error/cool.cl");
+        Bootstrap.run("cool.cl", str);
+        assertEquals("Expected Type but actual ID at Pos{row=4, column=25}.\r\n" +
+                "Expected Type but actual ID at Pos{row=12, column=29}.\r\n", systemErrRule.getLog());
     }
 }

@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
@@ -29,8 +29,8 @@ public class TestGC {
 
     @org.junit.Test
     public void test() {
-        String str = FileUtils.readJarFile("gc.cl");
-        Main.run("gc.cl",str);
+        String str = FileUtil.readJarFile("gc.cl");
+        Bootstrap.run("gc.cl", str);
         assertEquals("", systemOutRule.getLog());
     }
 }

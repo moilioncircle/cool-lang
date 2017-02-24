@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -31,8 +31,8 @@ public class TestCell {
 
     @org.junit.Test
     public void test() {
-        String str = FileUtils.readJarFile("cell.cl");
-        Main.run("cell.cl",str);
+        String str = FileUtil.readJarFile("cell.cl");
+        Bootstrap.run("cell.cl", str);
         assertEquals("         X         \n" +
                 "........XXX........\n" +
                 ".......X...X.......\n" +

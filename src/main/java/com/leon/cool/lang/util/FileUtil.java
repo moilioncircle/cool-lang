@@ -20,13 +20,13 @@ import java.io.*;
  *
  * @author leon on 15-10-31
  */
-public class FileUtils {
+public class FileUtil {
 
     public static String readJarFile(String fileName) {
         StringBuilder sb = new StringBuilder();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(FileUtils.class.getClassLoader().getResourceAsStream(fileName)));
+            br = new BufferedReader(new InputStreamReader(FileUtil.class.getClassLoader().getResourceAsStream(fileName)));
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line).append("\n");

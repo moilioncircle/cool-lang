@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +32,8 @@ public class TestList {
 
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("list.cl");
-        Main.run("list.cl",str);
+        String str = FileUtil.readJarFile("list.cl");
+        Bootstrap.run("list.cl", str);
         assertEquals("5 4 3 2 1 \n" +
                 "4 3 2 1 \n" +
                 "3 2 1 \n" +

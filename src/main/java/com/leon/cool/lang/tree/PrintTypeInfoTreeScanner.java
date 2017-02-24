@@ -1,6 +1,7 @@
 package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.*;
+import com.leon.cool.lang.support.ScannerSupport;
 import com.leon.cool.lang.tokenizer.Token;
 
 /**
@@ -21,6 +22,11 @@ import com.leon.cool.lang.tokenizer.Token;
  * @author leon on 15-10-17
  */
 public class PrintTypeInfoTreeScanner extends TreeScanner {
+
+    public PrintTypeInfoTreeScanner(ScannerSupport scannerSupport) {
+        super(scannerSupport);
+    }
+
     @Override
     public void applyProgram(Program program) {
         scan(program.classDef);

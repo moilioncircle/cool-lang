@@ -1,6 +1,6 @@
 package com.leon.cool.lang.tokenizer;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 public class TestTokenizer {
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("tokenizer/tokenizer.cl");
+        String str = FileUtil.readJarFile("tokenizer/tokenizer.cl");
         CoolTokenizer tokenizer = new CoolTokenizer(str.toCharArray());
 
         CoolScanner scanner = new CoolScanner(tokenizer);

@@ -66,7 +66,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.leon.cool.lang.Main</mainClass>
+                            <mainClass>com.leon.cool.lang.Bootstrap</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,8 +38,8 @@ public class TestPrimes {
     @Test
     public void test() {
         exit.expectSystemExit();
-        String str = FileUtils.readJarFile("primes.cl");
-        Main.run("primes.cl",str);
+        String str = FileUtil.readJarFile("primes.cl");
+        Bootstrap.run("primes.cl", str);
         assertEquals("2 is trivially prime.\n" +
                 "3 is prime.\n" +
                 "5 is prime.\n" +

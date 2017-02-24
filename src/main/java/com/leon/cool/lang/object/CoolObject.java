@@ -1,11 +1,10 @@
 package com.leon.cool.lang.object;
 
+import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.util.SymbolTable;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.infrastructure.SymbolTable;
 import com.leon.cool.lang.type.Type;
-import com.leon.cool.lang.util.Constant;
 
 /**
  * Copyright leon
@@ -38,8 +37,6 @@ public class CoolObject {
 
     public CoolObject abort() {
         System.out.println(this.type + " abort and exit.");
-        Utils.clear();
-        Utils.close();
         System.exit(0);
         return this;
     }

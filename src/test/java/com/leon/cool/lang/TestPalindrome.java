@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,8 +37,8 @@ public class TestPalindrome {
     @Test
     public void test() {
         systemInMock.provideText("aabaa");
-        String str = FileUtils.readJarFile("palindrome.cl");
-        Main.run("palindrome.cl",str);
+        String str = FileUtil.readJarFile("palindrome.cl");
+        Bootstrap.run("palindrome.cl", str);
         assertEquals("enter a string\n" +
                 "that was a palindrome\n",systemOutRule.getLog());
     }

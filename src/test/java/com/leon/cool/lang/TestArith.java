@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -36,8 +36,8 @@ public class TestArith {
     @org.junit.Test
     public void test() {
         systemInMock.provideText("q");
-        String str = FileUtils.readJarFile("arith.cl");
-        Main.run("arith.cl",str);
+        String str = FileUtil.readJarFile("arith.cl");
+        Bootstrap.run("arith.cl", str);
         assertEquals("number 0 is even!\n" +
                 "Class type is now A\n" +
                 "\n" +

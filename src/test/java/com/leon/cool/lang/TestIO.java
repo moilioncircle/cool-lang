@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +32,8 @@ public class TestIO {
 
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("io.cl");
-        Main.run("io.cl",str);
+        String str = FileUtil.readJarFile("io.cl");
+        Bootstrap.run("io.cl", str);
         assertEquals("A: Hello world\n" +
                 "B: Hello world\n" +
                 "C: Hello world\n" +

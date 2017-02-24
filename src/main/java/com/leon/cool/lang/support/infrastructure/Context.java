@@ -1,7 +1,6 @@
-package com.leon.cool.lang.support;
+package com.leon.cool.lang.support.infrastructure;
 
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.util.SymbolTable;
 
 /**
  * Copyright leon

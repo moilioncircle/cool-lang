@@ -1,9 +1,10 @@
 package com.leon.cool.lang.tree;
 
+import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.support.CgenSupport;
-import com.leon.cool.lang.support.ConstantPool;
-import com.leon.cool.lang.util.Constant;
+import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.infrastructure.ConstantPool;
 
 import java.io.PrintStream;
 
@@ -30,7 +31,8 @@ public class CodeConstantGenTreeScanner extends TreeScanner {
 
     private final String fileName;
 
-    public CodeConstantGenTreeScanner(String fileName) {
+    public CodeConstantGenTreeScanner(ScannerSupport scannerSupport, String fileName) {
+        super(scannerSupport);
         str = System.err;
         this.fileName = fileName;
         codeGlobalData();

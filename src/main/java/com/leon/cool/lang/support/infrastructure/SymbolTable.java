@@ -1,4 +1,6 @@
-package com.leon.cool.lang.util;
+package com.leon.cool.lang.support.infrastructure;
+
+import com.leon.cool.lang.util.Stack;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

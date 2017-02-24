@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +32,8 @@ public class TestLam {
 
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("lam.cl");
-        Main.run("lam.cl",str);
+        String str = FileUtil.readJarFile("lam.cl");
+        Bootstrap.run("lam.cl", str);
         assertEquals("\\x.x\n" +
                 "\\x.\\y.x\n" +
                 "\\x.\\y.\\z.((((x)@(z)))@(((y)@(z))))\n" +

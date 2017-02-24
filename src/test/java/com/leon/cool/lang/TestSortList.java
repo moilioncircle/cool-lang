@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +39,8 @@ public class TestSortList {
     @Test
     public void test() {
         systemInMock.provideText("5");
-        String str = FileUtils.readJarFile("sort_list.cl");
-        Main.run("sort_list.cl",str);
+        String str = FileUtil.readJarFile("sort_list.cl");
+        Bootstrap.run("sort_list.cl", str);
         assertEquals("How many numbers to sort?0\n" +
                 "1\n" +
                 "2\n" +

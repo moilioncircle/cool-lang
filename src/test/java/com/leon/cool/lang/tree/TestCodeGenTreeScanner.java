@@ -1,10 +1,8 @@
 package com.leon.cool.lang.tree;
 
-import com.leon.cool.lang.Main;
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.Bootstrap;
+import com.leon.cool.lang.util.FileUtil;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Copyright leon
@@ -52,8 +50,8 @@ public class TestCodeGenTreeScanner {
 
     @Test
     public void testApplySub() throws Exception {
-        String str = FileUtils.readJarFile("tree/sub.cl");
-        Main.run("sub.cl",str);
+        String str = FileUtil.readJarFile("tree/sub.cl");
+        Bootstrap.run("sub.cl", str);
     }
 
     @Test

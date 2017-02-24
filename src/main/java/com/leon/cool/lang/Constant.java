@@ -1,4 +1,4 @@
-package com.leon.cool.lang.util;
+package com.leon.cool.lang;
 
 /**
  * Copyright leon
@@ -24,7 +24,7 @@ public class Constant {
     public static final String STRING = "String";
     public static final String INT = "Int";
     public static final String BOOL = "Bool";
-    public static final String MAIN = "Main";
+    public static final String MAIN = "Bootstrap";
     public static final String SELF_TYPE = "SELF_TYPE";
 
     public static final String SELF = "self";

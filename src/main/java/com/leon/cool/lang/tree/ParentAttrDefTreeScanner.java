@@ -1,7 +1,7 @@
 package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.ClassDef;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.ScannerSupport;
 
 /**
  * Copyright leon
@@ -22,11 +22,15 @@ import com.leon.cool.lang.support.Utils;
  */
 public class ParentAttrDefTreeScanner extends TreeScanner {
 
+    public ParentAttrDefTreeScanner(ScannerSupport scannerSupport) {
+        super(scannerSupport);
+    }
+
     public void applyClassDef(ClassDef classDef) {
         String className = classDef.type.name;
-        Utils.createSymbolTable(className);
-        Utils.lookupSymbolTable(className).enterScope();
-        Utils.mergeAttrGraph(className);
+        scannerSupport.createSymbolTable(className);
+        scannerSupport.lookupSymbolTable(className).enterScope();
+        scannerSupport.mergeAttrGraph(className);
         super.applyClassDef(classDef);
     }
 }

@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ import org.junit.Test;
 public class TestGraph {
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("graph.cl");
-        Main.run("graph.cl",str);
+        String str = FileUtil.readJarFile("graph.cl");
+        Bootstrap.run("graph.cl", str);
     }
 }

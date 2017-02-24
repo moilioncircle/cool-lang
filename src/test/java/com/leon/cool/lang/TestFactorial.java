@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,8 +37,8 @@ public class TestFactorial {
     @Test
     public void test() {
         systemInMock.provideLines("10");
-        String str = FileUtils.readJarFile("factorial.cl");
-        Main.run("factorial.cl",str);
+        String str = FileUtil.readJarFile("factorial.cl");
+        Bootstrap.run("factorial.cl", str);
         assertEquals("Enter an integer greater-than or equal-to 0: The factorial of 10 is 3628800\n", systemOutRule.getLog());
     }
 }

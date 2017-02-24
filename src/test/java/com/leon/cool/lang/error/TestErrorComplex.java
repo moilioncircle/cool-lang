@@ -1,7 +1,7 @@
 package com.leon.cool.lang.error;
 
-import com.leon.cool.lang.Main;
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.Bootstrap;
+import com.leon.cool.lang.util.FileUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
@@ -31,19 +31,19 @@ public class TestErrorComplex {
 
     @Test
     public void test() {
-        String str = FileUtils.readJarFile("error/complex.cl");
-        Main.run("complex.cl",str);
-        assertEquals("Type check error.Type Complex is not same as Int  at Pos{row=4, column=9} to Pos{row=4, column=50}.\n" +
-                "Type check error.Expected Bool but actual NoType  at Pos{row=4, column=9} to Pos{row=4, column=50}.\n" +
-                "Type check error.Type String is not same as Int  at Pos{row=19, column=6} to Pos{row=19, column=11}.\n" +
-                "Type check error.Type String is not same as Int  at Pos{row=25, column=5} to Pos{row=25, column=10}.\n" +
-                "Class Complex method out_int(String) not defined error  at Pos{row=27, column=34} to Pos{row=27, column=41}.\n" +
-                "Class NoType method out_string(String) not defined error  at Pos{row=27, column=45} to Pos{row=27, column=55}.\n" +
-                "Type check error.Expected Bool but actual NoType  at Pos{row=25, column=5} to Pos{row=25, column=10}.\n" +
-                "Type check error.Expected Int but actual String  at Pos{row=34, column=11} to Pos{row=34, column=12}.\n" +
-                "Type check error.Type String is not same as NoType  at Pos{row=34, column=6} to Pos{row=34, column=12}.\n" +
-                "Type check error.Type SELF_TYPE(Complex) is not subclass of Int  at Pos{row=31, column=19} to Pos{row=31, column=22}.\n" +
-                "Type check error.Expected Int but actual String  at Pos{row=41, column=11} to Pos{row=41, column=12}.\n" +
-                "Type check error.Type String is not same as NoType  at Pos{row=41, column=6} to Pos{row=41, column=12}.\n", systemErrRule.getLog());
+        String str = FileUtil.readJarFile("error/complex.cl");
+        Bootstrap.run("complex.cl", str);
+        assertEquals("Type check error.Type Complex is not same as Int  at Pos{row=4, column=9} to Pos{row=4, column=50}.\r\n" +
+                "Type check error.Expected Bool but actual NoType  at Pos{row=4, column=9} to Pos{row=4, column=50}.\r\n" +
+                "Type check error.Type String is not same as Int  at Pos{row=19, column=6} to Pos{row=19, column=11}.\r\n" +
+                "Type check error.Type String is not same as Int  at Pos{row=25, column=5} to Pos{row=25, column=10}.\r\n" +
+                "Class Complex method out_int(String) not defined error  at Pos{row=27, column=34} to Pos{row=27, column=41}.\r\n" +
+                "Class NoType method out_string(String) not defined error  at Pos{row=27, column=45} to Pos{row=27, column=55}.\r\n" +
+                "Type check error.Expected Bool but actual NoType  at Pos{row=25, column=5} to Pos{row=25, column=10}.\r\n" +
+                "Type check error.Expected Int but actual String  at Pos{row=34, column=11} to Pos{row=34, column=12}.\r\n" +
+                "Type check error.Type String is not same as NoType  at Pos{row=34, column=6} to Pos{row=34, column=12}.\r\n" +
+                "Type check error.Type SELF_TYPE(Complex) is not subclass of Int  at Pos{row=31, column=19} to Pos{row=31, column=22}.\r\n" +
+                "Type check error.Expected Int but actual String  at Pos{row=41, column=11} to Pos{row=41, column=12}.\r\n" +
+                "Type check error.Type String is not same as NoType  at Pos{row=41, column=6} to Pos{row=41, column=12}.\r\n", systemErrRule.getLog());
     }
 }

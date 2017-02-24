@@ -1,11 +1,12 @@
 package com.leon.cool.lang.tree;
 
+import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
-import com.leon.cool.lang.support.AttrDeclaration;
 import com.leon.cool.lang.support.CgenSupport;
-import com.leon.cool.lang.support.ConstantPool;
-import com.leon.cool.lang.support.Utils;
-import com.leon.cool.lang.util.Constant;
+import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TypeSupport;
+import com.leon.cool.lang.support.declaration.AttrDeclaration;
+import com.leon.cool.lang.support.infrastructure.ConstantPool;
 import com.leon.cool.lang.util.Stack;
 
 import java.io.PrintStream;
@@ -19,7 +20,8 @@ public class CodeGenTreeScanner extends TreeScanner {
 
     private final PrintStream str;
 
-    public CodeGenTreeScanner(String fileName) {
+    public CodeGenTreeScanner(ScannerSupport scannerSupport, String fileName) {
+        super(scannerSupport);
         str = System.err;
         codeConstants();
         codeClassNameTab();
@@ -182,7 +184,7 @@ public class CodeGenTreeScanner extends TreeScanner {
 
     private void codeClassNameTab() {
         str.print(CgenSupport.CLASSNAMETAB + CgenSupport.LABEL);
-        Utils.classGraph.keySet().forEach(e -> {
+        scannerSupport.classGraph.keySet().forEach(e -> {
             str.print(CgenSupport.WORD); // tag
             ConstantPool.getInstance().addString(e).codeRef(str);
             str.println();
@@ -191,7 +193,7 @@ public class CodeGenTreeScanner extends TreeScanner {
 
     private void codeClassObjTab() {
         str.print(CgenSupport.CLASSOBJTAB + CgenSupport.LABEL);
-        Utils.classGraph.keySet().forEach(e -> {
+        scannerSupport.classGraph.keySet().forEach(e -> {
             str.print(CgenSupport.WORD);
             CgenSupport.emitProtObjRef(e, str);
             str.println();
@@ -202,7 +204,7 @@ public class CodeGenTreeScanner extends TreeScanner {
     }
 
     private void codeDispTab() {
-        Utils.methodGraph.entrySet().forEach(e -> {
+        scannerSupport.methodGraph.entrySet().forEach(e -> {
             String className = e.getKey();
             CgenSupport.emitDispTableRef(className, str);
             str.print(CgenSupport.LABEL);
@@ -223,7 +225,7 @@ public class CodeGenTreeScanner extends TreeScanner {
         // 4 String
         // 5+ self define class tag
         int index = Constant.SELF_DEFINE_TAG;
-        for (String className : Utils.classGraph.keySet()) {
+        for (String className : scannerSupport.classGraph.keySet()) {
             switch (className) {
                 case Constant.INT:
                     str.println(CgenSupport.WORD + "-1");
@@ -278,9 +280,9 @@ public class CodeGenTreeScanner extends TreeScanner {
                     String temp = className;
                     int attrSize = 0;
                     while (temp != null) {
-                        attrSize += Utils.attrGraph.get(temp).values().size();
+                        attrSize += scannerSupport.attrGraph.get(temp).values().size();
                         inheritsLinks.push(temp);
-                        temp = Utils.classGraph.get(temp);
+                        temp = scannerSupport.classGraph.get(temp);
                     }
 
                     str.println(CgenSupport.WORD + "-1");
@@ -301,19 +303,19 @@ public class CodeGenTreeScanner extends TreeScanner {
                      */
                     while (!inheritsLinks.isEmpty()) {
                         String parentClassName = inheritsLinks.pop();
-                        Map<String, AttrDeclaration> attrs = Utils.attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
+                        Map<String, AttrDeclaration> attrs = scannerSupport.attrGraph.getOrDefault(parentClassName, Collections.EMPTY_MAP);
                         for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
-                            if (Utils.isStringType(attr.getValue().type)) {
+                            if (TypeSupport.isStringType(attr.getValue().type)) {
                                 StringConst stringConst = ConstantPool.getInstance().addString("");
                                 str.print(CgenSupport.WORD);
                                 stringConst.codeRef(str);
                                 str.println();
-                            } else if (Utils.isBoolType(attr.getValue().type)) {
+                            } else if (TypeSupport.isBoolType(attr.getValue().type)) {
                                 BoolConst boolConst = ConstantPool.getInstance().addBool(false);
                                 str.print(CgenSupport.WORD);
                                 boolConst.codeRef(str);
                                 str.println();
-                            } else if (Utils.isIntType(attr.getValue().type)) {
+                            } else if (TypeSupport.isIntType(attr.getValue().type)) {
                                 intConst = ConstantPool.getInstance().addInt(0);
                                 str.print(CgenSupport.WORD);
                                 intConst.codeRef(str);

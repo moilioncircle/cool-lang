@@ -24,6 +24,6 @@ import static org.junit.Assert.assertEquals;
 public class TestUtils {
     @Test
     public void testMessage(){
-        assertEquals("Contains \\b \\n \\t \\f at row 10 column 15.",Utils.errorMsg("tokenizer.error.illegal.char",10+"",15+""));
+        assertEquals("Contains \\b \\n \\t \\f at row 10 column 15.", ErrorSupport.errorMsg("tokenizer.error.illegal.char", 10 + "", 15 + ""));
     }
 }

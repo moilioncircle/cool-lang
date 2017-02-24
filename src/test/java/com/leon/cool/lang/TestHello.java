@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -31,8 +31,8 @@ public class TestHello {
 
     @org.junit.Test
     public void test() {
-        String str = FileUtils.readJarFile("hello.cl");
-        Main.run("hello.cl",str);
+        String str = FileUtil.readJarFile("hello.cl");
+        Bootstrap.run("hello.cl", str);
         assertEquals("Hello, world! chen bao yi\n", systemOutRule.getLog());
     }
 }

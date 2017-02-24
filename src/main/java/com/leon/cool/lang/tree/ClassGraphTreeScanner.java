@@ -1,10 +1,12 @@
 package com.leon.cool.lang.tree;
 
+import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.ast.Program;
 import com.leon.cool.lang.ast.StaticDispatch;
-import com.leon.cool.lang.support.Utils;
-import com.leon.cool.lang.util.Constant;
+import com.leon.cool.lang.support.ErrorSupport;
+import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TypeSupport;
 
 /**
  * Copyright leon
@@ -25,30 +27,34 @@ import com.leon.cool.lang.util.Constant;
  */
 public class ClassGraphTreeScanner extends TreeScanner {
 
+    public ClassGraphTreeScanner(ScannerSupport scannerSupport) {
+        super(scannerSupport);
+    }
+
     public void applyProgram(Program program) {
         super.applyProgram(program);
-        Utils.checkUndefinedClass();
+        scannerSupport.checkUndefinedClass();
     }
 
     @Override
     public void applyClassDef(ClassDef classDef) {
-        if (Utils.isSelfType(classDef.type)) {
-            Utils.error("type.error.self.type", Utils.errorPos(classDef.type));
+        if (TypeSupport.isSelfType(classDef.type)) {
+            ErrorSupport.error("type.error.self.type", ErrorSupport.errorPos(classDef.type));
         }
         if (classDef.inheritsType.isPresent()) {
-            if (Utils.isSelfType(classDef.inheritsType.get())) {
-                Utils.error("type.error.inherits.type", Constant.SELF_TYPE, Utils.errorPos(classDef.inheritsType.get()));
-            } else if (Utils.isBasicType(classDef.inheritsType.get())) {
-                Utils.error("type.error.inherits.type", classDef.inheritsType.get().name, Utils.errorPos(classDef.inheritsType.get()));
+            if (TypeSupport.isSelfType(classDef.inheritsType.get())) {
+                ErrorSupport.error("type.error.inherits.type", Constant.SELF_TYPE, ErrorSupport.errorPos(classDef.inheritsType.get()));
+            } else if (TypeSupport.isBasicType(classDef.inheritsType.get())) {
+                ErrorSupport.error("type.error.inherits.type", classDef.inheritsType.get().name, ErrorSupport.errorPos(classDef.inheritsType.get()));
             }
         }
-        Utils.putToClassGraph(classDef.type.name, classDef.inheritsType.map(e -> e.name));
+        scannerSupport.putToClassGraph(classDef.type.name, classDef.inheritsType.map(e -> e.name));
         super.applyClassDef(classDef);
     }
 
     public void applyStaticDispatch(StaticDispatch staticDispatch) {
-        if (staticDispatch.type.isPresent() && Utils.isSelfType(staticDispatch.type.get())) {
-            Utils.error("type.error.cast.type", Utils.errorPos(staticDispatch.type.get()));
+        if (staticDispatch.type.isPresent() && TypeSupport.isSelfType(staticDispatch.type.get())) {
+            ErrorSupport.error("type.error.cast.type", ErrorSupport.errorPos(staticDispatch.type.get()));
         }
         super.applyStaticDispatch(staticDispatch);
     }

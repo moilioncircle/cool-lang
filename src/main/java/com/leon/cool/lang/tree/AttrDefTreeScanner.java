@@ -2,8 +2,10 @@ package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.AttrDef;
 import com.leon.cool.lang.ast.ClassDef;
-import com.leon.cool.lang.support.AttrDeclaration;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.ErrorSupport;
+import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TypeSupport;
+import com.leon.cool.lang.support.declaration.AttrDeclaration;
 
 /**
  * Copyright leon
@@ -25,21 +27,25 @@ import com.leon.cool.lang.support.Utils;
 public class AttrDefTreeScanner extends TreeScanner {
     private String className = null;
 
+    public AttrDefTreeScanner(ScannerSupport scannerSupport) {
+        super(scannerSupport);
+    }
+
     public void applyClassDef(ClassDef classDef) {
         className = classDef.type.name;
-        Utils.createAttrGraph(className);
+        scannerSupport.createAttrGraph(className);
         super.applyClassDef(classDef);
     }
 
     public void applyAttrDef(AttrDef attrDef) {
-        if (Utils.isSelf(attrDef.id)) {
-            Utils.error("type.error.assign.self", Utils.errorPos(attrDef.id));
+        if (TypeSupport.isSelf(attrDef.id)) {
+            ErrorSupport.error("type.error.assign.self", ErrorSupport.errorPos(attrDef.id));
         }
         AttrDeclaration attrDeclaration = new AttrDeclaration();
         attrDeclaration.id = attrDef.id.name;
         attrDeclaration.type = attrDef.type.name;
         attrDeclaration.expr = attrDef.expr;
-        Utils.putToAttrGraph(className, attrDef.id.name, attrDeclaration);
+        scannerSupport.putToAttrGraph(className, attrDef.id.name, attrDeclaration);
         super.applyAttrDef(attrDef);
     }
 }

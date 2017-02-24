@@ -1,4 +1,4 @@
-package com.leon.cool.lang.support;
+package com.leon.cool.lang.support.infrastructure;
 
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.ast.Expression;
