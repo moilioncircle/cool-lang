@@ -58,7 +58,7 @@ public class ClassTable {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public List<ClassDef> installBasicClasses() {
+    public List<ClassDef> builtInClasses() {
         List<ClassDef> classDefs = new ArrayList<>();
         List<Feature> features = new ArrayList<>();
         features.add(f.methodDef(new Token("abort", ID), Collections.EMPTY_LIST, new Token("Object", TYPE), f.noExpression()));

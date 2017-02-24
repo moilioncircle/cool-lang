@@ -59,7 +59,7 @@ public class CoolParser {
             syntaxError(token.kind, token.startPos);
         } else {
             Pos startPos = token.startPos;
-            classDefs.addAll(new ClassTable().installBasicClasses());
+            classDefs.addAll(new ClassTable().builtInClasses());
             while (true) {
                 if (token.kind == EOF) {
                     accept(EOF);
