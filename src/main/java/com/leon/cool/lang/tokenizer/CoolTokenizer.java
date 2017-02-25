@@ -1,7 +1,9 @@
 package com.leon.cool.lang.tokenizer;
 
 import com.leon.cool.lang.Constant;
-import com.leon.cool.lang.support.infrastructure.Pos;
+import com.leon.cool.lang.glossary.Pos;
+import com.leon.cool.lang.glossary.TokenKind;
+import com.leon.cool.lang.glossary.TokenTag;
 
 import java.util.ArrayList;
 import java.util.List;

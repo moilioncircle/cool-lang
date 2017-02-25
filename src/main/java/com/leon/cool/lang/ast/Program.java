@@ -1,9 +1,9 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.glossary.TokenKind;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.Token;
-import com.leon.cool.lang.tokenizer.TokenKind;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeVisitor;
 

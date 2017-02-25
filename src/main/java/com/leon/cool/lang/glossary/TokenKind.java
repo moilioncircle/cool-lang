@@ -1,7 +1,4 @@
-package com.leon.cool.lang.tokenizer;
-
-import com.leon.cool.lang.glossary.Nullable;
-import com.leon.cool.lang.parser.Assoc;
+package com.leon.cool.lang.glossary;
 
 import java.util.function.Predicate;
 

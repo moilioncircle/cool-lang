@@ -1,8 +1,8 @@
 package com.leon.cool.lang.ast;
 
+import com.leon.cool.lang.glossary.Pos;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.infrastructure.Context;
-import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeElement;
 import com.leon.cool.lang.type.Type;

@@ -1,4 +1,4 @@
-package com.leon.cool.lang.support.infrastructure;
+package com.leon.cool.lang.glossary;
 
 /**
  * Copyright leon
@@ -15,24 +15,8 @@ package com.leon.cool.lang.support.infrastructure;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @author leon on 15-11-1
+ * @author leon on 15-10-11
  */
-public class Pos {
-    public final int column;
-    public final int row;
-
-    public static final Pos constPos = new Pos(-1, -1);
-
-    public Pos(int column, int row) {
-        this.column = column;
-        this.row = row;
-    }
-
-    @Override
-    public String toString() {
-        return "Pos{" +
-                "row=" + row +
-                ", column=" + column +
-                '}';
-    }
+public enum Assoc {
+    LEFT, RIGHT, NONE
 }
