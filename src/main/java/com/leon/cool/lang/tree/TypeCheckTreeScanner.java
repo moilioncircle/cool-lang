@@ -4,7 +4,7 @@ import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.support.ErrorSupport;
-import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.TypeSupport;
 import com.leon.cool.lang.support.declaration.MethodDeclaration;
 import com.leon.cool.lang.tokenizer.Token;
@@ -36,11 +36,13 @@ import java.util.stream.Collectors;
  * @author leon on 15-10-15
  */
 public class TypeCheckTreeScanner extends TreeScanner {
+
     private String className = null;
+
     public final List<String> errMsgs = new ArrayList<>();
 
-    public TypeCheckTreeScanner(ScannerSupport scannerSupport) {
-        super(scannerSupport);
+    public TypeCheckTreeScanner(TreeSupport treeSupport) {
+        super(treeSupport);
     }
 
     @Override
@@ -51,7 +53,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyClassDef(ClassDef classDef) {
         className = classDef.type.name;
         super.applyClassDef(classDef);
-        scannerSupport.lookupSymbolTable(className).exitScope();
+        treeSupport.lookupSymbolTable(className).exitScope();
     }
 
     @Override
@@ -64,7 +66,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         super.applyStaticDispatch(staticDispatch);
         List<Type> paramsTypes = staticDispatch.dispatch.params.stream().map(e -> e.typeInfo).collect(Collectors.toList());
         if (!staticDispatch.type.isPresent()) {
-            Optional<MethodDeclaration> methodDeclaration = scannerSupport.lookupMethodDeclaration(staticDispatch.expr.typeInfo.replace().className(), staticDispatch.dispatch.id.name, paramsTypes);
+            Optional<MethodDeclaration> methodDeclaration = treeSupport.lookupMethodDeclaration(staticDispatch.expr.typeInfo.replace().className(), staticDispatch.dispatch.id.name, paramsTypes);
             if (!methodDeclaration.isPresent()) {
                 String method = StringUtil.constructMethod(staticDispatch.dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
                 reportTypeCheckError("type.error.method.undefined", staticDispatch.expr.typeInfo.replace().className(), method, ErrorSupport.errorPos(staticDispatch.dispatch.id));
@@ -78,11 +80,11 @@ public class TypeCheckTreeScanner extends TreeScanner {
             }
         } else {
             Type type = TypeFactory.objectType(staticDispatch.type.get().name, className);
-            if (!TypeSupport.isParent(scannerSupport.classGraph, staticDispatch.expr.typeInfo, type)) {
+            if (!TypeSupport.isParent(treeSupport.classGraph, staticDispatch.expr.typeInfo, type)) {
                 reportTypeCheckError("type.error.subclass", staticDispatch.expr.typeInfo.toString(), type.toString(), ErrorSupport.errorPos(staticDispatch.type.get()));
                 staticDispatch.typeInfo = TypeFactory.noType();
             } else {
-                Optional<MethodDeclaration> methodDeclaration = scannerSupport.lookupMethodDeclaration(type.className(), staticDispatch.dispatch.id.name, paramsTypes);
+                Optional<MethodDeclaration> methodDeclaration = treeSupport.lookupMethodDeclaration(type.className(), staticDispatch.dispatch.id.name, paramsTypes);
                 if (!methodDeclaration.isPresent()) {
                     String method = StringUtil.constructMethod(staticDispatch.dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
                     reportTypeCheckError("type.error.method.undefined", type.className(), method, ErrorSupport.errorPos(staticDispatch.dispatch.id));
@@ -107,7 +109,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
     public void applyDispatch(Dispatch dispatch) {
         super.applyDispatch(dispatch);
         List<Type> paramsTypes = dispatch.params.stream().map(e -> e.typeInfo).collect(Collectors.toList());
-        Optional<MethodDeclaration> methodDeclaration = scannerSupport.lookupMethodDeclaration(className, dispatch.id.name, paramsTypes);
+        Optional<MethodDeclaration> methodDeclaration = treeSupport.lookupMethodDeclaration(className, dispatch.id.name, paramsTypes);
         if (!methodDeclaration.isPresent()) {
             String method = StringUtil.constructMethod(dispatch.id.name, paramsTypes.stream().map(Object::toString).collect(Collectors.toList()));
             reportTypeCheckError("type.error.method.undefined", className, method, ErrorSupport.errorPos(dispatch.id));
@@ -130,52 +132,52 @@ public class TypeCheckTreeScanner extends TreeScanner {
             super.applyCaseDef(caseDef);
         } else {
             super.applyCaseDef(caseDef);
-            caseDef.typeInfo = scannerSupport.lub(caseDef.branchList.stream().map(e -> e.typeInfo).collect(Collectors.toList()));
+            caseDef.typeInfo = treeSupport.lub(caseDef.branchList.stream().map(e -> e.typeInfo).collect(Collectors.toList()));
         }
     }
 
     @Override
     public void applyBranch(Branch branch) {
-        scannerSupport.lookupSymbolTable(className).enterScope();
-        scannerSupport.lookupSymbolTable(className).addId(branch.id.name, branch.type.name);
+        treeSupport.lookupSymbolTable(className).enterScope();
+        treeSupport.lookupSymbolTable(className).addId(branch.id.name, branch.type.name);
         super.applyBranch(branch);
         branch.typeInfo = branch.expr.typeInfo;
-        scannerSupport.lookupSymbolTable(className).exitScope();
+        treeSupport.lookupSymbolTable(className).exitScope();
     }
 
     public void applyMethodDef(MethodDef methodDef) {
-        scannerSupport.lookupSymbolTable(className).enterScope();
+        treeSupport.lookupSymbolTable(className).enterScope();
         methodDef.formals.forEach(e -> {
             if (TypeSupport.isSelf(e.id)) {
                 reportTypeCheckError("type.error.assign.self", ErrorSupport.errorPos(e.id));
             } else {
-                scannerSupport.lookupSymbolTable(className).addId(e.id.name, e.type.name);
+                treeSupport.lookupSymbolTable(className).addId(e.id.name, e.type.name);
             }
         });
         super.applyMethodDef(methodDef);
-        if (!TypeSupport.isParent(scannerSupport.classGraph, methodDef.expr.typeInfo, TypeFactory.objectType(methodDef.type.name, className))) {
+        if (!TypeSupport.isParent(treeSupport.classGraph, methodDef.expr.typeInfo, TypeFactory.objectType(methodDef.type.name, className))) {
             reportTypeCheckError("type.error.subclass", methodDef.expr.typeInfo.toString(), TypeFactory.objectType(methodDef.type.name, className).toString(), ErrorSupport.errorPos(methodDef.type));
         }
-        scannerSupport.lookupSymbolTable(className).exitScope();
+        treeSupport.lookupSymbolTable(className).exitScope();
     }
 
     @Override
     public void applyAttrDef(AttrDef attrDef) {
         super.applyAttrDef(attrDef);
         if (attrDef.expr.isPresent()) {
-            Type t0 = TypeFactory.objectType(scannerSupport.lookupSymbolTable(className).lookup(attrDef.id.name).get(), className);
+            Type t0 = TypeFactory.objectType(treeSupport.lookupSymbolTable(className).lookup(attrDef.id.name).get(), className);
             Type t1 = attrDef.expr.get().typeInfo;
-            if (!TypeSupport.isParent(scannerSupport.classGraph, t1, t0)) {
+            if (!TypeSupport.isParent(treeSupport.classGraph, t1, t0)) {
                 reportTypeCheckError("type.error.subclass", t1.toString(), t0.toString(), ErrorSupport.errorPos(attrDef));
             }
         }
     }
 
     public void applyLet(Let let) {
-        scannerSupport.lookupSymbolTable(className).enterScope();
+        treeSupport.lookupSymbolTable(className).enterScope();
         super.applyLet(let);
         let.typeInfo = let.expr.typeInfo;
-        scannerSupport.lookupSymbolTable(className).exitScope();
+        treeSupport.lookupSymbolTable(className).exitScope();
     }
 
     @Override
@@ -186,11 +188,11 @@ public class TypeCheckTreeScanner extends TreeScanner {
         }
         if (letAttrDef.expr.isPresent()) {
             Type t0 = TypeFactory.objectType(letAttrDef.type.name, className);
-            if (!TypeSupport.isParent(scannerSupport.classGraph, letAttrDef.expr.get().typeInfo, t0)) {
+            if (!TypeSupport.isParent(treeSupport.classGraph, letAttrDef.expr.get().typeInfo, t0)) {
                 reportTypeCheckError("type.error.subclass", letAttrDef.expr.get().typeInfo.toString(), t0.toString(), ErrorSupport.errorPos(letAttrDef));
             }
         }
-        scannerSupport.lookupSymbolTable(className).addId(letAttrDef.id.name, letAttrDef.type.name);
+        treeSupport.lookupSymbolTable(className).addId(letAttrDef.id.name, letAttrDef.type.name);
     }
 
     public void applyAssign(Assign assign) {
@@ -198,7 +200,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
             reportTypeCheckError("type.error.assign.self", ErrorSupport.errorPos(assign.id));
         }
         super.applyAssign(assign);
-        if (TypeSupport.isParent(scannerSupport.classGraph, assign.expr.typeInfo, assign.id.typeInfo)) {
+        if (TypeSupport.isParent(treeSupport.classGraph, assign.expr.typeInfo, assign.id.typeInfo)) {
             assign.typeInfo = assign.expr.typeInfo;
         } else {
             reportTypeCheckError("type.error.subclass", assign.expr.typeInfo.toString(), assign.id.typeInfo.toString(), ErrorSupport.errorPos(assign));
@@ -212,7 +214,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         if (cond.condExpr.typeInfo.type() != TypeEnum.BOOL) {
             reportTypeCheckError("type.error.expected", Constant.BOOL, cond.condExpr.typeInfo.toString(), ErrorSupport.errorPos(cond.condExpr));
         }
-        cond.typeInfo = scannerSupport.lub(Arrays.asList(cond.thenExpr.typeInfo, cond.elseExpr.typeInfo));
+        cond.typeInfo = treeSupport.lub(Arrays.asList(cond.thenExpr.typeInfo, cond.elseExpr.typeInfo));
     }
 
     @Override
@@ -375,10 +377,10 @@ public class TypeCheckTreeScanner extends TreeScanner {
     }
 
     public void applyIdConst(IdConst idConst) {
-        Optional<String> type = scannerSupport.lookupSymbolTable(className).lookup(idConst.tok.name);
+        Optional<String> type = treeSupport.lookupSymbolTable(className).lookup(idConst.tok.name);
         if (type.isPresent()) {
             String typeStr = type.get();
-            if (!TypeSupport.isTypeDefined(scannerSupport.classGraph, typeStr)) {
+            if (!TypeSupport.isTypeDefined(treeSupport.classGraph, typeStr)) {
                 reportTypeCheckError("type.error.type.undefined", className, typeStr, ErrorSupport.errorPos(idConst));
                 idConst.typeInfo = TypeFactory.noType();
             } else {

@@ -37,17 +37,4 @@ public class Constant {
     public static final String MAIN_METHOD = "main";
 
     public static final int GC_HEAP_SIZE = 10;
-
-    public static final int INT_TAG = 2;
-
-    public static final int BOOL_TAG = 3;
-
-    public static final int STRING_TAG = 4;
-
-    public static final int OBJECT_TAG = 0;
-
-    public static final int IO_TAG = 1;
-
-    public static final int SELF_DEFINE_TAG = 5;
-
 }

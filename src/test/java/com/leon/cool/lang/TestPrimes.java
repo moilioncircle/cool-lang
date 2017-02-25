@@ -39,7 +39,7 @@ public class TestPrimes {
     public void test() {
         exit.expectSystemExit();
         String str = FileUtil.readJarFile("primes.cl");
-        Bootstrap.run("primes.cl", str);
+        Bootstrap.run(str);
         assertEquals("2 is trivially prime.\n" +
                 "3 is prime.\n" +
                 "5 is prime.\n" +

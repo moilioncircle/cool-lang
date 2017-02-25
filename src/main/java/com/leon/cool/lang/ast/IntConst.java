@@ -1,13 +1,10 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.CgenSupport;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeVisitor;
-
-import java.io.PrintStream;
 
 /**
  * Copyright leon
@@ -53,28 +50,10 @@ public class IntConst extends Expression {
         return visitor.applyIntConst(this, context);
     }
 
-    public void codeDef(PrintStream s) {
-        s.println(CgenSupport.WORD + "-1");
-        codeRef(s, index);
-        s.print(CgenSupport.LABEL);
-        s.println(CgenSupport.WORD + 2);
-        s.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + CgenSupport.INT_SLOTS)); // size
-        s.print(CgenSupport.WORD);
-        s.println("Int_dispTab");
-        s.println(CgenSupport.WORD + tok.name);
-    }
-
-    public void codeRef(PrintStream s, int index) {
-        s.print(CgenSupport.INTCONST_PREFIX + index);
-    }
-
-    public void codeRef(PrintStream s) {
-        s.print(CgenSupport.INTCONST_PREFIX + index);
-    }
-
     /**
      * Returns a copy of this symbol
      */
+    @Override
     public Object clone() {
         return new IntConst(new Token(tok.name, tok.kind, tok.startPos));
     }

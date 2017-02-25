@@ -44,30 +44,24 @@ import static com.leon.cool.lang.support.TypeSupport.*;
  *
  * @author leon on 15-10-15
  */
-public class ScannerSupport implements Closeable {
+public class TreeSupport implements Closeable {
 
+    public BufferedReader reader;
     public Map<String, String> classGraph = new HashMap<>();
     public Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
     public Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
     public Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
-    public BufferedReader reader;
 
     public void createSymbolTable(String className) {
-        if (!symbolTables.containsKey(className)) {
-            symbolTables.put(className, new SymbolTable<>());
-        }
+        symbolTables.putIfAbsent(className, new SymbolTable<>());
     }
 
     public void createAttrGraph(String className) {
-        if (!attrGraph.containsKey(className)) {
-            attrGraph.put(className, new LinkedHashMap<>());
-        }
+        attrGraph.putIfAbsent(className, new LinkedHashMap<>());
     }
 
     public void createMethodGraph(String className) {
-        if (!methodGraph.containsKey(className)) {
-            methodGraph.put(className, new LinkedHashSet<>());
-        }
+        methodGraph.putIfAbsent(className, new LinkedHashSet<>());
     }
 
     public void putToClassGraph(String type, Optional<String> parentType) {
@@ -149,7 +143,7 @@ public class ScannerSupport implements Closeable {
             // Type check for NoType.
             return Optional.empty();
         }
-        List<MethodDeclaration> list = methodGraph.get(className).stream().filter(e -> e.methodName.equals(methodName) && checkType(e.paramTypes, typeInfo, className)).collect(Collectors.toList());
+        List<MethodDeclaration> list = methodGraph.get(className).stream().filter(e -> e.methodName.equals(methodName) && checkParamType(e.paramTypes, typeInfo, className)).collect(Collectors.toList());
         if (list.isEmpty()) {
             return Optional.empty();
         } else if (list.size() > 1) {
@@ -158,29 +152,6 @@ public class ScannerSupport implements Closeable {
         } else {
             return Optional.of(list.get(0));
         }
-    }
-
-    private Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
-        MethodDeclaration min = new MethodDeclaration();
-        min.paramTypes = typeInfo.stream().map(e -> Constant.OBJECT).collect(Collectors.toList());
-        label:
-        for (MethodDeclaration declaration : list) {
-            for (int i = 0; i < declaration.paramTypes.size(); i++) {
-                if (!isParent(classGraph, TypeFactory.objectType(declaration.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
-                    continue label;
-                }
-            }
-            min = declaration;
-        }
-        for (MethodDeclaration declaration : list) {
-            for (int i = 0; i < declaration.paramTypes.size(); i++) {
-                if (!isParent(classGraph, TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(declaration.paramTypes.get(i), className))) {
-                    ErrorSupport.error("global.error.overload", className, StringUtil.mkString(list.stream().map(StringUtil::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
-                    return Optional.empty();
-                }
-            }
-        }
-        return Optional.of(min);
     }
 
     public Optional<MethodDeclaration> lookupMethodDeclaration(String className, String methodName) {
@@ -208,18 +179,9 @@ public class ScannerSupport implements Closeable {
                 reader.close();
                 reader = null;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignore) { }
         Heap.clear();
         ConstantPool.getInstance().clear();
-    }
-
-    private BufferedReader reader() {
-        if (reader == null) {
-            reader = new BufferedReader(new InputStreamReader(System.in));
-        }
-        return reader;
     }
 
     /**
@@ -269,66 +231,6 @@ public class ScannerSupport implements Closeable {
         gc(context);
         Heap.add(object);
         return object;
-    }
-
-    /**
-     * Mark-Sweep GC
-     *
-     * @param context
-     */
-    public void gc(Context context) {
-        if (Heap.size() < Constant.GC_HEAP_SIZE) return;
-        SymbolTable<CoolObject> environment = context.environment;
-
-        //Mark
-        List<CoolObject> rootObjects = new ArrayList<>();
-        for (int i = 0; i < environment.size(); i++) {
-            rootObjects.addAll(environment.elementAt(i).values().stream().filter(e -> isObjectType(e.type)).collect(Collectors.toList()));
-        }
-
-        while (!rootObjects.isEmpty()) {
-            CoolObject obj = rootObjects.remove(0);
-            Heap.canReach(obj);
-            SymbolTable<CoolObject> variables = obj.variables;
-            if (variables == null) continue;
-            for (int i = 0; i < variables.size(); i++) {
-                Collection<CoolObject> values = variables.elementAt(i).values();
-                for (CoolObject variable : values) {
-                    //防止循环引用
-                    if (isObjectType(variable.type) && !Heap.isReach(variable)) {
-                        rootObjects.add(variable);
-                    }
-                }
-            }
-        }
-        //Sweep
-        Heap.clearUnreachable();
-    }
-
-    /**
-     * @param visitor
-     * @param object
-     * @see this.newDef(Type)
-     * <p>
-     * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
-     */
-    private void initializer(EvalTreeVisitor visitor, CoolObject object) {
-        Stack<String> inheritsLinks = new Stack<>();
-        String temp = object.type.className();
-        while (temp != null) {
-            inheritsLinks.push(temp);
-            temp = classGraph.get(temp);
-        }
-        Context context = new Context(object, object.variables);
-        while (!inheritsLinks.isEmpty()) {
-            String parentClassName = inheritsLinks.pop();
-            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
-            attrs.entrySet().forEach(attr -> {
-                if (attr.getValue().expr.isPresent()) {
-                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().accept(visitor, context));
-                }
-            });
-        }
     }
 
     /**
@@ -431,6 +333,96 @@ public class ScannerSupport implements Closeable {
         return TypeFactory.objectType(list1.stream().filter(list2::contains).findFirst().get());
     }
 
+    private BufferedReader reader() {
+        if (reader == null) {
+            reader = new BufferedReader(new InputStreamReader(System.in));
+        }
+        return reader;
+    }
+
+    /**
+     * Mark-Sweep GC
+     *
+     * @param context
+     */
+    private void gc(Context context) {
+        if (Heap.size() < Constant.GC_HEAP_SIZE) return;
+        SymbolTable<CoolObject> environment = context.environment;
+
+        //Mark
+        List<CoolObject> rootObjects = new ArrayList<>();
+        for (int i = 0; i < environment.size(); i++) {
+            rootObjects.addAll(environment.elementAt(i).values().stream().filter(e -> isObjectType(e.type)).collect(Collectors.toList()));
+        }
+
+        while (!rootObjects.isEmpty()) {
+            CoolObject obj = rootObjects.remove(0);
+            Heap.canReach(obj);
+            SymbolTable<CoolObject> variables = obj.variables;
+            if (variables == null) continue;
+            for (int i = 0; i < variables.size(); i++) {
+                Collection<CoolObject> values = variables.elementAt(i).values();
+                for (CoolObject variable : values) {
+                    //防止循环引用
+                    if (isObjectType(variable.type) && !Heap.isReach(variable)) {
+                        rootObjects.add(variable);
+                    }
+                }
+            }
+        }
+        //Sweep
+        Heap.clearUnreachable();
+    }
+
+    /**
+     * @param visitor
+     * @param object
+     * @see this.newDef(Type)
+     * <p>
+     * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
+     */
+    private void initializer(EvalTreeVisitor visitor, CoolObject object) {
+        Stack<String> inheritsLinks = new Stack<>();
+        String temp = object.type.className();
+        while (temp != null) {
+            inheritsLinks.push(temp);
+            temp = classGraph.get(temp);
+        }
+        Context context = new Context(object, object.variables);
+        while (!inheritsLinks.isEmpty()) {
+            String parentClassName = inheritsLinks.pop();
+            Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
+            attrs.entrySet().forEach(attr -> {
+                if (attr.getValue().expr.isPresent()) {
+                    object.variables.addId(attr.getKey(), attr.getValue().expr.get().accept(visitor, context));
+                }
+            });
+        }
+    }
+
+    private Optional<MethodDeclaration> minimumMethodDeclaration(List<MethodDeclaration> list, String className, List<Type> typeInfo) {
+        MethodDeclaration min = new MethodDeclaration();
+        min.paramTypes = typeInfo.stream().map(e -> Constant.OBJECT).collect(Collectors.toList());
+        label:
+        for (MethodDeclaration declaration : list) {
+            for (int i = 0; i < declaration.paramTypes.size(); i++) {
+                if (!isParent(classGraph, TypeFactory.objectType(declaration.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
+                    continue label;
+                }
+            }
+            min = declaration;
+        }
+        for (MethodDeclaration declaration : list) {
+            for (int i = 0; i < declaration.paramTypes.size(); i++) {
+                if (!isParent(classGraph, TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(declaration.paramTypes.get(i), className))) {
+                    ErrorSupport.error("global.error.overload", className, StringUtil.mkString(list.stream().map(StringUtil::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
+                    return Optional.empty();
+                }
+            }
+        }
+        return Optional.of(min);
+    }
+
     private void checkCircleInherits(Map<String, String> classGraph) {
         Set<String> keys = classGraph.keySet();
         for (String key : keys) {
@@ -444,7 +436,7 @@ public class ScannerSupport implements Closeable {
         }
     }
 
-    private boolean checkType(List<String> paramTypes, List<Type> typeInfos, String className) {
+    private boolean checkParamType(List<String> paramTypes, List<Type> typeInfos, String className) {
         if (paramTypes.size() != typeInfos.size()) {
             return false;
         } else {

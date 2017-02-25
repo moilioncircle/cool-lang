@@ -1,7 +1,7 @@
 package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.*;
-import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.tokenizer.Token;
 
 import java.util.List;
@@ -26,10 +26,10 @@ import java.util.Optional;
  */
 public class TreeScanner implements TreeVisitor {
 
-    protected ScannerSupport scannerSupport;
+    protected TreeSupport treeSupport;
 
-    public TreeScanner(ScannerSupport scannerSupport) {
-        this.scannerSupport = scannerSupport;
+    public TreeScanner(TreeSupport treeSupport) {
+        this.treeSupport = treeSupport;
     }
 
     protected <T extends TreeNode> void scan(T node) {

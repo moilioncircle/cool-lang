@@ -58,6 +58,7 @@ public class CoolIO extends CoolObject {
         return new CoolInt();
     }
 
+    @Override
     public CoolIO copy() {
         return new CoolIO();
     }

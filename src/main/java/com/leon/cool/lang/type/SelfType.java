@@ -30,6 +30,7 @@ public class SelfType implements Type {
         this.type = type;
     }
 
+    @Override
     public Type replace() {
         return TypeFactory.objectType(type);
     }

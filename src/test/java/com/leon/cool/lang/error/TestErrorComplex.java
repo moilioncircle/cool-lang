@@ -32,7 +32,7 @@ public class TestErrorComplex {
     @Test
     public void test() {
         String str = FileUtil.readJarFile("error/complex.cl");
-        Bootstrap.run("complex.cl", str);
+        Bootstrap.run(str);
         assertEquals("Type check error.Type Complex is not same as Int  at Pos{row=4, column=9} to Pos{row=4, column=50}.\r\n" +
                 "Type check error.Expected Bool but actual NoType  at Pos{row=4, column=9} to Pos{row=4, column=50}.\r\n" +
                 "Type check error.Type String is not same as Int  at Pos{row=19, column=6} to Pos{row=19, column=11}.\r\n" +

@@ -34,7 +34,7 @@ public class TestComplex {
     @Test
     public void test() {
         String str = FileUtil.readJarFile("complex.cl");
-        Bootstrap.run("complex.cl", str);
+        Bootstrap.run(str);
         assertEquals("=)\n", systemOutRule.getLog());
     }
 

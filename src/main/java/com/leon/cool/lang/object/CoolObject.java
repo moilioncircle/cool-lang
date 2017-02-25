@@ -32,7 +32,6 @@ public class CoolObject {
     public SymbolTable<CoolObject> variables = new SymbolTable<>();
 
     public CoolObject() {
-
     }
 
     public CoolObject abort() {

@@ -47,6 +47,7 @@ public class CoolInt extends CoolObject {
         return val;
     }
 
+    @Override
     public CoolInt copy() {
         return ObjectFactory.coolInt(this.val);
     }

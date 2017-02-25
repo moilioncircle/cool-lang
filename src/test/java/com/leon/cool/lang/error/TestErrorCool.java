@@ -32,7 +32,7 @@ public class TestErrorCool {
     @Test
     public void test() {
         String str = FileUtil.readJarFile("error/cool.cl");
-        Bootstrap.run("cool.cl", str);
+        Bootstrap.run(str);
         assertEquals("Expected Type but actual ID at Pos{row=4, column=25}.\r\n" +
                 "Expected Type but actual ID at Pos{row=12, column=29}.\r\n", systemErrRule.getLog());
     }

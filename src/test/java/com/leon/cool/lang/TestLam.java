@@ -33,7 +33,7 @@ public class TestLam {
     @Test
     public void test() {
         String str = FileUtil.readJarFile("lam.cl");
-        Bootstrap.run("lam.cl", str);
+        Bootstrap.run(str);
         assertEquals("\\x.x\n" +
                 "\\x.\\y.x\n" +
                 "\\x.\\y.\\z.((((x)@(z)))@(((y)@(z))))\n" +

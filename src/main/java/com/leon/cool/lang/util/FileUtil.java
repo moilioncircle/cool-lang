@@ -25,9 +25,7 @@ public class FileUtil {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(FileUtil.class.getClassLoader().getResourceAsStream(fileName)))) {
             String line; while ((line = br.readLine()) != null) sb.append(line).append("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignore) { }
         return sb.toString();
     }
 
@@ -35,9 +33,7 @@ public class FileUtil {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName))))) {
             String line; while ((line = br.readLine()) != null) sb.append(line).append("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignore) { }
         return sb.toString();
     }
 }

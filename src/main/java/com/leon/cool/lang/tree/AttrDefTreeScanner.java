@@ -3,7 +3,7 @@ package com.leon.cool.lang.tree;
 import com.leon.cool.lang.ast.AttrDef;
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.support.ErrorSupport;
-import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.TypeSupport;
 import com.leon.cool.lang.support.declaration.AttrDeclaration;
 
@@ -27,13 +27,13 @@ import com.leon.cool.lang.support.declaration.AttrDeclaration;
 public class AttrDefTreeScanner extends TreeScanner {
     private String className = null;
 
-    public AttrDefTreeScanner(ScannerSupport scannerSupport) {
-        super(scannerSupport);
+    public AttrDefTreeScanner(TreeSupport treeSupport) {
+        super(treeSupport);
     }
 
     public void applyClassDef(ClassDef classDef) {
         className = classDef.type.name;
-        scannerSupport.createAttrGraph(className);
+        treeSupport.createAttrGraph(className);
         super.applyClassDef(classDef);
     }
 
@@ -45,7 +45,7 @@ public class AttrDefTreeScanner extends TreeScanner {
         attrDeclaration.id = attrDef.id.name;
         attrDeclaration.type = attrDef.type.name;
         attrDeclaration.expr = attrDef.expr;
-        scannerSupport.putToAttrGraph(className, attrDef.id.name, attrDeclaration);
+        treeSupport.putToAttrGraph(className, attrDef.id.name, attrDeclaration);
         super.applyAttrDef(attrDef);
     }
 }

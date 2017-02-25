@@ -46,6 +46,7 @@ public class CoolBool extends CoolObject {
         return (val ? 1 : 0);
     }
 
+    @Override
     public CoolBool copy() {
         return new CoolBool(this.val);
     }

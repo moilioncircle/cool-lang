@@ -1,14 +1,10 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.CgenSupport;
-import com.leon.cool.lang.support.infrastructure.ConstantPool;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeVisitor;
-
-import java.io.PrintStream;
 
 /**
  * Copyright (c) 2000 The Regents of the University of California.
@@ -57,34 +53,10 @@ public class StringConst extends Expression {
         return visitor.applyStringConst(this, context);
     }
 
-    public void codeDef(PrintStream s) {
-        IntConst lensym = ConstantPool.getInstance().addInt(tok.name.length());
-        s.println(CgenSupport.WORD + "-1");
-        codeRef(s, index);
-        s.print(CgenSupport.LABEL);
-        s.println(CgenSupport.WORD + 4);
-        s.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + CgenSupport.STRING_SLOTS + (tok.name.length() + 4) / 4));
-        s.print(CgenSupport.WORD);
-
-        s.println("String_dispTab");
-        s.print(CgenSupport.WORD);
-        lensym.codeRef(s, lensym.index);
-        s.println();
-        CgenSupport.emitStringConstant(tok.name, s);
-        s.print(CgenSupport.ALIGN);
-    }
-
-    public void codeRef(PrintStream s, int index) {
-        s.print(CgenSupport.STRCONST_PREFIX + index);
-    }
-
-    public void codeRef(PrintStream s) {
-        s.print(CgenSupport.STRCONST_PREFIX + index);
-    }
-
     /**
      * Returns a copy of this symbol
      */
+    @Override
     public Object clone() {
         return new StringConst(new Token(tok.name, tok.kind, tok.startPos));
     }

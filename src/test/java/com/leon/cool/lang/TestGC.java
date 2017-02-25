@@ -30,7 +30,7 @@ public class TestGC {
     @org.junit.Test
     public void test() {
         String str = FileUtil.readJarFile("gc.cl");
-        Bootstrap.run("gc.cl", str);
+        Bootstrap.run(str);
         assertEquals("", systemOutRule.getLog());
     }
 }

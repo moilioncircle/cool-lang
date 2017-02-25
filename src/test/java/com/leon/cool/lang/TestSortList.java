@@ -40,7 +40,7 @@ public class TestSortList {
     public void test() {
         systemInMock.provideText("5");
         String str = FileUtil.readJarFile("sort_list.cl");
-        Bootstrap.run("sort_list.cl", str);
+        Bootstrap.run(str);
         assertEquals("How many numbers to sort?0\n" +
                 "1\n" +
                 "2\n" +

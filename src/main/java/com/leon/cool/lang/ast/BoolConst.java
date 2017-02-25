@@ -1,12 +1,9 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.CgenSupport;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeVisitor;
-
-import java.io.PrintStream;
 
 /**
  * Copyright leon
@@ -48,20 +45,5 @@ public class BoolConst extends Expression {
     @Override
     public CoolObject accept(EvalTreeVisitor visitor, Context context) {
         return visitor.applyBoolConst(this, context);
-    }
-
-    public void codeRef(PrintStream s) {
-        s.print(CgenSupport.BOOLCONST_PREFIX + (bool ? "1" : "0"));
-    }
-
-    public void codeDef(PrintStream s) {
-        s.println(CgenSupport.WORD + "-1");
-        codeRef(s);
-        s.print(CgenSupport.LABEL); // label
-        s.println(CgenSupport.WORD + 3); // tag
-        s.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + CgenSupport.BOOL_SLOTS)); // size
-        s.print(CgenSupport.WORD);
-        s.println("Bool_dispTab");
-        s.println(CgenSupport.WORD + (bool ? "1" : "0"));
     }
 }

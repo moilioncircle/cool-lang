@@ -32,7 +32,7 @@ public class TestCell {
     @org.junit.Test
     public void test() {
         String str = FileUtil.readJarFile("cell.cl");
-        Bootstrap.run("cell.cl", str);
+        Bootstrap.run(str);
         assertEquals("         X         \n" +
                 "........XXX........\n" +
                 ".......X...X.......\n" +

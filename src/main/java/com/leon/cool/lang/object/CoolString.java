@@ -71,6 +71,7 @@ public class CoolString extends CoolObject {
         return result;
     }
 
+    @Override
     public CoolString copy() {
         return ObjectFactory.coolString(this.str);
     }

@@ -309,7 +309,7 @@ public class CoolParser {
                 if (opStack.isEmpty()) {
                     opStack.push(o1);
                 } else {
-                    while (!opStack.isEmpty() && ((o1.assoc != Assoc.RIGHT && o1.prec <= opStack.top().prec) || (o1.assoc == Assoc.RIGHT && o1.prec < opStack.top().prec))) {
+                    while (!opStack.isEmpty() && ((o1.assoc != Assoc.RIGHT && o1.prec <= opStack.peek().prec) || (o1.assoc == Assoc.RIGHT && o1.prec < opStack.peek().prec))) {
                         add(opStack.pop());
                     }
                     opStack.push(o1);
@@ -626,7 +626,7 @@ public class CoolParser {
     Shunting yard algorithm
      */
     private Expression expr(List<Object> suffixExpr) {
-        Pos startPos = errStartTokenSupply.top().startPos;
+        Pos startPos = errStartTokenSupply.peek().startPos;
         Pos endPos = errEndToken.endPos;
         Stack<Object> stack = new Stack<>();
         boolean nonAssoc = false;
@@ -635,7 +635,7 @@ public class CoolParser {
                 TokenKind op = (TokenKind) suffixExpr.get(i);
                 switch (op) {
                     case MONKEYS_AT:
-                        ErrorSupport.error("parser.error.unexpected.at", ErrorSupport.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        ErrorSupport.error("parser.error.unexpected.at", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                     case DOT:
                         if (nextIsAt(i, suffixExpr)) {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
@@ -695,7 +695,7 @@ public class CoolParser {
                         break;
                     case LT:
                         if (nonAssoc) {
-                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -705,7 +705,7 @@ public class CoolParser {
                         break;
                     case LTEQ:
                         if (nonAssoc) {
-                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -715,7 +715,7 @@ public class CoolParser {
                         break;
                     case EQ:
                         if (nonAssoc) {
-                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -724,7 +724,7 @@ public class CoolParser {
                         }
                         break;
                     default:
-                        ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                 }
             } else {
                 stack.push(suffixExpr.get(i));
@@ -739,7 +739,7 @@ public class CoolParser {
         try {
             return (T) stack.pop();
         } catch (ClassCastException e) {
-            ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+            ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
         }
         return null;
     }

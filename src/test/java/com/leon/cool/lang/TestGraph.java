@@ -26,6 +26,6 @@ public class TestGraph {
     @Test
     public void test() {
         String str = FileUtil.readJarFile("graph.cl");
-        Bootstrap.run("graph.cl", str);
+        Bootstrap.run(str);
     }
 }

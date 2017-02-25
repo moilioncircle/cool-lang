@@ -1,6 +1,6 @@
 package com.leon.cool.lang.util;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,7 +21,7 @@ import java.util.List;
  * @author leon on 15-10-11
  */
 public class Stack<T> {
-    private final List<T> list = new ArrayList<>();
+    private final List<T> list = new LinkedList<>();
 
     public boolean isEmpty() {
         return list.isEmpty();
@@ -45,7 +45,7 @@ public class Stack<T> {
         return list.remove(0);
     }
 
-    public T top() {
+    public T peek() {
         if (isEmpty()) return null;
         return list.get(0);
     }

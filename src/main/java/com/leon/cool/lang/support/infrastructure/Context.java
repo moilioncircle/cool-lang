@@ -1,5 +1,6 @@
 package com.leon.cool.lang.support.infrastructure;
 
+import com.leon.cool.lang.glossary.Nullable;
 import com.leon.cool.lang.object.CoolObject;
 
 /**
@@ -25,7 +26,7 @@ public class Context {
 
     public final SymbolTable<CoolObject> environment;
 
-    public Context(CoolObject selfObject, SymbolTable<CoolObject> environment) {
+    public Context(@Nullable CoolObject selfObject, @Nullable SymbolTable<CoolObject> environment) {
         this.selfObject = selfObject;
         this.environment = environment;
     }

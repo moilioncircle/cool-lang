@@ -33,7 +33,7 @@ public class TestHairyscary {
     @Test
     public void test() {
         String str = FileUtil.readJarFile("hairyscary.cl");
-        Bootstrap.run("hairyscary.cl", str);
+        Bootstrap.run(str);
         assertEquals("17141611714163171416511714161171416317141653117141611714163171416511714161171416317141653171416117141631714165171416", systemOutRule.getLog());
     }
 

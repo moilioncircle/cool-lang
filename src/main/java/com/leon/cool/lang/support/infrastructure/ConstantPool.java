@@ -6,7 +6,6 @@ import com.leon.cool.lang.ast.StringConst;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tokenizer.TokenKind;
 
-import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -75,13 +74,6 @@ public class ConstantPool {
 
     public BoolConst addBool(boolean bool) {
         return bool ? trueBool : falseBool;
-    }
-
-    public void genConstantPool(final PrintStream s) {
-        stringPool.values().stream().forEach(e -> e.codeDef(s));
-        intPool.values().stream().forEach(e -> e.codeDef(s));
-        falseBool.codeDef(s);
-        trueBool.codeDef(s);
     }
 
     public void clear() {

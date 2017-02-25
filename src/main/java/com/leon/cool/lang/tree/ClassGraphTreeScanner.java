@@ -5,7 +5,7 @@ import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.ast.Program;
 import com.leon.cool.lang.ast.StaticDispatch;
 import com.leon.cool.lang.support.ErrorSupport;
-import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.TypeSupport;
 
 /**
@@ -27,13 +27,13 @@ import com.leon.cool.lang.support.TypeSupport;
  */
 public class ClassGraphTreeScanner extends TreeScanner {
 
-    public ClassGraphTreeScanner(ScannerSupport scannerSupport) {
-        super(scannerSupport);
+    public ClassGraphTreeScanner(TreeSupport treeSupport) {
+        super(treeSupport);
     }
 
     public void applyProgram(Program program) {
         super.applyProgram(program);
-        scannerSupport.checkUndefinedClass();
+        treeSupport.checkUndefinedClass();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ClassGraphTreeScanner extends TreeScanner {
                 ErrorSupport.error("type.error.inherits.type", classDef.inheritsType.get().name, ErrorSupport.errorPos(classDef.inheritsType.get()));
             }
         }
-        scannerSupport.putToClassGraph(classDef.type.name, classDef.inheritsType.map(e -> e.name));
+        treeSupport.putToClassGraph(classDef.type.name, classDef.inheritsType.map(e -> e.name));
         super.applyClassDef(classDef);
     }
 

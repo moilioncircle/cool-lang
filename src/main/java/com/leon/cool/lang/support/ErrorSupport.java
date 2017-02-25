@@ -17,7 +17,7 @@ public class ErrorSupport {
     private static final Properties messages = new Properties();
 
     static {
-        try (InputStream stream = ScannerSupport.class.getClassLoader().getResourceAsStream("messages.properties")) {
+        try (InputStream stream = TreeSupport.class.getClassLoader().getResourceAsStream("messages.properties")) {
             messages.load(stream);
         } catch (IOException e) {
             e.printStackTrace();

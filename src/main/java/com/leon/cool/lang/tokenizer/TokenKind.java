@@ -1,5 +1,6 @@
 package com.leon.cool.lang.tokenizer;
 
+import com.leon.cool.lang.glossary.Nullable;
 import com.leon.cool.lang.parser.Assoc;
 
 import java.util.function.Predicate;
@@ -58,7 +59,7 @@ public enum TokenKind implements Predicate<TokenKind> {
         this(null, tag, 10, Assoc.LEFT);
     }
 
-    TokenKind(String name, TokenTag tag, int prec, Assoc assoc) {
+    TokenKind(@Nullable String name, TokenTag tag, int prec, Assoc assoc) {
         this.name = name;
         this.tag = tag;
         this.prec = prec;

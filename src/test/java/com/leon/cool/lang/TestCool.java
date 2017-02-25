@@ -33,7 +33,7 @@ public class TestCool {
     @Test
     public void test() {
         String str = FileUtil.readJarFile("cool.cl");
-        Bootstrap.run("cool.cl", str);
+        Bootstrap.run(str);
         assertEquals("cool\n", systemOutRule.getLog());
     }
 

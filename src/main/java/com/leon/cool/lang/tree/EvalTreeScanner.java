@@ -9,7 +9,7 @@ import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
 import com.leon.cool.lang.support.ErrorSupport;
-import com.leon.cool.lang.support.ScannerSupport;
+import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.TypeSupport;
 import com.leon.cool.lang.support.declaration.MethodDeclaration;
 import com.leon.cool.lang.support.infrastructure.Context;
@@ -39,10 +39,10 @@ import java.util.stream.Collectors;
  */
 public class EvalTreeScanner implements EvalTreeVisitor {
 
-    protected ScannerSupport scannerSupport;
+    protected TreeSupport treeSupport;
 
-    public EvalTreeScanner(ScannerSupport scannerSupport) {
-        this.scannerSupport = scannerSupport;
+    public EvalTreeScanner(TreeSupport treeSupport) {
+        this.treeSupport = treeSupport;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class EvalTreeScanner implements EvalTreeVisitor {
         } else {
             type = TypeFactory.objectType(newDef.type.name);
         }
-        return scannerSupport.newDef(this, type, context);
+        return treeSupport.newDef(this, type, context);
     }
 
     @Override
@@ -208,9 +208,9 @@ public class EvalTreeScanner implements EvalTreeVisitor {
         List<Type> paramTypes = paramObjects.stream().map(e -> e.type).collect(Collectors.toList());
         CoolObject obj = context.selfObject;
         //根据类型，方法名称，类名lookup方法声明
-        MethodDeclaration methodDeclaration = scannerSupport.lookupMethodDeclaration(obj.type.className(), dispatch.id.name, paramTypes).get();
+        MethodDeclaration methodDeclaration = treeSupport.lookupMethodDeclaration(obj.type.className(), dispatch.id.name, paramTypes).get();
 
-        CoolObject str = scannerSupport.buildIn(paramObjects, obj, methodDeclaration, ErrorSupport.errorPos(dispatch.starPos, dispatch.endPos));
+        CoolObject str = treeSupport.buildIn(paramObjects, obj, methodDeclaration, ErrorSupport.errorPos(dispatch.starPos, dispatch.endPos));
         if (str != null) return str;
 
         /**
@@ -258,12 +258,12 @@ public class EvalTreeScanner implements EvalTreeVisitor {
         //如果提供type，则根据type查找方法声明
         //如果没提供type，则根据上述expr值的类型查找方法声明
         if (staticDispatch.type.isPresent()) {
-            methodDeclaration = scannerSupport.lookupMethodDeclaration(staticDispatch.type.get().name, staticDispatch.dispatch.id.name, paramTypes).get();
+            methodDeclaration = treeSupport.lookupMethodDeclaration(staticDispatch.type.get().name, staticDispatch.dispatch.id.name, paramTypes).get();
         } else {
-            methodDeclaration = scannerSupport.lookupMethodDeclaration(obj.type.className(), staticDispatch.dispatch.id.name, paramTypes).get();
+            methodDeclaration = treeSupport.lookupMethodDeclaration(obj.type.className(), staticDispatch.dispatch.id.name, paramTypes).get();
         }
 
-        CoolObject str = scannerSupport.buildIn(paramObjects, obj, methodDeclaration, ErrorSupport.errorPos(staticDispatch.starPos, staticDispatch.endPos));
+        CoolObject str = treeSupport.buildIn(paramObjects, obj, methodDeclaration, ErrorSupport.errorPos(staticDispatch.starPos, staticDispatch.endPos));
         if (str != null) return str;
 
         /**
@@ -330,7 +330,7 @@ public class EvalTreeScanner implements EvalTreeVisitor {
                 }
                 return returnVal;
             }
-            temp = scannerSupport.classGraph.get(temp);
+            temp = treeSupport.classGraph.get(temp);
         }
         ErrorSupport.error("runtime.error.case", ErrorSupport.errorPos(caseDef.starPos, caseDef.endPos));
         return ObjectFactory.coolVoid();

@@ -21,6 +21,7 @@ import com.leon.cool.lang.tokenizer.Token;
  * @author leon on 15-10-14
  */
 public interface TreeVisitor {
+
     void applyProgram(Program program);
 
     void applyClassDef(ClassDef classDef);

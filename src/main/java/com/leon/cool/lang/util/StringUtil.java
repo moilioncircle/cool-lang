@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
  * Created by Baoyi Chen on 2017/2/24.
  */
 public class StringUtil {
+
     public static <T> String mkString(List<T> tks, String split) {
         return mkString(tks, Optional.empty(), split, Optional.empty());
     }
