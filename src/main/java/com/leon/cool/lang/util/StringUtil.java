@@ -1,9 +1,9 @@
 package com.leon.cool.lang.util;
 
+import com.leon.cool.lang.glossary.Nullable;
 import com.leon.cool.lang.support.declaration.MethodDeclaration;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -12,19 +12,17 @@ import java.util.stream.Collectors;
 public class StringUtil {
 
     public static <T> String mkString(List<T> tks, String split) {
-        return mkString(tks, Optional.empty(), split, Optional.empty());
+        return mkString(tks, null, split, null);
     }
 
-    public static <T> String mkString(List<T> tks, Optional<String> beforeOpt, String split, Optional<String> endOpt) {
-        StringBuilder sb = new StringBuilder();
-        if (beforeOpt.isPresent()) sb.append(beforeOpt.get());
-        sb.append(tks.stream().map(T::toString).collect(Collectors.joining(split)));
-        if (endOpt.isPresent()) sb.append(endOpt.get());
-        return sb.toString();
+    public static <T> String mkString(List<T> tks, @Nullable String prefix, String split, @Nullable String suffix) {
+        if (prefix == null) prefix = "";
+        if (suffix == null) suffix = "";
+        return tks.stream().map(T::toString).collect(Collectors.joining(split, prefix, suffix));
     }
 
     public static String constructMethod(String id, List<String> params) {
-        return id + mkString(params, Optional.of("("), ",", Optional.of(")"));
+        return id + mkString(params, "(", ",", ")");
     }
 
     public static String constructMethod(MethodDeclaration methodDeclaration) {

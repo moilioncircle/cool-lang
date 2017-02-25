@@ -419,7 +419,7 @@ public class TreeSupport implements Closeable {
         for (MethodDeclaration declaration : list) {
             for (int i = 0; i < declaration.paramTypes.size(); i++) {
                 if (!isParent(classGraph, objectType(min.paramTypes.get(i), className), objectType(declaration.paramTypes.get(i), className))) {
-                    error("global.error.overload", className, mkString(list.stream().map(StringUtil::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
+                    error("global.error.overload", className, mkString(list.stream().map(StringUtil::constructMethod).collect(Collectors.toList()), "[", ",", "]"));
                     return Optional.empty();
                 }
             }
