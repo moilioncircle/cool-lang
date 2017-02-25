@@ -8,8 +8,8 @@ import com.leon.cool.lang.type.TypeEnum;
 import java.util.Map;
 
 import static com.leon.cool.lang.factory.TypeFactory.objectType;
-import static com.leon.cool.lang.tokenizer.TokenKind.ID;
-import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
+import static com.leon.cool.lang.glossary.TokenKind.ID;
+import static com.leon.cool.lang.glossary.TokenKind.TYPE;
 
 /**
  * Created by Baoyi Chen on 2017/2/24.

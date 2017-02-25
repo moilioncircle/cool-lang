@@ -3,11 +3,12 @@ package com.leon.cool.lang.parser;
 import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.factory.TreeFactory;
+import com.leon.cool.lang.glossary.Assoc;
+import com.leon.cool.lang.glossary.Pos;
+import com.leon.cool.lang.glossary.TokenKind;
 import com.leon.cool.lang.support.infrastructure.ClassTable;
-import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.Token;
-import com.leon.cool.lang.tokenizer.TokenKind;
 import com.leon.cool.lang.util.Stack;
 
 import java.util.ArrayList;
@@ -16,9 +17,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.leon.cool.lang.glossary.TokenKind.*;
 import static com.leon.cool.lang.support.ErrorSupport.*;
 import static com.leon.cool.lang.support.TypeSupport.isSelf;
-import static com.leon.cool.lang.tokenizer.TokenKind.*;
 import static com.leon.cool.lang.util.StringUtil.mkString;
 
 /**

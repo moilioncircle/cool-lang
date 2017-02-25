@@ -8,8 +8,8 @@ import com.leon.cool.lang.tokenizer.Token;
 
 import java.util.*;
 
-import static com.leon.cool.lang.tokenizer.TokenKind.ID;
-import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
+import static com.leon.cool.lang.glossary.TokenKind.ID;
+import static com.leon.cool.lang.glossary.TokenKind.TYPE;
 
 /**
  * Copyright leon

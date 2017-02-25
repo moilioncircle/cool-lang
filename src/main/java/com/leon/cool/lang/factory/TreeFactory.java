@@ -1,7 +1,7 @@
 package com.leon.cool.lang.factory;
 
 import com.leon.cool.lang.ast.*;
-import com.leon.cool.lang.support.infrastructure.Pos;
+import com.leon.cool.lang.glossary.Pos;
 import com.leon.cool.lang.tokenizer.Token;
 
 import java.util.List;

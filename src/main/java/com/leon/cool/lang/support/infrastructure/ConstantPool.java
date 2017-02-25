@@ -3,8 +3,9 @@ package com.leon.cool.lang.support.infrastructure;
 import com.leon.cool.lang.ast.BoolConst;
 import com.leon.cool.lang.ast.IntConst;
 import com.leon.cool.lang.ast.StringConst;
+import com.leon.cool.lang.glossary.Pos;
+import com.leon.cool.lang.glossary.TokenKind;
 import com.leon.cool.lang.tokenizer.Token;
-import com.leon.cool.lang.tokenizer.TokenKind;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

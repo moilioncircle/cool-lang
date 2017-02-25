@@ -1,4 +1,4 @@
-package com.leon.cool.lang.tokenizer;
+package com.leon.cool.lang.glossary;
 
 /**
  * Copyright leon

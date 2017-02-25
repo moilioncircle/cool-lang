@@ -1,5 +1,6 @@
 package com.leon.cool.lang.tokenizer;
 
+import com.leon.cool.lang.glossary.TokenKind;
 import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Test;
