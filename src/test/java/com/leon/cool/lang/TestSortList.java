@@ -1,6 +1,6 @@
 package com.leon.cool.lang;
 
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,13 +12,13 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Copyright leon
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,12 +39,12 @@ public class TestSortList {
     @Test
     public void test() {
         systemInMock.provideText("5");
-        String str = FileUtils.readJarFile("sort_list.cl");
-        Main.run(str);
+        String str = FileUtil.readJarFile("sort_list.cl");
+        Bootstrap.run(str);
         assertEquals("How many numbers to sort?0\n" +
                 "1\n" +
                 "2\n" +
                 "3\n" +
-                "4\n",systemOutRule.getLog());
+                "4\n", systemOutRule.getLog());
     }
 }

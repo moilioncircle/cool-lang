@@ -1,7 +1,9 @@
 package com.leon.cool.lang.type;
 
 import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.ErrorSupport;
+
+import static com.leon.cool.lang.Constant.SELF_TYPE;
 
 /**
  * Copyright leon
@@ -28,13 +30,14 @@ public class SelfType implements Type {
         this.type = type;
     }
 
+    @Override
     public Type replace() {
         return TypeFactory.objectType(type);
     }
 
     @Override
     public String className() {
-        Utils.error("unexpected.error");
+        ErrorSupport.error("unexpected.error");
         return toString();
     }
 
@@ -61,6 +64,6 @@ public class SelfType implements Type {
 
     @Override
     public String toString() {
-        return "SELF_TYPE(" + type + ')';
+        return SELF_TYPE + "(" + type + ')';
     }
 }

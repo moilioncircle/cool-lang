@@ -1,4 +1,7 @@
-package com.leon.cool.lang.util;
+package com.leon.cool.lang.support.infrastructure;
+
+import com.leon.cool.lang.glossary.Nullable;
+import com.leon.cool.lang.object.CoolObject;
 
 /**
  * Copyright leon
@@ -15,22 +18,16 @@ package com.leon.cool.lang.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @author leon on 15-11-1
+ * @author leon on 15-10-28
  */
-public class Pos {
-    public final int column;
-    public final int row;
+public class Context {
 
-    public Pos(int column, int row) {
-        this.column = column;
-        this.row = row;
-    }
+    public final CoolObject selfObject;
 
-    @Override
-    public String toString() {
-        return "Pos{" +
-                "row=" + row +
-                ", column=" + column +
-                '}';
+    public final SymbolTable<CoolObject> environment;
+
+    public Context(@Nullable CoolObject selfObject, @Nullable SymbolTable<CoolObject> environment) {
+        this.selfObject = selfObject;
+        this.environment = environment;
     }
 }

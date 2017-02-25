@@ -1,7 +1,7 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.Context;
+import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeVisitor;
@@ -24,6 +24,9 @@ import com.leon.cool.lang.tree.TreeVisitor;
  * @author leon on 15-10-31
  */
 public class IntConst extends Expression {
+
+    public int index = 0;
+
     public final Token tok;
 
     public IntConst(Token tok) {
@@ -47,4 +50,11 @@ public class IntConst extends Expression {
         return visitor.applyIntConst(this, context);
     }
 
+    /**
+     * Returns a copy of this symbol
+     */
+    @Override
+    public Object clone() {
+        return new IntConst(new Token(tok.name, tok.kind, tok.startPos));
+    }
 }

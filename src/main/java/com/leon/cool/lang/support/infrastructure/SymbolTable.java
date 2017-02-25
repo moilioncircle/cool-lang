@@ -1,4 +1,6 @@
-package com.leon.cool.lang.util;
+package com.leon.cool.lang.support.infrastructure;
+
+import com.leon.cool.lang.util.Stack;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,7 +46,7 @@ public class SymbolTable<T> {
         if (tbl.isEmpty()) {
             System.out.println("addId: can't add a symbol without a scope.");
         }
-        tbl.top().put(id, info);
+        tbl.peek().put(id, info);
     }
 
     public Optional<T> lookup(String sym) {
@@ -81,7 +83,7 @@ public class SymbolTable<T> {
         if (tbl.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(tbl.top());
+            return Optional.of(tbl.peek());
         }
     }
 

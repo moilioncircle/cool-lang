@@ -3,12 +3,12 @@ package com.leon.cool.lang;
 import com.leon.cool.lang.ast.Program;
 import com.leon.cool.lang.factory.TreeFactory;
 import com.leon.cool.lang.parser.CoolParser;
-import com.leon.cool.lang.support.Context;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.TreeSupport;
+import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.CoolTokenizer;
 import com.leon.cool.lang.tree.*;
-import com.leon.cool.lang.util.FileUtils;
+import com.leon.cool.lang.util.FileUtil;
 
 /**
  * Copyright leon
@@ -27,9 +27,11 @@ import com.leon.cool.lang.util.FileUtils;
  *
  * @author leon on 15-10-8
  */
-public class Main {
+public class Bootstrap {
+
     public static void run(String str) {
-        try {
+        try (TreeSupport treeSupport = new TreeSupport()) {
+            //compile
             CoolTokenizer tokenizer = new CoolTokenizer(str.toCharArray());
             CoolScanner scanner = new CoolScanner(tokenizer);
             CoolParser parser = new CoolParser(scanner, new TreeFactory());
@@ -38,29 +40,25 @@ public class Main {
                 parser.errMsgs.forEach(System.err::println);
                 return;
             }
-            expr.accept(new ClassGraphTreeScanner());
-            expr.accept(new MethodDefTreeScanner());
-            expr.accept(new ParentMethodDefTreeScanner());
-            expr.accept(new AttrDefTreeScanner());
-            expr.accept(new ParentAttrDefTreeScanner());
-            TypeCheckTreeScanner typeCheckTreeScanner = new TypeCheckTreeScanner();
-            expr.accept(typeCheckTreeScanner);
+            TypeCheckTreeScanner typeCheckTreeScanner;
+            expr.accept(new ClassGraphTreeScanner(treeSupport));
+            expr.accept(new MethodDefTreeScanner(treeSupport));
+            expr.accept(new ParentMethodDefTreeScanner(treeSupport));
+            expr.accept(new AttrDefTreeScanner(treeSupport));
+            expr.accept(new ParentAttrDefTreeScanner(treeSupport));
+            expr.accept(typeCheckTreeScanner = new TypeCheckTreeScanner(treeSupport));
             if (!typeCheckTreeScanner.errMsgs.isEmpty()) {
                 typeCheckTreeScanner.errMsgs.forEach(System.err::println);
                 return;
             }
             //expr.accept(new PrintTypeInfoTreeScanner());
-            expr.accept(new EvalTreeScanner(), new Context(null, null));
-        } finally {
-            Utils.clear();
-            Utils.close();
+            //runtime
+            expr.accept(new EvalTreeScanner(treeSupport), new Context(null, null));
         }
-
     }
 
     public static void main(String[] args) {
-        System.out.println(args[0]);
-        String str = FileUtils.readFile(args[0]);
-        Main.run(str);
+        String str = FileUtil.readFile(args[0]);
+        Bootstrap.run(str);
     }
 }

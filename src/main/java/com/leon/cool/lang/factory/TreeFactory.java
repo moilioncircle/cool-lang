@@ -1,8 +1,8 @@
 package com.leon.cool.lang.factory;
 
 import com.leon.cool.lang.ast.*;
+import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tokenizer.Token;
-import com.leon.cool.lang.util.Pos;
 
 import java.util.List;
 import java.util.Optional;

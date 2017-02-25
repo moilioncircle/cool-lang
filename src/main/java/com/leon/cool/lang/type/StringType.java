@@ -1,5 +1,7 @@
 package com.leon.cool.lang.type;
 
+import static com.leon.cool.lang.Constant.STRING;
+
 /**
  * Copyright leon
  * <p>
@@ -36,6 +38,6 @@ public class StringType implements Type {
 
     @Override
     public String toString() {
-        return "String";
+        return STRING;
     }
 }

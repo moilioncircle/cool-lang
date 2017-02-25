@@ -1,4 +1,8 @@
-package com.leon.cool.lang.tokenizer;
+package com.leon.cool.lang.support.declaration;
+
+import com.leon.cool.lang.ast.Expression;
+
+import java.util.Optional;
 
 /**
  * Copyright leon
@@ -15,8 +19,10 @@ package com.leon.cool.lang.tokenizer;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @author leon on 15-10-8
+ * @author leon on 15-10-28
  */
-public interface Filter<T> {
-    boolean accepts(T t);
+public class AttrDeclaration {
+    public String id;
+    public String type;
+    public Optional<Expression> expr;
 }

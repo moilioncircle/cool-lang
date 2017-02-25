@@ -2,8 +2,10 @@ package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.ast.MethodDef;
-import com.leon.cool.lang.support.MethodDeclaration;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.ErrorSupport;
+import com.leon.cool.lang.support.TreeSupport;
+import com.leon.cool.lang.support.TypeSupport;
+import com.leon.cool.lang.support.declaration.MethodDeclaration;
 
 import java.util.stream.Collectors;
 
@@ -27,28 +29,32 @@ import java.util.stream.Collectors;
 public class MethodDefTreeScanner extends TreeScanner {
     private String className;
 
+    public MethodDefTreeScanner(TreeSupport treeSupport) {
+        super(treeSupport);
+    }
+
     public void applyClassDef(ClassDef classDef) {
         className = classDef.type.name;
-        Utils.createMethodGraph(className);
+        treeSupport.createMethodGraph(className);
         super.applyClassDef(classDef);
     }
 
     public void applyMethodDef(MethodDef methodDef) {
-        if (Utils.isTypeDefined(methodDef.type)) {
-            Utils.error("type.error.undefined", methodDef.type.name, Utils.errorPos(methodDef.type));
+        if (TypeSupport.isTypeDefined(treeSupport.classGraph, methodDef.type)) {
+            ErrorSupport.error("type.error.undefined", methodDef.type.name, ErrorSupport.errorPos(methodDef.type));
         }
         MethodDeclaration methodDeclaration = new MethodDeclaration();
         methodDeclaration.methodName = methodDef.id.name;
         methodDeclaration.returnType = methodDef.type.name;
         methodDeclaration.paramTypes = methodDef.formals.stream().map(e -> {
-            if (Utils.isTypeDefined(e.type)) {
-                Utils.error("type.error.undefined", e.type.name, Utils.errorPos(e.type));
+            if (TypeSupport.isTypeDefined(treeSupport.classGraph, e.type)) {
+                ErrorSupport.error("type.error.undefined", e.type.name, ErrorSupport.errorPos(e.type));
             }
             return e.type.name;
         }).collect(Collectors.toList());
         methodDeclaration.declaration = methodDef;
         methodDeclaration.belongs = className;
-        Utils.putToMethodGraph(className, methodDeclaration);
+        treeSupport.putToMethodGraph(className, methodDeclaration);
         super.applyMethodDef(methodDef);
     }
 }

@@ -2,12 +2,11 @@ package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.Context;
-import com.leon.cool.lang.support.Dumpable;
+import com.leon.cool.lang.support.infrastructure.Context;
+import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeElement;
 import com.leon.cool.lang.type.Type;
-import com.leon.cool.lang.util.Pos;
 
 /**
  * Copyright leon
@@ -26,15 +25,10 @@ import com.leon.cool.lang.util.Pos;
  *
  * @author leon on 15-10-8
  */
-public abstract class TreeNode implements Dumpable, TreeElement {
+public abstract class TreeNode implements TreeElement {
     public Type typeInfo;
     public Pos starPos;
     public Pos endPos;
-
-    @Override
-    public void dump() {
-        System.out.println(this.toString());
-    }
 
     @Override
     public CoolObject accept(EvalTreeVisitor visitor, Context context) {

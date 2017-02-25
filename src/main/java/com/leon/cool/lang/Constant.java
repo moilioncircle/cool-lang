@@ -1,4 +1,4 @@
-package com.leon.cool.lang.util;
+package com.leon.cool.lang;
 
 /**
  * Copyright leon
@@ -20,16 +20,21 @@ package com.leon.cool.lang.util;
 public class Constant {
 
     public static final String OBJECT = "Object";
+    public static final String IO = "IO";
     public static final String STRING = "String";
     public static final String INT = "Int";
     public static final String BOOL = "Bool";
     public static final String SELF_TYPE = "SELF_TYPE";
+    public static final String NO_TYPE = "NoType";
+    public static final String VOID = "Void";
 
     public static final String SELF = "self";
 
     public static final String TRUE = "true";
     public static final String FALSE = "false";
 
-    public static final int GC_HEAP_SIZE = 10;
+    public static final String MAIN_CLASS = "Main";
+    public static final String MAIN_METHOD = "main";
 
+    public static final int GC_HEAP_SIZE = 10;
 }

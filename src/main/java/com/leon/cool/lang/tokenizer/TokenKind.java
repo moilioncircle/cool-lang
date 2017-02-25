@@ -1,7 +1,9 @@
 package com.leon.cool.lang.tokenizer;
 
+import com.leon.cool.lang.glossary.Nullable;
 import com.leon.cool.lang.parser.Assoc;
-import com.leon.cool.lang.support.Dumpable;
+
+import java.util.function.Predicate;
 
 /**
  * Copyright leon
@@ -20,7 +22,7 @@ import com.leon.cool.lang.support.Dumpable;
  *
  * @author leon on 15-10-7
  */
-public enum TokenKind implements Filter<TokenKind>, Dumpable {
+public enum TokenKind implements Predicate<TokenKind> {
     //
     ID(TokenTag.NAME), TYPE(TokenTag.TYPE), STRING(TokenTag.STR), INTEGER(TokenTag.NUM), COMMENT(TokenTag.COMMENT),
     //KEY WORDS
@@ -57,7 +59,7 @@ public enum TokenKind implements Filter<TokenKind>, Dumpable {
         this(null, tag, 10, Assoc.LEFT);
     }
 
-    TokenKind(String name, TokenTag tag, int prec, Assoc assoc) {
+    TokenKind(@Nullable String name, TokenTag tag, int prec, Assoc assoc) {
         this.name = name;
         this.tag = tag;
         this.prec = prec;
@@ -65,13 +67,8 @@ public enum TokenKind implements Filter<TokenKind>, Dumpable {
     }
 
     @Override
-    public boolean accepts(TokenKind that) {
+    public boolean test(TokenKind that) {
         return this == that;
-    }
-
-    @Override
-    public void dump() {
-        System.out.println(this.toString());
     }
 
     @Override

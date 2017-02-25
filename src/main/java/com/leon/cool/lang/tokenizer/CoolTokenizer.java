@@ -1,8 +1,8 @@
 package com.leon.cool.lang.tokenizer;
 
-import com.leon.cool.lang.support.Utils;
-import com.leon.cool.lang.util.Constant;
-import com.leon.cool.lang.util.Pos;
+import com.leon.cool.lang.Constant;
+import com.leon.cool.lang.support.ErrorSupport;
+import com.leon.cool.lang.support.infrastructure.Pos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -262,7 +262,7 @@ public class CoolTokenizer {
                     break loop;
                 default:
                     tk = TokenKind.ERROR;
-                    Utils.error("tokenizer.error.unexpected.char", new String(new char[]{currentChar()}), row + "", column + "");
+                    ErrorSupport.error("tokenizer.error.unexpected.char", new String(new char[]{currentChar()}), row + "", column + "");
             }
         }
         if (tk.tag == TokenTag.DEFAULT) {
@@ -308,14 +308,14 @@ public class CoolTokenizer {
                 case 0x1A:
                     //EOI
                     tk = TokenKind.ERROR;
-                    Utils.error("tokenizer.error.unclosed.string");
+                    ErrorSupport.error("tokenizer.error.unclosed.string");
                     return;
                 case '\b':
                 case '\t':
                 case '\n':
                 case '\f':
                     tk = TokenKind.ERROR;
-                    Utils.error("tokenizer.error.illegal.char", row + "", column + "");
+                    ErrorSupport.error("tokenizer.error.illegal.char", row + "", column + "");
                     return;
                 default:
                     putChar(currentChar());

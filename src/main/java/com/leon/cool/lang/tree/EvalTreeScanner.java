@@ -1,5 +1,6 @@
 package com.leon.cool.lang.tree;
 
+import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.factory.ObjectFactory;
 import com.leon.cool.lang.factory.TypeFactory;
@@ -7,12 +8,13 @@ import com.leon.cool.lang.object.CoolBool;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
-import com.leon.cool.lang.support.Context;
-import com.leon.cool.lang.support.MethodDeclaration;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.ErrorSupport;
+import com.leon.cool.lang.support.TreeSupport;
+import com.leon.cool.lang.support.TypeSupport;
+import com.leon.cool.lang.support.declaration.MethodDeclaration;
+import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
-import com.leon.cool.lang.util.Constant;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +39,12 @@ import java.util.stream.Collectors;
  */
 public class EvalTreeScanner implements EvalTreeVisitor {
 
+    protected TreeSupport treeSupport;
+
+    public EvalTreeScanner(TreeSupport treeSupport) {
+        this.treeSupport = treeSupport;
+    }
+
     @Override
     public CoolObject applyAssign(Assign assign, Context context) {
         CoolObject object = assign.expr.accept(this, context);
@@ -56,12 +64,12 @@ public class EvalTreeScanner implements EvalTreeVisitor {
     @Override
     public CoolObject applyNewDef(NewDef newDef, Context context) {
         Type type;
-        if (Utils.isSelfType(newDef.type)) {
+        if (TypeSupport.isSelfType(newDef.type)) {
             type = context.selfObject.type;
         } else {
             type = TypeFactory.objectType(newDef.type.name);
         }
-        return Utils.newDef(this, type, context);
+        return treeSupport.newDef(this, type, context);
     }
 
     @Override
@@ -96,7 +104,7 @@ public class EvalTreeScanner implements EvalTreeVisitor {
         CoolInt l = (CoolInt) divide.left.accept(this, context);
         CoolInt r = (CoolInt) divide.right.accept(this, context);
         if (r.val == 0) {
-            Utils.error("runtime.error.divide.zero", Utils.errorPos(divide.right));
+            ErrorSupport.error("runtime.error.divide.zero", ErrorSupport.errorPos(divide.right));
         }
         return ObjectFactory.coolInt(l.val / r.val);
     }
@@ -133,7 +141,7 @@ public class EvalTreeScanner implements EvalTreeVisitor {
     public CoolObject applyComp(Comp comp, Context context) {
         CoolObject l = comp.left.accept(this, context);
         CoolObject r = comp.right.accept(this, context);
-        if (Utils.isBasicType(l.type) && Utils.isBasicType(r.type)) {
+        if (TypeSupport.isBasicType(l.type) && TypeSupport.isBasicType(r.type)) {
             if (l instanceof CoolString && r instanceof CoolString) {
                 return ObjectFactory.coolBool(((CoolString) l).str.equals(((CoolString) r).str));
             } else if (l instanceof CoolInt && r instanceof CoolInt) {
@@ -200,9 +208,9 @@ public class EvalTreeScanner implements EvalTreeVisitor {
         List<Type> paramTypes = paramObjects.stream().map(e -> e.type).collect(Collectors.toList());
         CoolObject obj = context.selfObject;
         //根据类型，方法名称，类名lookup方法声明
-        MethodDeclaration methodDeclaration = Utils.lookupMethodDeclaration(obj.type.className(), dispatch.id.name, paramTypes).get();
+        MethodDeclaration methodDeclaration = treeSupport.lookupMethodDeclaration(obj.type.className(), dispatch.id.name, paramTypes).get();
 
-        CoolObject str = Utils.buildIn(paramObjects, obj, methodDeclaration, Utils.errorPos(dispatch.starPos, dispatch.endPos));
+        CoolObject str = treeSupport.buildIn(paramObjects, obj, methodDeclaration, ErrorSupport.errorPos(dispatch.starPos, dispatch.endPos));
         if (str != null) return str;
 
         /**
@@ -245,17 +253,17 @@ public class EvalTreeScanner implements EvalTreeVisitor {
         // expr[@TYPE].ID( [ expr [[, expr]] ∗ ] )对第一个expr求值
         CoolObject obj = staticDispatch.expr.accept(this, context);
         if (obj.type.type() == TypeEnum.VOID) {
-            Utils.error("runtime.error.dispatch.void", Utils.errorPos(staticDispatch.expr));
+            ErrorSupport.error("runtime.error.dispatch.void", ErrorSupport.errorPos(staticDispatch.expr));
         }
         //如果提供type，则根据type查找方法声明
         //如果没提供type，则根据上述expr值的类型查找方法声明
         if (staticDispatch.type.isPresent()) {
-            methodDeclaration = Utils.lookupMethodDeclaration(staticDispatch.type.get().name, staticDispatch.dispatch.id.name, paramTypes).get();
+            methodDeclaration = treeSupport.lookupMethodDeclaration(staticDispatch.type.get().name, staticDispatch.dispatch.id.name, paramTypes).get();
         } else {
-            methodDeclaration = Utils.lookupMethodDeclaration(obj.type.className(), staticDispatch.dispatch.id.name, paramTypes).get();
+            methodDeclaration = treeSupport.lookupMethodDeclaration(obj.type.className(), staticDispatch.dispatch.id.name, paramTypes).get();
         }
 
-        CoolObject str = Utils.buildIn(paramObjects, obj, methodDeclaration, Utils.errorPos(staticDispatch.starPos, staticDispatch.endPos));
+        CoolObject str = treeSupport.buildIn(paramObjects, obj, methodDeclaration, ErrorSupport.errorPos(staticDispatch.starPos, staticDispatch.endPos));
         if (str != null) return str;
 
         /**
@@ -318,13 +326,13 @@ public class EvalTreeScanner implements EvalTreeVisitor {
                 CoolObject returnVal = branch.expr.accept(this, context);
                 context.environment.exitScope();
                 if (returnVal.type.type() == TypeEnum.VOID) {
-                    Utils.error("runtime.error.void", Utils.errorPos(branch.expr));
+                    ErrorSupport.error("runtime.error.void", ErrorSupport.errorPos(branch.expr));
                 }
                 return returnVal;
             }
-            temp = Utils.classGraph.get(temp);
+            temp = treeSupport.classGraph.get(temp);
         }
-        Utils.error("runtime.error.case", Utils.errorPos(caseDef.starPos, caseDef.endPos));
+        ErrorSupport.error("runtime.error.case", ErrorSupport.errorPos(caseDef.starPos, caseDef.endPos));
         return ObjectFactory.coolVoid();
     }
 
@@ -338,11 +346,11 @@ public class EvalTreeScanner implements EvalTreeVisitor {
         if (letAttrDef.expr.isPresent()) {
             context.environment.addId(letAttrDef.id.name, letAttrDef.expr.get().accept(this, context));
         } else {
-            if (Utils.isStringType(letAttrDef.type)) {
+            if (TypeSupport.isStringType(letAttrDef.type)) {
                 context.environment.addId(letAttrDef.id.name, ObjectFactory.coolStringDefault());
-            } else if (Utils.isIntType(letAttrDef.type)) {
+            } else if (TypeSupport.isIntType(letAttrDef.type)) {
                 context.environment.addId(letAttrDef.id.name, ObjectFactory.coolIntDefault());
-            } else if (Utils.isBoolType(letAttrDef.type)) {
+            } else if (TypeSupport.isBoolType(letAttrDef.type)) {
                 context.environment.addId(letAttrDef.id.name, ObjectFactory.coolBoolDefault());
             } else {
                 context.environment.addId(letAttrDef.id.name, ObjectFactory.coolVoid());

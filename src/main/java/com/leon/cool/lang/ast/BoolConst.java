@@ -1,7 +1,7 @@
 package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.object.CoolObject;
-import com.leon.cool.lang.support.Context;
+import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.tree.TreeVisitor;
 
@@ -23,6 +23,7 @@ import com.leon.cool.lang.tree.TreeVisitor;
  * @author leon on 15-10-31
  */
 public class BoolConst extends Expression {
+
     public final Boolean bool;
 
     public BoolConst(Boolean bool) {
@@ -45,5 +46,4 @@ public class BoolConst extends Expression {
     public CoolObject accept(EvalTreeVisitor visitor, Context context) {
         return visitor.applyBoolConst(this, context);
     }
-
 }

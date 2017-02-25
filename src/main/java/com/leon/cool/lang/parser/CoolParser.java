@@ -1,21 +1,23 @@
 package com.leon.cool.lang.parser;
 
+import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.factory.TreeFactory;
-import com.leon.cool.lang.support.ClassTable;
-import com.leon.cool.lang.support.Utils;
+import com.leon.cool.lang.support.ErrorSupport;
+import com.leon.cool.lang.support.TypeSupport;
+import com.leon.cool.lang.support.infrastructure.ClassTable;
+import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tokenizer.CoolScanner;
-import com.leon.cool.lang.tokenizer.Filter;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tokenizer.TokenKind;
-import com.leon.cool.lang.util.Constant;
-import com.leon.cool.lang.util.Pos;
 import com.leon.cool.lang.util.Stack;
+import com.leon.cool.lang.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.leon.cool.lang.tokenizer.TokenKind.*;
 
@@ -57,7 +59,7 @@ public class CoolParser {
             syntaxError(token.kind, token.startPos);
         } else {
             Pos startPos = token.startPos;
-            classDefs.addAll(new ClassTable().installBasicClasses());
+            classDefs.addAll(new ClassTable().builtInClasses());
             while (true) {
                 if (token.kind == EOF) {
                     accept(EOF);
@@ -307,7 +309,7 @@ public class CoolParser {
                 if (opStack.isEmpty()) {
                     opStack.push(o1);
                 } else {
-                    while (!opStack.isEmpty() && ((o1.assoc != Assoc.RIGHT && o1.prec <= opStack.top().prec) || (o1.assoc == Assoc.RIGHT && o1.prec < opStack.top().prec))) {
+                    while (!opStack.isEmpty() && ((o1.assoc != Assoc.RIGHT && o1.prec <= opStack.peek().prec) || (o1.assoc == Assoc.RIGHT && o1.prec < opStack.peek().prec))) {
                         add(opStack.pop());
                     }
                     opStack.push(o1);
@@ -624,7 +626,7 @@ public class CoolParser {
     Shunting yard algorithm
      */
     private Expression expr(List<Object> suffixExpr) {
-        Pos startPos = errStartTokenSupply.top().startPos;
+        Pos startPos = errStartTokenSupply.peek().startPos;
         Pos endPos = errEndToken.endPos;
         Stack<Object> stack = new Stack<>();
         boolean nonAssoc = false;
@@ -633,7 +635,7 @@ public class CoolParser {
                 TokenKind op = (TokenKind) suffixExpr.get(i);
                 switch (op) {
                     case MONKEYS_AT:
-                        Utils.error("parser.error.unexpected.at", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        ErrorSupport.error("parser.error.unexpected.at", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                     case DOT:
                         if (nextIsAt(i, suffixExpr)) {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
@@ -646,7 +648,7 @@ public class CoolParser {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
                             Expression expr = this.getGenericElement(stack);
                             // self.doSomething() equals to doSomething(). this is totally for simple tail-recursive optimization.
-                            if (expr instanceof IdConst && Utils.isSelf(((IdConst) expr).tok)) {
+                            if (expr instanceof IdConst && TypeSupport.isSelf(((IdConst) expr).tok)) {
                                 assert dispatch != null;
                                 stack.push(f.at(startPos, endPos).dispatch(dispatch.id, dispatch.params));
                             } else {
@@ -693,7 +695,7 @@ public class CoolParser {
                         break;
                     case LT:
                         if (nonAssoc) {
-                            Utils.error("parser.error.non.assoc", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -703,7 +705,7 @@ public class CoolParser {
                         break;
                     case LTEQ:
                         if (nonAssoc) {
-                            Utils.error("parser.error.non.assoc", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -713,7 +715,7 @@ public class CoolParser {
                         break;
                     case EQ:
                         if (nonAssoc) {
-                            Utils.error("parser.error.non.assoc", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -722,7 +724,7 @@ public class CoolParser {
                         }
                         break;
                     default:
-                        Utils.error("parser.error.expr", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+                        ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                 }
             } else {
                 stack.push(suffixExpr.get(i));
@@ -737,7 +739,7 @@ public class CoolParser {
         try {
             return (T) stack.pop();
         } catch (ClassCastException e) {
-            Utils.error("parser.error.expr", Utils.errorPos(errStartTokenSupply.top().startPos, errEndToken.endPos));
+            ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
         }
         return null;
     }
@@ -792,42 +794,42 @@ public class CoolParser {
         token = scanner.token();
     }
 
-    private boolean peekToken(Filter<TokenKind> tk) {
+    private boolean peekToken(Predicate<TokenKind> tk) {
         return peekToken(0, tk);
     }
 
-    private boolean peekToken(int lookAhead, Filter<TokenKind> tk) {
-        return tk.accepts(scanner.token(lookAhead + 1).kind);
+    private boolean peekToken(int lookAhead, Predicate<TokenKind> tk) {
+        return tk.test(scanner.token(lookAhead + 1).kind);
     }
 
-    private boolean peekToken(Filter<TokenKind> tk1, Filter<TokenKind> tk2) {
+    private boolean peekToken(Predicate<TokenKind> tk1, Predicate<TokenKind> tk2) {
         return peekToken(0, tk1, tk2);
     }
 
-    private boolean peekToken(int lookAhead, Filter<TokenKind> tk1, Filter<TokenKind> tk2) {
-        return tk1.accepts(scanner.token(lookAhead + 1).kind) &&
-                tk2.accepts(scanner.token(lookAhead + 2).kind);
+    private boolean peekToken(int lookAhead, Predicate<TokenKind> tk1, Predicate<TokenKind> tk2) {
+        return tk1.test(scanner.token(lookAhead + 1).kind) &&
+                tk2.test(scanner.token(lookAhead + 2).kind);
     }
 
-    private boolean peekToken(Filter<TokenKind> tk1, Filter<TokenKind> tk2, Filter<TokenKind> tk3) {
+    private boolean peekToken(Predicate<TokenKind> tk1, Predicate<TokenKind> tk2, Predicate<TokenKind> tk3) {
         return peekToken(0, tk1, tk2, tk3);
     }
 
-    private boolean peekToken(int lookAhead, Filter<TokenKind> tk1, Filter<TokenKind> tk2, Filter<TokenKind> tk3) {
-        return tk1.accepts(scanner.token(lookAhead + 1).kind) &&
-                tk2.accepts(scanner.token(lookAhead + 2).kind) &&
-                tk3.accepts(scanner.token(lookAhead + 3).kind);
+    private boolean peekToken(int lookAhead, Predicate<TokenKind> tk1, Predicate<TokenKind> tk2, Predicate<TokenKind> tk3) {
+        return tk1.test(scanner.token(lookAhead + 1).kind) &&
+                tk2.test(scanner.token(lookAhead + 2).kind) &&
+                tk3.test(scanner.token(lookAhead + 3).kind);
     }
 
     @SafeVarargs
-    private final boolean peekToken(Filter<TokenKind>... kinds) {
+    private final boolean peekToken(Predicate<TokenKind>... kinds) {
         return peekToken(0, kinds);
     }
 
     @SafeVarargs
-    private final boolean peekToken(int lookAhead, Filter<TokenKind>... kinds) {
+    private final boolean peekToken(int lookAhead, Predicate<TokenKind>... kinds) {
         for (; lookAhead < kinds.length; lookAhead++) {
-            if (!kinds[lookAhead].accepts(scanner.token(lookAhead + 1).kind)) {
+            if (!kinds[lookAhead].test(scanner.token(lookAhead + 1).kind)) {
                 return false;
             }
         }
@@ -852,11 +854,11 @@ public class CoolParser {
     }
 
     private void syntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        Utils.error("parser.error.expected", Utils.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString());
+        ErrorSupport.error("parser.error.expected", StringUtil.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString());
     }
 
     private void reportSyntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        reportSyntaxError(Utils.errorMsg("parser.error.expected", Utils.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString()));
+        reportSyntaxError(ErrorSupport.errorMsg("parser.error.expected", StringUtil.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString()));
     }
 
     private void reportSyntaxError(String message) {
@@ -864,7 +866,7 @@ public class CoolParser {
     }
 
     private void syntaxError(TokenKind actual, Pos pos) {
-        Utils.error("parser.error.unexpected", actual.toString(), pos.toString());
+        ErrorSupport.error("parser.error.unexpected", actual.toString(), pos.toString());
     }
 
 }
