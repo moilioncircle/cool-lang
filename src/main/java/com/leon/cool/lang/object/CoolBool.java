@@ -1,6 +1,7 @@
 package com.leon.cool.lang.object;
 
-import com.leon.cool.lang.factory.TypeFactory;
+import static com.leon.cool.lang.factory.ObjectFactory.coolBool;
+import static com.leon.cool.lang.factory.TypeFactory.booleanType;
 
 /**
  * Copyright leon
@@ -28,7 +29,7 @@ public class CoolBool extends CoolObject {
     }
 
     public CoolBool() {
-        this.type = TypeFactory.booleanType();
+        this.type = booleanType();
     }
 
     @Override
@@ -48,6 +49,6 @@ public class CoolBool extends CoolObject {
 
     @Override
     public CoolBool copy() {
-        return new CoolBool(this.val);
+        return coolBool(this.val);
     }
 }

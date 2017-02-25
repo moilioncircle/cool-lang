@@ -3,15 +3,12 @@ package com.leon.cool.lang.parser;
 import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.factory.TreeFactory;
-import com.leon.cool.lang.support.ErrorSupport;
-import com.leon.cool.lang.support.TypeSupport;
 import com.leon.cool.lang.support.infrastructure.ClassTable;
 import com.leon.cool.lang.support.infrastructure.Pos;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.tokenizer.TokenKind;
 import com.leon.cool.lang.util.Stack;
-import com.leon.cool.lang.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +16,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.leon.cool.lang.support.ErrorSupport.*;
+import static com.leon.cool.lang.support.TypeSupport.isSelf;
 import static com.leon.cool.lang.tokenizer.TokenKind.*;
+import static com.leon.cool.lang.util.StringUtil.mkString;
 
 /**
  * Copyright leon
@@ -635,7 +635,7 @@ public class CoolParser {
                 TokenKind op = (TokenKind) suffixExpr.get(i);
                 switch (op) {
                     case MONKEYS_AT:
-                        ErrorSupport.error("parser.error.unexpected.at", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
+                        error("parser.error.unexpected.at", errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                     case DOT:
                         if (nextIsAt(i, suffixExpr)) {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
@@ -648,7 +648,7 @@ public class CoolParser {
                             StaticDispatchBody dispatch = this.getGenericElement(stack);
                             Expression expr = this.getGenericElement(stack);
                             // self.doSomething() equals to doSomething(). this is totally for simple tail-recursive optimization.
-                            if (expr instanceof IdConst && TypeSupport.isSelf(((IdConst) expr).tok)) {
+                            if (expr instanceof IdConst && isSelf(((IdConst) expr).tok)) {
                                 assert dispatch != null;
                                 stack.push(f.at(startPos, endPos).dispatch(dispatch.id, dispatch.params));
                             } else {
@@ -695,7 +695,7 @@ public class CoolParser {
                         break;
                     case LT:
                         if (nonAssoc) {
-                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
+                            error("parser.error.non.assoc", errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -705,7 +705,7 @@ public class CoolParser {
                         break;
                     case LTEQ:
                         if (nonAssoc) {
-                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
+                            error("parser.error.non.assoc", errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -715,7 +715,7 @@ public class CoolParser {
                         break;
                     case EQ:
                         if (nonAssoc) {
-                            ErrorSupport.error("parser.error.non.assoc", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
+                            error("parser.error.non.assoc", errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                         } else {
                             right = this.getGenericElement(stack);
                             left = this.getGenericElement(stack);
@@ -724,7 +724,7 @@ public class CoolParser {
                         }
                         break;
                     default:
-                        ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
+                        error("parser.error.expr", errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
                 }
             } else {
                 stack.push(suffixExpr.get(i));
@@ -739,7 +739,7 @@ public class CoolParser {
         try {
             return (T) stack.pop();
         } catch (ClassCastException e) {
-            ErrorSupport.error("parser.error.expr", ErrorSupport.errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
+            error("parser.error.expr", errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
         }
         return null;
     }
@@ -854,11 +854,11 @@ public class CoolParser {
     }
 
     private void syntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        ErrorSupport.error("parser.error.expected", StringUtil.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString());
+        error("parser.error.expected", mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString());
     }
 
     private void reportSyntaxError(TokenKind actual, Pos pos, TokenKind... tks) {
-        reportSyntaxError(ErrorSupport.errorMsg("parser.error.expected", StringUtil.mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString()));
+        reportSyntaxError(errorMsg("parser.error.expected", mkString(Arrays.asList(tks), ","), actual.toString(), pos.toString()));
     }
 
     private void reportSyntaxError(String message) {
@@ -866,7 +866,7 @@ public class CoolParser {
     }
 
     private void syntaxError(TokenKind actual, Pos pos) {
-        ErrorSupport.error("parser.error.unexpected", actual.toString(), pos.toString());
+        error("parser.error.unexpected", actual.toString(), pos.toString());
     }
 
 }

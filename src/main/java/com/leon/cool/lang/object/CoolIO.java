@@ -1,10 +1,11 @@
 package com.leon.cool.lang.object;
 
-import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.support.ErrorSupport;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
+import static com.leon.cool.lang.factory.ObjectFactory.*;
+import static com.leon.cool.lang.factory.TypeFactory.objectType;
+import static com.leon.cool.lang.support.ErrorSupport.error;
 
 /**
  * Copyright leon
@@ -25,7 +26,7 @@ import java.io.InputStreamReader;
  */
 public class CoolIO extends CoolObject {
     public CoolIO() {
-        this.type = TypeFactory.objectType("IO");
+        this.type = objectType("IO");
     }
 
     public CoolObject out_string(CoolString x) {
@@ -41,21 +42,21 @@ public class CoolIO extends CoolObject {
     public CoolString in_string() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             String str = reader.readLine();
-            return new CoolString(str, str.length());
+            return coolString(str);
         } catch (Exception e) {
-            ErrorSupport.error("unexpected.error");
+            error("unexpected.error");
         }
-        return new CoolString();
+        return coolStringDefault();
     }
 
     public CoolInt in_int() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             String str = reader.readLine();
-            return new CoolInt(Integer.parseInt(str));
+            return coolInt(Integer.parseInt(str));
         } catch (Exception e) {
-            ErrorSupport.error("unexpected.error");
+            error("unexpected.error");
         }
-        return new CoolInt();
+        return coolIntDefault();
     }
 
     @Override

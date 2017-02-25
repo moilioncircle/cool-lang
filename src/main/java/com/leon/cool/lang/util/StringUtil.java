@@ -24,7 +24,7 @@ public class StringUtil {
     }
 
     public static String constructMethod(String id, List<String> params) {
-        return id + StringUtil.mkString(params, Optional.of("("), ",", Optional.of(")"));
+        return id + mkString(params, Optional.of("("), ",", Optional.of(")"));
     }
 
     public static String constructMethod(MethodDeclaration methodDeclaration) {

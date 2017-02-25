@@ -1,11 +1,12 @@
 package com.leon.cool.lang.tokenizer;
 
 import com.leon.cool.lang.Constant;
-import com.leon.cool.lang.support.ErrorSupport;
 import com.leon.cool.lang.support.infrastructure.Pos;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.leon.cool.lang.support.ErrorSupport.error;
 
 /**
  * Copyright leon
@@ -262,7 +263,7 @@ public class CoolTokenizer {
                     break loop;
                 default:
                     tk = TokenKind.ERROR;
-                    ErrorSupport.error("tokenizer.error.unexpected.char", new String(new char[]{currentChar()}), row + "", column + "");
+                    error("tokenizer.error.unexpected.char", new String(new char[]{currentChar()}), row + "", column + "");
             }
         }
         if (tk.tag == TokenTag.DEFAULT) {
@@ -308,14 +309,14 @@ public class CoolTokenizer {
                 case 0x1A:
                     //EOI
                     tk = TokenKind.ERROR;
-                    ErrorSupport.error("tokenizer.error.unclosed.string");
+                    error("tokenizer.error.unclosed.string");
                     return;
                 case '\b':
                 case '\t':
                 case '\n':
                 case '\f':
                     tk = TokenKind.ERROR;
-                    ErrorSupport.error("tokenizer.error.illegal.char", row + "", column + "");
+                    error("tokenizer.error.illegal.char", row + "", column + "");
                     return;
                 default:
                     putChar(currentChar());

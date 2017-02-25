@@ -1,8 +1,8 @@
 package com.leon.cool.lang.object;
 
-import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.support.ErrorSupport;
+import static com.leon.cool.lang.factory.ObjectFactory.*;
+import static com.leon.cool.lang.factory.TypeFactory.stringType;
+import static com.leon.cool.lang.support.ErrorSupport.error;
 
 /**
  * Copyright leon
@@ -32,25 +32,25 @@ public class CoolString extends CoolObject {
     }
 
     public CoolString() {
-        this.type = TypeFactory.stringType();
+        this.type = stringType();
     }
 
     public CoolInt length() {
-        return new CoolInt(length);
+        return coolInt(length);
     }
 
     public CoolString concat(CoolString s) {
-        return ObjectFactory.coolString(this.str.concat(s.str));
+        return coolString(this.str.concat(s.str));
     }
 
     public CoolString substr(CoolInt i, CoolInt l, String pos) {
         try {
             String str = this.str.substring(i.val, i.val + l.val);
-            return ObjectFactory.coolString(str);
+            return coolString(str);
         } catch (StringIndexOutOfBoundsException e) {
-            ErrorSupport.error("runtime.error.range", pos);
+            error("runtime.error.range", pos);
         }
-        return ObjectFactory.coolStringDefault();
+        return coolStringDefault();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class CoolString extends CoolObject {
 
     @Override
     public CoolString copy() {
-        return ObjectFactory.coolString(this.str);
+        return coolString(this.str);
     }
 
     @Override

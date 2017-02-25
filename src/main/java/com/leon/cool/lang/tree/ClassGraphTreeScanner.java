@@ -4,9 +4,12 @@ import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.ast.Program;
 import com.leon.cool.lang.ast.StaticDispatch;
-import com.leon.cool.lang.support.ErrorSupport;
 import com.leon.cool.lang.support.TreeSupport;
-import com.leon.cool.lang.support.TypeSupport;
+
+import static com.leon.cool.lang.support.ErrorSupport.error;
+import static com.leon.cool.lang.support.ErrorSupport.errorPos;
+import static com.leon.cool.lang.support.TypeSupport.isBasicType;
+import static com.leon.cool.lang.support.TypeSupport.isSelfType;
 
 /**
  * Copyright leon
@@ -38,14 +41,14 @@ public class ClassGraphTreeScanner extends TreeScanner {
 
     @Override
     public void applyClassDef(ClassDef classDef) {
-        if (TypeSupport.isSelfType(classDef.type)) {
-            ErrorSupport.error("type.error.self.type", ErrorSupport.errorPos(classDef.type));
+        if (isSelfType(classDef.type)) {
+            error("type.error.self.type", errorPos(classDef.type));
         }
         if (classDef.inheritsType.isPresent()) {
-            if (TypeSupport.isSelfType(classDef.inheritsType.get())) {
-                ErrorSupport.error("type.error.inherits.type", Constant.SELF_TYPE, ErrorSupport.errorPos(classDef.inheritsType.get()));
-            } else if (TypeSupport.isBasicType(classDef.inheritsType.get())) {
-                ErrorSupport.error("type.error.inherits.type", classDef.inheritsType.get().name, ErrorSupport.errorPos(classDef.inheritsType.get()));
+            if (isSelfType(classDef.inheritsType.get())) {
+                error("type.error.inherits.type", Constant.SELF_TYPE, errorPos(classDef.inheritsType.get()));
+            } else if (isBasicType(classDef.inheritsType.get())) {
+                error("type.error.inherits.type", classDef.inheritsType.get().name, errorPos(classDef.inheritsType.get()));
             }
         }
         treeSupport.putToClassGraph(classDef.type.name, classDef.inheritsType.map(e -> e.name));
@@ -53,8 +56,8 @@ public class ClassGraphTreeScanner extends TreeScanner {
     }
 
     public void applyStaticDispatch(StaticDispatch staticDispatch) {
-        if (staticDispatch.type.isPresent() && TypeSupport.isSelfType(staticDispatch.type.get())) {
-            ErrorSupport.error("type.error.cast.type", ErrorSupport.errorPos(staticDispatch.type.get()));
+        if (staticDispatch.type.isPresent() && isSelfType(staticDispatch.type.get())) {
+            error("type.error.cast.type", errorPos(staticDispatch.type.get()));
         }
         super.applyStaticDispatch(staticDispatch);
     }

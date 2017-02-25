@@ -1,8 +1,9 @@
 package com.leon.cool.lang.factory;
 
 import com.leon.cool.lang.Constant;
-import com.leon.cool.lang.support.ErrorSupport;
 import com.leon.cool.lang.type.*;
+
+import static com.leon.cool.lang.support.ErrorSupport.error;
 
 /**
  * Copyright leon
@@ -58,7 +59,7 @@ public class TypeFactory {
             case Constant.BOOL:
                 return booleanType();
             case Constant.SELF_TYPE:
-                ErrorSupport.error("unexpected.error");
+                error("unexpected.error");
             default:
                 return new ObjectType(type);
         }
