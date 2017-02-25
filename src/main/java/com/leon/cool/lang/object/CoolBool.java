@@ -1,5 +1,6 @@
 package com.leon.cool.lang.object;
 
+import static com.leon.cool.lang.factory.ObjectFactory.coolBool;
 import static com.leon.cool.lang.factory.TypeFactory.booleanType;
 
 /**
@@ -48,6 +49,6 @@ public class CoolBool extends CoolObject {
 
     @Override
     public CoolBool copy() {
-        return new CoolBool(this.val);
+        return coolBool(this.val);
     }
 }

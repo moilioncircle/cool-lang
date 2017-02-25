@@ -1,7 +1,6 @@
 package com.leon.cool.lang.object;
 
-import static com.leon.cool.lang.factory.ObjectFactory.coolString;
-import static com.leon.cool.lang.factory.ObjectFactory.coolStringDefault;
+import static com.leon.cool.lang.factory.ObjectFactory.*;
 import static com.leon.cool.lang.factory.TypeFactory.stringType;
 import static com.leon.cool.lang.support.ErrorSupport.error;
 
@@ -37,7 +36,7 @@ public class CoolString extends CoolObject {
     }
 
     public CoolInt length() {
-        return new CoolInt(length);
+        return coolInt(length);
     }
 
     public CoolString concat(CoolString s) {
