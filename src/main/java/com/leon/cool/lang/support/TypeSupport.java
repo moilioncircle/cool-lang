@@ -1,13 +1,13 @@
 package com.leon.cool.lang.support;
 
 import com.leon.cool.lang.Constant;
-import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.tokenizer.Token;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
 
 import java.util.Map;
 
+import static com.leon.cool.lang.factory.TypeFactory.objectType;
 import static com.leon.cool.lang.tokenizer.TokenKind.ID;
 import static com.leon.cool.lang.tokenizer.TokenKind.TYPE;
 
@@ -102,7 +102,7 @@ public class TypeSupport {
                 if (temp.type() == parentTypeInfo.type()) return true;
                 String parentType = classGraph.get(temp.className());
                 if (parentType == null) return false;
-                temp = TypeFactory.objectType(parentType);
+                temp = objectType(parentType);
             }
             return false;
         }

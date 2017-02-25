@@ -1,6 +1,6 @@
 package com.leon.cool.lang.object;
 
-import com.leon.cool.lang.factory.TypeFactory;
+import static com.leon.cool.lang.factory.TypeFactory.voidType;
 
 /**
  * Copyright leon
@@ -21,6 +21,6 @@ import com.leon.cool.lang.factory.TypeFactory;
  */
 public class CoolVoid extends CoolObject {
     public CoolVoid() {
-        this.type = TypeFactory.voidType();
+        this.type = voidType();
     }
 }

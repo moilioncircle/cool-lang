@@ -2,10 +2,12 @@ package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.AttrDef;
 import com.leon.cool.lang.ast.ClassDef;
-import com.leon.cool.lang.support.ErrorSupport;
 import com.leon.cool.lang.support.TreeSupport;
-import com.leon.cool.lang.support.TypeSupport;
 import com.leon.cool.lang.support.declaration.AttrDeclaration;
+
+import static com.leon.cool.lang.support.ErrorSupport.error;
+import static com.leon.cool.lang.support.ErrorSupport.errorPos;
+import static com.leon.cool.lang.support.TypeSupport.isSelf;
 
 /**
  * Copyright leon
@@ -38,8 +40,8 @@ public class AttrDefTreeScanner extends TreeScanner {
     }
 
     public void applyAttrDef(AttrDef attrDef) {
-        if (TypeSupport.isSelf(attrDef.id)) {
-            ErrorSupport.error("type.error.assign.self", ErrorSupport.errorPos(attrDef.id));
+        if (isSelf(attrDef.id)) {
+            error("type.error.assign.self", errorPos(attrDef.id));
         }
         AttrDeclaration attrDeclaration = new AttrDeclaration();
         attrDeclaration.id = attrDef.id.name;

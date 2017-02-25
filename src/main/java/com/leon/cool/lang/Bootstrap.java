@@ -8,7 +8,8 @@ import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.CoolTokenizer;
 import com.leon.cool.lang.tree.*;
-import com.leon.cool.lang.util.FileUtil;
+
+import static com.leon.cool.lang.util.FileUtil.readFile;
 
 /**
  * Copyright leon
@@ -58,7 +59,7 @@ public class Bootstrap {
     }
 
     public static void main(String[] args) {
-        String str = FileUtil.readFile(args[0]);
+        String str = readFile(args[0]);
         Bootstrap.run(str);
     }
 }

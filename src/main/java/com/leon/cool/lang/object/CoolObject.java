@@ -1,10 +1,11 @@
 package com.leon.cool.lang.object;
 
 import com.leon.cool.lang.Constant;
-import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.support.infrastructure.SymbolTable;
 import com.leon.cool.lang.type.Type;
+
+import static com.leon.cool.lang.factory.ObjectFactory.coolObject;
+import static com.leon.cool.lang.factory.TypeFactory.objectType;
 
 /**
  * Copyright leon
@@ -24,7 +25,7 @@ import com.leon.cool.lang.type.Type;
  * @author leon on 15-10-21
  */
 public class CoolObject {
-    public Type type = TypeFactory.objectType(Constant.OBJECT);
+    public Type type = objectType(Constant.OBJECT);
 
     /**
      * 对象内变量
@@ -41,7 +42,7 @@ public class CoolObject {
     }
 
     public CoolObject copy() {
-        CoolObject object = ObjectFactory.coolObject();
+        CoolObject object = coolObject();
         object.type = this.type;
         object.variables = this.variables;
         return object;

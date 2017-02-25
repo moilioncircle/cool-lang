@@ -1,10 +1,10 @@
 package com.leon.cool.lang.object;
 
-import com.leon.cool.lang.factory.TypeFactory;
-import com.leon.cool.lang.support.ErrorSupport;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
+import static com.leon.cool.lang.factory.TypeFactory.objectType;
+import static com.leon.cool.lang.support.ErrorSupport.error;
 
 /**
  * Copyright leon
@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
  */
 public class CoolIO extends CoolObject {
     public CoolIO() {
-        this.type = TypeFactory.objectType("IO");
+        this.type = objectType("IO");
     }
 
     public CoolObject out_string(CoolString x) {
@@ -43,7 +43,7 @@ public class CoolIO extends CoolObject {
             String str = reader.readLine();
             return new CoolString(str, str.length());
         } catch (Exception e) {
-            ErrorSupport.error("unexpected.error");
+            error("unexpected.error");
         }
         return new CoolString();
     }
@@ -53,7 +53,7 @@ public class CoolIO extends CoolObject {
             String str = reader.readLine();
             return new CoolInt(Integer.parseInt(str));
         } catch (Exception e) {
-            ErrorSupport.error("unexpected.error");
+            error("unexpected.error");
         }
         return new CoolInt();
     }

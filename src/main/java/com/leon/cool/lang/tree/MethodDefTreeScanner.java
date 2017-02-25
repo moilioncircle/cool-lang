@@ -2,12 +2,14 @@ package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.ast.MethodDef;
-import com.leon.cool.lang.support.ErrorSupport;
 import com.leon.cool.lang.support.TreeSupport;
-import com.leon.cool.lang.support.TypeSupport;
 import com.leon.cool.lang.support.declaration.MethodDeclaration;
 
 import java.util.stream.Collectors;
+
+import static com.leon.cool.lang.support.ErrorSupport.error;
+import static com.leon.cool.lang.support.ErrorSupport.errorPos;
+import static com.leon.cool.lang.support.TypeSupport.isTypeDefined;
 
 /**
  * Copyright leon
@@ -40,15 +42,15 @@ public class MethodDefTreeScanner extends TreeScanner {
     }
 
     public void applyMethodDef(MethodDef methodDef) {
-        if (TypeSupport.isTypeDefined(treeSupport.classGraph, methodDef.type)) {
-            ErrorSupport.error("type.error.undefined", methodDef.type.name, ErrorSupport.errorPos(methodDef.type));
+        if (isTypeDefined(treeSupport.classGraph, methodDef.type)) {
+            error("type.error.undefined", methodDef.type.name, errorPos(methodDef.type));
         }
         MethodDeclaration methodDeclaration = new MethodDeclaration();
         methodDeclaration.methodName = methodDef.id.name;
         methodDeclaration.returnType = methodDef.type.name;
         methodDeclaration.paramTypes = methodDef.formals.stream().map(e -> {
-            if (TypeSupport.isTypeDefined(treeSupport.classGraph, e.type)) {
-                ErrorSupport.error("type.error.undefined", e.type.name, ErrorSupport.errorPos(e.type));
+            if (isTypeDefined(treeSupport.classGraph, e.type)) {
+                error("type.error.undefined", e.type.name, errorPos(e.type));
             }
             return e.type.name;
         }).collect(Collectors.toList());

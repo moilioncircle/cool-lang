@@ -1,8 +1,6 @@
 package com.leon.cool.lang.support;
 
 import com.leon.cool.lang.Constant;
-import com.leon.cool.lang.factory.ObjectFactory;
-import com.leon.cool.lang.factory.TypeFactory;
 import com.leon.cool.lang.object.CoolInt;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
@@ -25,7 +23,12 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.leon.cool.lang.factory.ObjectFactory.*;
+import static com.leon.cool.lang.factory.TypeFactory.*;
+import static com.leon.cool.lang.support.ErrorSupport.error;
 import static com.leon.cool.lang.support.TypeSupport.*;
+import static com.leon.cool.lang.util.StringUtil.constructMethod;
+import static com.leon.cool.lang.util.StringUtil.mkString;
 
 /**
  * Copyright leon
@@ -66,7 +69,7 @@ public class TreeSupport implements Closeable {
 
     public void putToClassGraph(String type, Optional<String> parentType) {
         if (classGraph.containsKey(type)) {
-            ErrorSupport.error("global.error.class.duplicated", type);
+            error("global.error.class.duplicated", type);
         } else {
             if (parentType.isPresent()) {
                 classGraph.put(type, parentType.get());
@@ -75,7 +78,7 @@ public class TreeSupport implements Closeable {
                 if (isObjectType(type)) {
                     classGraph.put(type, null);
                 } else {
-                    ErrorSupport.error("global.error.inherits.object", type);
+                    error("global.error.inherits.object", type);
                 }
             }
         }
@@ -84,7 +87,7 @@ public class TreeSupport implements Closeable {
     public void putToMethodGraph(String className, MethodDeclaration methodDeclaration) {
         Set<MethodDeclaration> methodDeclarations = methodGraph.get(className);
         if (methodDeclarations.contains(methodDeclaration)) {
-            ErrorSupport.error("global.error.method.duplicated", className, StringUtil.constructMethod(methodDeclaration));
+            error("global.error.method.duplicated", className, constructMethod(methodDeclaration));
         } else {
             methodDeclarations.add(methodDeclaration);
             methodGraph.put(className, methodDeclarations);
@@ -104,7 +107,7 @@ public class TreeSupport implements Closeable {
                 parentDeclarations.forEach(e -> {
                     //仅返回类型不同的话override错误
                     if (declaration.equals(e) && !declaration.returnType.equals(e.returnType)) {
-                        ErrorSupport.error("global.error.override", className, StringUtil.constructMethod(declaration));
+                        error("global.error.override", className, constructMethod(declaration));
                     }
                 });
             }
@@ -129,7 +132,7 @@ public class TreeSupport implements Closeable {
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 //参数重定义
                 if (lookupSymbolTable(className).lookup(attr.getKey()).isPresent()) {
-                    ErrorSupport.error("global.error.attr.redefined", className, attr.getKey(), parentClassName);
+                    error("global.error.attr.redefined", className, attr.getKey(), parentClassName);
                 } else {
                     lookupSymbolTable(className).addId(attr.getKey(), attr.getValue().type);
                 }
@@ -167,7 +170,7 @@ public class TreeSupport implements Closeable {
         keys.forEach(key -> {
             if (!isObjectType(key)) {
                 if (!keys.contains(classGraph.get(key))) {
-                    ErrorSupport.error("global.error.class.undefined", classGraph.get(key));
+                    error("global.error.class.undefined", classGraph.get(key));
                 }
             }
         });
@@ -179,7 +182,8 @@ public class TreeSupport implements Closeable {
                 reader.close();
                 reader = null;
             }
-        } catch (IOException ignore) { }
+        } catch (IOException ignore) {
+        }
         Heap.clear();
         ConstantPool.getInstance().clear();
     }
@@ -191,7 +195,7 @@ public class TreeSupport implements Closeable {
      * @return
      */
     public CoolObject newDef(EvalTreeVisitor visitor, Type type, Context context) {
-        CoolObject object = ObjectFactory.coolObject();
+        CoolObject object = coolObject();
         object.type = type;
 
         object.variables.enterScope();
@@ -216,13 +220,13 @@ public class TreeSupport implements Closeable {
             Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (isStringType(attr.getValue().type)) {
-                    object.variables.addId(attr.getKey(), ObjectFactory.coolStringDefault());
+                    object.variables.addId(attr.getKey(), coolStringDefault());
                 } else if (isBoolType(attr.getValue().type)) {
-                    object.variables.addId(attr.getKey(), ObjectFactory.coolBoolDefault());
+                    object.variables.addId(attr.getKey(), coolBoolDefault());
                 } else if (isIntType(attr.getValue().type)) {
-                    object.variables.addId(attr.getKey(), ObjectFactory.coolIntDefault());
+                    object.variables.addId(attr.getKey(), coolIntDefault());
                 } else {
-                    object.variables.addId(attr.getKey(), ObjectFactory.coolVoid());
+                    object.variables.addId(attr.getKey(), coolVoid());
                 }
             }
         }
@@ -246,11 +250,11 @@ public class TreeSupport implements Closeable {
         switch (methodDeclaration.belongs) {
             case "Object":
                 if (methodDeclaration.methodName.equals("type_name")) {
-                    return ObjectFactory.coolString(obj.type.className());
+                    return coolString(obj.type.className());
                 } else if (methodDeclaration.methodName.equals("copy")) {
                     return obj.copy();
                 } else if (methodDeclaration.methodName.equals("abort")) {
-                    return ObjectFactory.coolObject().abort();
+                    return coolObject().abort();
                 }
                 break;
             case "IO":
@@ -263,20 +267,20 @@ public class TreeSupport implements Closeable {
                 } else if (methodDeclaration.methodName.equals("in_string")) {
                     try {
                         String str = reader().readLine();
-                        return ObjectFactory.coolString(str);
+                        return coolString(str);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        ErrorSupport.error("unexpected.error");
+                        error("unexpected.error");
                     }
-                    return ObjectFactory.coolStringDefault();
+                    return coolStringDefault();
                 } else if (methodDeclaration.methodName.equals("in_int")) {
                     try {
                         String str = reader().readLine();
-                        return ObjectFactory.coolInt(Integer.parseInt(str));
+                        return coolInt(Integer.parseInt(str));
                     } catch (Exception e) {
-                        ErrorSupport.error("unexpected.error");
+                        error("unexpected.error");
                     }
-                    return ObjectFactory.coolIntDefault();
+                    return coolIntDefault();
                 }
                 break;
             case "String":
@@ -302,13 +306,13 @@ public class TreeSupport implements Closeable {
      * @see com.leon.cool.lang.ast.Cond
      */
     public Type lub(List<Type> types) {
-        return types.stream().reduce(TypeFactory.noType(), (type1, type2) -> {
+        return types.stream().reduce(noType(), (type1, type2) -> {
             if (type1.type() == TypeEnum.NO_TYPE) {
                 return type2;
             } else if (type2.type() == TypeEnum.NO_TYPE) {
                 return type1;
             } else if (type1.type() == TypeEnum.SELF_TYPE && type2.type() == TypeEnum.SELF_TYPE) {
-                return TypeFactory.selfType(lub(type1.replace(), type2.replace()).className());
+                return selfType(lub(type1.replace(), type2.replace()).className());
             } else {
                 return lub(type1.replace(), type2.replace());
             }
@@ -330,7 +334,7 @@ public class TreeSupport implements Closeable {
             temp = classGraph.get(temp);
             list2.add(temp);
         }
-        return TypeFactory.objectType(list1.stream().filter(list2::contains).findFirst().get());
+        return objectType(list1.stream().filter(list2::contains).findFirst().get());
     }
 
     private BufferedReader reader() {
@@ -406,7 +410,7 @@ public class TreeSupport implements Closeable {
         label:
         for (MethodDeclaration declaration : list) {
             for (int i = 0; i < declaration.paramTypes.size(); i++) {
-                if (!isParent(classGraph, TypeFactory.objectType(declaration.paramTypes.get(i), className), TypeFactory.objectType(min.paramTypes.get(i), className))) {
+                if (!isParent(classGraph, objectType(declaration.paramTypes.get(i), className), objectType(min.paramTypes.get(i), className))) {
                     continue label;
                 }
             }
@@ -414,8 +418,8 @@ public class TreeSupport implements Closeable {
         }
         for (MethodDeclaration declaration : list) {
             for (int i = 0; i < declaration.paramTypes.size(); i++) {
-                if (!isParent(classGraph, TypeFactory.objectType(min.paramTypes.get(i), className), TypeFactory.objectType(declaration.paramTypes.get(i), className))) {
-                    ErrorSupport.error("global.error.overload", className, StringUtil.mkString(list.stream().map(StringUtil::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
+                if (!isParent(classGraph, objectType(min.paramTypes.get(i), className), objectType(declaration.paramTypes.get(i), className))) {
+                    error("global.error.overload", className, mkString(list.stream().map(StringUtil::constructMethod).collect(Collectors.toList()), Optional.of("["), ",", Optional.of("]")));
                     return Optional.empty();
                 }
             }
@@ -431,7 +435,7 @@ public class TreeSupport implements Closeable {
                 parent = classGraph.get(parent);
             }
             if (parent != null && parent.equals(key)) {
-                ErrorSupport.error("global.error.class.circle", key);
+                error("global.error.class.circle", key);
             }
         }
     }
@@ -441,7 +445,7 @@ public class TreeSupport implements Closeable {
             return false;
         } else {
             for (int i = 0; i < typeInfos.size(); i++) {
-                if (!isParent(classGraph, typeInfos.get(i), TypeFactory.objectType(paramTypes.get(i), className))) {
+                if (!isParent(classGraph, typeInfos.get(i), objectType(paramTypes.get(i), className))) {
                     return false;
                 }
             }

@@ -19,9 +19,7 @@ public class ErrorSupport {
     static {
         try (InputStream stream = TreeSupport.class.getClassLoader().getResourceAsStream("messages.properties")) {
             messages.load(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignore) { }
     }
 
     public static void error(String key, Object... params) {

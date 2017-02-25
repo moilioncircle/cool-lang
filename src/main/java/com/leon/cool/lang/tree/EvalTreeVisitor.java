@@ -1,6 +1,7 @@
 package com.leon.cool.lang.tree;
 
 import com.leon.cool.lang.ast.*;
+import com.leon.cool.lang.glossary.Out;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.infrastructure.Context;
 
@@ -23,59 +24,59 @@ import com.leon.cool.lang.support.infrastructure.Context;
  */
 public interface EvalTreeVisitor {
 
-    CoolObject applyAssign(Assign assign, Context context);
+    CoolObject applyAssign(Assign assign, @Out Context context);
 
-    CoolObject applyBlocks(Blocks blocks, Context context);
+    CoolObject applyBlocks(Blocks blocks, @Out Context context);
 
-    CoolObject applyNewDef(NewDef newDef, Context context);
+    CoolObject applyNewDef(NewDef newDef, @Out Context context);
 
-    CoolObject applyIsVoid(IsVoid isVoid, Context context);
+    CoolObject applyIsVoid(IsVoid isVoid, @Out Context context);
 
-    CoolObject applyPlus(Plus plus, Context context);
+    CoolObject applyPlus(Plus plus, @Out Context context);
 
-    CoolObject applySub(Sub sub, Context context);
+    CoolObject applySub(Sub sub, @Out Context context);
 
-    CoolObject applyMul(Mul mul, Context context);
+    CoolObject applyMul(Mul mul, @Out Context context);
 
-    CoolObject applyDivide(Divide divide, Context context);
+    CoolObject applyDivide(Divide divide, @Out Context context);
 
-    CoolObject applyNeg(Neg neg, Context context);
+    CoolObject applyNeg(Neg neg, @Out Context context);
 
-    CoolObject applyLt(Lt lt, Context context);
+    CoolObject applyLt(Lt lt, @Out Context context);
 
-    CoolObject applyLtEq(LtEq ltEq, Context context);
+    CoolObject applyLtEq(LtEq ltEq, @Out Context context);
 
-    CoolObject applyComp(Comp comp, Context context);
+    CoolObject applyComp(Comp comp, @Out Context context);
 
-    CoolObject applyNot(Not not, Context context);
+    CoolObject applyNot(Not not, @Out Context context);
 
-    CoolObject applyIdConst(IdConst idConst, Context context);
+    CoolObject applyIdConst(IdConst idConst, @Out Context context);
 
-    CoolObject applyStringConst(StringConst stringConst, Context context);
+    CoolObject applyStringConst(StringConst stringConst, @Out Context context);
 
-    CoolObject applyBoolConst(BoolConst boolConst, Context context);
+    CoolObject applyBoolConst(BoolConst boolConst, @Out Context context);
 
-    CoolObject applyIntConst(IntConst intConst, Context context);
+    CoolObject applyIntConst(IntConst intConst, @Out Context context);
 
-    CoolObject applyParen(Paren paren, Context context);
+    CoolObject applyParen(Paren paren, @Out Context context);
 
-    CoolObject applyNoExpression(NoExpression expr, Context context);
+    CoolObject applyNoExpression(NoExpression expr, @Out Context context);
 
-    CoolObject applyDispatch(Dispatch dispatch, Context context);
+    CoolObject applyDispatch(Dispatch dispatch, @Out Context context);
 
-    CoolObject applyStaticDispatchBody(StaticDispatchBody staticDispatchBody, Context context);
+    CoolObject applyStaticDispatchBody(StaticDispatchBody staticDispatchBody, @Out Context context);
 
-    CoolObject applyStaticDispatch(StaticDispatch staticDispatch, Context context);
+    CoolObject applyStaticDispatch(StaticDispatch staticDispatch, @Out Context context);
 
-    CoolObject applyCond(Cond cond, Context context);
+    CoolObject applyCond(Cond cond, @Out Context context);
 
-    CoolObject applyLoop(Loop loop, Context context);
+    CoolObject applyLoop(Loop loop, @Out Context context);
 
-    CoolObject applyLet(Let let, Context context);
+    CoolObject applyLet(Let let, @Out Context context);
 
-    CoolObject applyCaseDef(CaseDef caseDef, Context context);
+    CoolObject applyCaseDef(CaseDef caseDef, @Out Context context);
 
-    CoolObject applyBranch(Branch branch, Context context);
+    CoolObject applyBranch(Branch branch, @Out Context context);
 
-    CoolObject applyLetAttrDef(LetAttrDef letAttrDef, Context context);
+    CoolObject applyLetAttrDef(LetAttrDef letAttrDef, @Out Context context);
 }
