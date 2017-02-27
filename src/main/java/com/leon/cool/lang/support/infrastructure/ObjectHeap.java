@@ -25,22 +25,22 @@ import java.util.stream.Collectors;
  *
  * @author leon on 16-3-13
  */
-public class Heap {
-    private static final Logger LOGGER = Logger.getLogger(Heap.class.getName());
+public class ObjectHeap {
+    private static final Logger LOGGER = Logger.getLogger(ObjectHeap.class.getName());
 
-    private static Map<CoolObject, Boolean> heap = new HashMap<>();
+    private Map<CoolObject, Boolean> heap = new HashMap<>();
 
-    public static void add(CoolObject obj) {
+    public void add(CoolObject obj) {
         heap.put(obj, false);
     }
 
-    public static void canReach(CoolObject obj) {
+    public void canReach(CoolObject obj) {
         if (heap.containsKey(obj)) {
             heap.put(obj, true);
         }
     }
 
-    public static boolean isReach(CoolObject obj) {
+    public boolean isReach(CoolObject obj) {
         if (heap.containsKey(obj)) {
             return heap.get(obj);
         }
@@ -53,7 +53,7 @@ public class Heap {
     /**
      * 删除不可达对象，并将可达对象重新设置成false
      */
-    public static void clearUnreachable() {
+    public void clearUnreachable() {
         LOGGER.info("*Mark-Sweep GC* total object size:" + heap.size());
         Set<Map.Entry<CoolObject, Boolean>> sets = heap.entrySet().stream().filter(Map.Entry::getValue).collect(Collectors.toSet());
         LOGGER.info("*Mark-Sweep GC* reachable object size:" + sets.size());
@@ -61,11 +61,7 @@ public class Heap {
         sets.stream().forEach(e -> heap.put(e.getKey(), false));
     }
 
-    public static int size() {
+    public int size() {
         return heap.size();
-    }
-
-    public static void clear() {
-        heap.clear();
     }
 }

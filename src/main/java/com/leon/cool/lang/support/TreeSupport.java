@@ -6,9 +6,8 @@ import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.object.CoolString;
 import com.leon.cool.lang.support.declaration.AttrDeclaration;
 import com.leon.cool.lang.support.declaration.MethodDeclaration;
-import com.leon.cool.lang.support.infrastructure.ConstantPool;
 import com.leon.cool.lang.support.infrastructure.Context;
-import com.leon.cool.lang.support.infrastructure.Heap;
+import com.leon.cool.lang.support.infrastructure.ObjectHeap;
 import com.leon.cool.lang.support.infrastructure.SymbolTable;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.type.Type;
@@ -49,12 +48,16 @@ import static com.leon.cool.lang.util.StringUtil.mkString;
  */
 public class TreeSupport implements Closeable {
 
+    public ObjectHeap heap;
     public BufferedReader reader;
     public Map<String, String> classGraph = new HashMap<>();
     public Map<String, SymbolTable<String>> symbolTables = new HashMap<>();
     public Map<String, Set<MethodDeclaration>> methodGraph = new HashMap<>();
     public Map<String, Map<String, AttrDeclaration>> attrGraph = new HashMap<>();
 
+    public TreeSupport() {
+        this.heap = new ObjectHeap();
+    }
     public void createSymbolTable(String className) {
         symbolTables.putIfAbsent(className, new SymbolTable<>());
     }
@@ -184,8 +187,6 @@ public class TreeSupport implements Closeable {
             }
         } catch (IOException ignore) {
         }
-        Heap.clear();
-        ConstantPool.getInstance().clear();
     }
 
     /**
@@ -233,7 +234,7 @@ public class TreeSupport implements Closeable {
         initializer(visitor, object);
         //垃圾回收
         gc(context);
-        Heap.add(object);
+        heap.add(object);
         return object;
     }
 
@@ -350,7 +351,7 @@ public class TreeSupport implements Closeable {
      * @param context
      */
     private void gc(Context context) {
-        if (Heap.size() < Constant.GC_HEAP_SIZE) return;
+        if (heap.size() < Constant.GC_HEAP_SIZE) return;
         SymbolTable<CoolObject> environment = context.environment;
 
         //Mark
@@ -361,21 +362,21 @@ public class TreeSupport implements Closeable {
 
         while (!rootObjects.isEmpty()) {
             CoolObject obj = rootObjects.remove(0);
-            Heap.canReach(obj);
+            heap.canReach(obj);
             SymbolTable<CoolObject> variables = obj.variables;
             if (variables == null) continue;
             for (int i = 0; i < variables.size(); i++) {
                 Collection<CoolObject> values = variables.elementAt(i).values();
                 for (CoolObject variable : values) {
                     //防止循环引用
-                    if (isObjectType(variable.type) && !Heap.isReach(variable)) {
+                    if (isObjectType(variable.type) && !heap.isReach(variable)) {
                         rootObjects.add(variable);
                     }
                 }
             }
         }
         //Sweep
-        Heap.clearUnreachable();
+        heap.clearUnreachable();
     }
 
     /**
