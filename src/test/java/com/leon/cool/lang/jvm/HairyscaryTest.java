@@ -6,7 +6,7 @@ package com.leon.cool.lang.jvm;
 public class HairyscaryTest {
     public static void main(String[] args) {
         //17141611714163171416511714161171416317141653117141611714163171416511714161171416317141653171416117141631714165171416
-        new Main();
+        new Main().main();
     }
 
     public static class Main {
@@ -14,6 +14,10 @@ public class HairyscaryTest {
         Foo b = new Foo();
         Razz c = new Razz();
         Bar d = new Bar();
+
+        String main() {
+            return "do nothing";
+        }
     }
 
     private static class Bazz {
