@@ -6,7 +6,7 @@ package com.leon.cool.lang.jvm;
 public class SelfTest {
 //    class Silly {
 //        copy() : SELF_TYPE {
-//            self
+//            (new SELF_TYPE);
 //        };
 //    };
 //
@@ -19,7 +19,7 @@ public class SelfTest {
 //        main() : Sally { x };
 //    };
 
-//    Finally,SELF_TYPE may be used in the following places:
+    //    Finally,SELF_TYPE may be used in the following places:
 //    new SELF_TYPE,
 //    as the return type of a method,
 //    as the declared type of a let variable,
@@ -29,14 +29,36 @@ public class SelfTest {
         Silly copy() {
             return this;
         }
+
+        Silly Silly$copy() {
+            return this;
+        }
+
+        Silly new$SELF_TYPE() {
+            return new Silly();
+        }
+
+        Silly self() {
+            return this;
+        }
     }
 
     private static class Sally extends Silly {
+        Sally copy() {
+            return (Sally) super.copy();
+        }
 
+        Sally new$SELF_TYPE() {
+            return new Sally();
+        }
+
+        Sally self() {
+            return this;
+        }
     }
 
     private static class Main {
-        Sally x = (Sally) (new Sally().copy());
+        Sally x = new Sally().copy();
 
         Sally main() {
             return x;
