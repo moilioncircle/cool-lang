@@ -10,10 +10,26 @@ public class HairyscaryTest {
     }
 
     public static class Main {
-        Bazz a = new Bazz();
-        Foo b = new Foo();
-        Razz c = new Razz();
-        Bar d = new Bar();
+        Bazz a = attr$a();
+        Foo b = attr$b();
+        Razz c = attr$c();
+        Bar d = attr$d();
+
+        Bazz attr$a() {
+            return new Bazz();
+        }
+
+        Foo attr$b() {
+            return new Foo();
+        }
+
+        Razz attr$c() {
+            return new Razz();
+        }
+
+        Bar attr$d() {
+            return new Bar();
+        }
 
         String main() {
             return "do nothing";
@@ -21,9 +37,9 @@ public class HairyscaryTest {
     }
 
     private static class Bazz {
-        int h = 1;
-        Foo g = (this.getClass() == Bazz.class) ? new Foo() : (this.getClass() == Razz.class) ? new Bar() : (this.getClass() == Foo.class) ? new Razz() : (this.getClass() == Bar.class) ? (Foo) this : null;
-        Object i = printh();
+        int h = attr$h();
+        Foo g = attr$g();
+        Object i = attr$i();
 
         int printh() {
             System.out.print(h);
@@ -39,11 +55,23 @@ public class HairyscaryTest {
             h = h + 1;
             return i;
         }
+
+        int attr$h() {
+            return 1;
+        }
+
+        Object attr$i() {
+            return printh();
+        }
+
+        Foo attr$g() {
+            return (this.getClass() == Bazz.class) ? new Foo() : (this.getClass() == Razz.class) ? new Bar() : (this.getClass() == Foo.class) ? new Razz() : (this.getClass() == Bar.class) ? (Foo) this : null;
+        }
     }
 
     private static class Foo extends Bazz {
-        Razz a = (this.getClass() == Razz.class) ? new Bar() : (this.getClass() == Foo.class) ? new Razz() : (this.getClass() == Bar.class) ? (Razz) this : null;
-        int b = a.doh() + g.doh() + doh() + printh();
+        Razz a = attr$a();
+        int b = attr$b();
 
         int doh() {
             return Foo$doh();
@@ -54,15 +82,39 @@ public class HairyscaryTest {
             h = h + 2;
             return i;
         }
+
+        Razz attr$a() {
+            return (this.getClass() == Razz.class) ? new Bar() : (this.getClass() == Foo.class) ? new Razz() : (this.getClass() == Bar.class) ? (Razz) this : null;
+        }
+
+        int attr$b() {
+            return a.doh() + g.doh() + doh() + printh();
+        }
     }
 
     private static class Razz extends Foo {
-        Bar e = (this.getClass() == Razz.class) ? new Bar() : (this.getClass() == Bar.class) ? (Bar) this : null;
-        int f = a.Bazz$doh() + g.doh() + e.doh() + doh() + printh();
+        Bar e = attr$e();
+        int f = attr$f();
+
+        Bar attr$e() {
+            return (this.getClass() == Razz.class) ? new Bar() : (this.getClass() == Bar.class) ? (Bar) this : null;
+        }
+
+        int attr$f() {
+            return a.Bazz$doh() + g.doh() + e.doh() + doh() + printh();
+        }
     }
 
     private static class Bar extends Razz {
-        int c = doh();
-        Object d = printh();
+        int c = attr$c();
+        Object d = attr$d();
+
+        int attr$c() {
+            return doh();
+        }
+
+        Object attr$d() {
+            return printh();
+        }
     }
 }
