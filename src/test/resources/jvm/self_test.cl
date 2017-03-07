@@ -4,7 +4,7 @@ class A inherits IO {
             {
                 a.println();
                 a.println1();
-                a@B.println();
+                a@A.println();
             };
         }
     };
@@ -28,6 +28,7 @@ class Main {
     main() : Object {
         {
             (new A).test();
+            (new B).test();
         }
     };
 };
