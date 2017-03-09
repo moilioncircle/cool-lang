@@ -24,7 +24,7 @@ public class SelfTest2 {
         }
 
         A println() {
-            return A$println1();
+            return A$println();
         }
 
         //static dispatch
@@ -123,7 +123,11 @@ public class SelfTest2 {
         }
 
         B println() {
-            return B$println1();
+            return B$println();
+        }
+
+        B println2() {
+            return B$println2();
         }
 
         //static dispatch
@@ -135,8 +139,12 @@ public class SelfTest2 {
             return (B)super.println1();
         }
 
-        A A$println() {
+        B B$println() {
             return out_string(new BuiltIn.CoolString("world\n"));
+        }
+
+        B B$println2() {
+            return out_string(new BuiltIn.CoolString("chen bao yi\n"));
         }
 
         //io
@@ -214,7 +222,7 @@ public class SelfTest2 {
 
         Object Main$main() {
             new A().test();
-            return new B().test();
+            return new B().test().println2();
         }
 
         //object
