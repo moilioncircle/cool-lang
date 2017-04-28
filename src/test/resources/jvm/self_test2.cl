@@ -22,13 +22,17 @@ class B inherits A {
     println() : SELF_TYPE {
         out_string("world\n")
     };
+
+    println2() : SELF_TYPE {
+        out_string("chen bao yi\n")
+    };
 };
 
 class Main {
     main() : Object {
         {
             (new A).test();
-            (new B).test();
+            (new B).test().println2();
         }
     };
 };

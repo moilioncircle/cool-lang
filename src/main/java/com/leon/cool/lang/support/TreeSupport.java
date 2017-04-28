@@ -248,7 +248,7 @@ public class TreeSupport implements Closeable {
      * @return CoolObject
      */
     public CoolObject buildIn(List<CoolObject> paramObjects, CoolObject obj, MethodDeclaration methodDeclaration, String pos) {
-        switch (methodDeclaration.belongs) {
+        switch (methodDeclaration.owner) {
             case "Object":
                 if (methodDeclaration.methodName.equals("type_name")) {
                     return coolString(obj.type.className());

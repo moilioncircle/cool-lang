@@ -27,10 +27,10 @@ public class MethodDeclaration {
     public List<String> paramTypes = new ArrayList<>();
     public String returnType;
     public MethodDef declaration;
-    public String belongs;
+    public String owner;
 
     /**
-     * 方法名以及形参类型相同，则比较成功，不包含（returnType，declaration，belongs）
+     * 方法名以及形参类型相同，则比较成功，不包含（returnType，declaration，owner）
      *
      * @param o
      * @return
