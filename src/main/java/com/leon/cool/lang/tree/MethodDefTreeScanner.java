@@ -55,7 +55,7 @@ public class MethodDefTreeScanner extends TreeScanner {
             return e.type.name;
         }).collect(Collectors.toList());
         methodDeclaration.declaration = methodDef;
-        methodDeclaration.belongs = className;
+        methodDeclaration.owner = className;
         treeSupport.putToMethodGraph(className, methodDeclaration);
         super.applyMethodDef(methodDef);
     }
