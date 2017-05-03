@@ -1,11 +1,6 @@
 package com.leon.cool.lang.support.infrastructure;
 
-import com.leon.cool.lang.util.Stack;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Copyright leon
@@ -25,10 +20,10 @@ import java.util.Optional;
  * @author leon on 15-10-11
  */
 public class SymbolTable<T> {
-    private final Stack<HashMap<String, T>> tbl;
+    private final LinkedList<HashMap<String, T>> tbl;
 
     public SymbolTable() {
-        tbl = new Stack<>();
+        tbl = new LinkedList<>();
     }
 
     public void enterScope() {
@@ -39,7 +34,7 @@ public class SymbolTable<T> {
         if (tbl.isEmpty()) {
             System.out.println("existScope: can't remove scope from an isEmpty symbol table.");
         }
-        tbl.pop();
+        tbl.poll();
     }
 
     public void addId(String id, T info) {
@@ -54,7 +49,7 @@ public class SymbolTable<T> {
             System.out.println("lookup: no scope in symbol table.");
         }
         for (int i = 0; i < tbl.size(); i++) {
-            T info = tbl.elementAt(i).get(sym);
+            T info = tbl.get(i).get(sym);
             if (info != null) return Optional.of(info);
         }
         return Optional.empty();
@@ -65,14 +60,14 @@ public class SymbolTable<T> {
             System.out.println("lookup: no scope in symbol table.");
         }
         for (int i = 0; i < tbl.size(); i++) {
-            if (tbl.elementAt(i).containsKey(sym)) {
-                tbl.elementAt(i).put(sym, obj);
+            if (tbl.get(i).containsKey(sym)) {
+                tbl.get(i).put(sym, obj);
             }
         }
     }
 
     public HashMap<String, T> elementAt(int index) {
-        return tbl.elementAt(index);
+        return tbl.get(index);
     }
 
     public int size() {
@@ -90,7 +85,7 @@ public class SymbolTable<T> {
     public String toString() {
         String res = "";
         for (int i = tbl.size() - 1, j = 0; i >= 0; i--, j++) {
-            res += "Scope " + j + ": " + tbl.elementAt(i) + "\n";
+            res += "Scope " + j + ": " + tbl.get(i) + "\n";
         }
         return res;
     }
