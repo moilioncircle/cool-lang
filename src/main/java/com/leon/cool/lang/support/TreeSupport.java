@@ -12,7 +12,6 @@ import com.leon.cool.lang.support.infrastructure.SymbolTable;
 import com.leon.cool.lang.tree.EvalTreeVisitor;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
-import com.leon.cool.lang.util.Stack;
 import com.leon.cool.lang.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -123,14 +122,14 @@ public class TreeSupport implements Closeable {
     }
 
     public void mergeAttrGraph(String className) {
-        Stack<String> inheritsLinks = new Stack<>();
+        Deque<String> inheritsLinks = new LinkedList<>();
         String temp = className;
         while (temp != null) {
             inheritsLinks.push(temp);
             temp = classGraph.get(temp);
         }
         while (!inheritsLinks.isEmpty()) {
-            String parentClassName = inheritsLinks.pop();
+            String parentClassName = inheritsLinks.poll();
             Map<String, AttrDeclaration> attrs = attrGraph.get(parentClassName);
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 //参数重定义
@@ -201,7 +200,7 @@ public class TreeSupport implements Closeable {
 
         object.variables.enterScope();
 
-        Stack<String> inheritsLinks = new Stack<>();
+        Deque<String> inheritsLinks = new LinkedList<>();
         String temp = type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
@@ -217,7 +216,7 @@ public class TreeSupport implements Closeable {
          * Object = void
          */
         while (!inheritsLinks.isEmpty()) {
-            String parentClassName = inheritsLinks.pop();
+            String parentClassName = inheritsLinks.poll();
             Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
             for (Map.Entry<String, AttrDeclaration> attr : attrs.entrySet()) {
                 if (isStringType(attr.getValue().type)) {
@@ -387,7 +386,7 @@ public class TreeSupport implements Closeable {
      * 对有表达式的属性求值，并更新对象变量表，没有表达式的属性会在newDef中赋初值。
      */
     private void initializer(EvalTreeVisitor visitor, CoolObject object) {
-        Stack<String> inheritsLinks = new Stack<>();
+        Deque<String> inheritsLinks = new LinkedList<>();
         String temp = object.type.className();
         while (temp != null) {
             inheritsLinks.push(temp);
@@ -395,7 +394,7 @@ public class TreeSupport implements Closeable {
         }
         Context context = new Context(object, object.variables);
         while (!inheritsLinks.isEmpty()) {
-            String parentClassName = inheritsLinks.pop();
+            String parentClassName = inheritsLinks.poll();
             Map<String, AttrDeclaration> attrs = attrGraph.getOrDefault(parentClassName, Collections.emptyMap());
             attrs.entrySet().forEach(attr -> {
                 if (attr.getValue().expr.isPresent()) {

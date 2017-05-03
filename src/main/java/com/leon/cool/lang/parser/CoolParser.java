@@ -9,12 +9,8 @@ import com.leon.cool.lang.glossary.TokenKind;
 import com.leon.cool.lang.support.infrastructure.ClassTable;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.Token;
-import com.leon.cool.lang.util.Stack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static com.leon.cool.lang.glossary.TokenKind.*;
@@ -249,7 +245,7 @@ public class CoolParser {
         Expression expr = parseExpr(0);
         suffixExprListSupply.remove(suffixExprListSupply.size() - 1);
         opStackSupply.remove(opStackSupply.size() - 1);
-        errStartTokenSupply.pop();
+        errStartTokenSupply.poll();
         return expr;
     }
 
@@ -257,8 +253,8 @@ public class CoolParser {
     Same as SymbolTable
      */
     private final List<List<Object>> suffixExprListSupply = new ArrayList<>();
-    private final List<Stack<TokenKind>> opStackSupply = new ArrayList<>();
-    private final Stack<Token> errStartTokenSupply = new Stack<>();
+    private final List<Deque<TokenKind>> opStackSupply = new ArrayList<>();
+    private final Deque<Token> errStartTokenSupply = new LinkedList<>();
     private Token errEndToken;
 
     private void newErrStartToken() {
@@ -270,8 +266,8 @@ public class CoolParser {
         return suffixExprListSupply.get(suffixExprListSupply.size() - 1);
     }
 
-    private Stack<TokenKind> newOpStack() {
-        opStackSupply.add(new Stack<>());
+    private Deque<TokenKind> newOpStack() {
+        opStackSupply.add(new LinkedList<>());
         return opStackSupply.get(opStackSupply.size() - 1);
     }
 
@@ -291,7 +287,7 @@ public class CoolParser {
     }
 
     private void pushOp(TokenKind o1) {
-        Stack<TokenKind> opStack = opStackSupply.get(opStackSupply.size() - 1);
+        Deque<TokenKind> opStack = opStackSupply.get(opStackSupply.size() - 1);
 
         switch (o1) {
             case MONKEYS_AT:
@@ -311,14 +307,14 @@ public class CoolParser {
                     opStack.push(o1);
                 } else {
                     while (!opStack.isEmpty() && ((o1.assoc != Assoc.RIGHT && o1.prec <= opStack.peek().prec) || (o1.assoc == Assoc.RIGHT && o1.prec < opStack.peek().prec))) {
-                        add(opStack.pop());
+                        add(opStack.poll());
                     }
                     opStack.push(o1);
                 }
                 break;
             default:
                 while (!opStack.isEmpty()) {
-                    add(opStack.pop());
+                    add(opStack.poll());
                 }
         }
 
@@ -629,7 +625,7 @@ public class CoolParser {
     private Expression expr(List<Object> suffixExpr) {
         Pos startPos = errStartTokenSupply.peek().startPos;
         Pos endPos = errEndToken.endPos;
-        Stack<Object> stack = new Stack<>();
+        Deque<Object> stack = new LinkedList<>();
         boolean nonAssoc = false;
         for (int i = 0; i < suffixExpr.size(); i++) {
             if (suffixExpr.get(i) instanceof TokenKind) {
@@ -732,13 +728,13 @@ public class CoolParser {
             }
         }
         assert stack.size() == 1;
-        return (Expression) stack.pop();
+        return (Expression) stack.poll();
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T getGenericElement(Stack<Object> stack) {
+    private <T> T getGenericElement(Deque<Object> stack) {
         try {
-            return (T) stack.pop();
+            return (T) stack.poll();
         } catch (ClassCastException e) {
             error("parser.error.expr", errorPos(errStartTokenSupply.peek().startPos, errEndToken.endPos));
         }
