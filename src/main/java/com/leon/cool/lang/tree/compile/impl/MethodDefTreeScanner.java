@@ -1,9 +1,10 @@
-package com.leon.cool.lang.tree;
+package com.leon.cool.lang.tree.compile.impl;
 
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.ast.MethodDef;
 import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.declaration.MethodDeclaration;
+import com.leon.cool.lang.tree.compile.TreeScanner;
 
 import java.util.stream.Collectors;
 

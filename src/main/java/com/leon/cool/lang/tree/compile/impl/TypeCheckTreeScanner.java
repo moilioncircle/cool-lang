@@ -1,10 +1,11 @@
-package com.leon.cool.lang.tree;
+package com.leon.cool.lang.tree.compile.impl;
 
 import com.leon.cool.lang.Constant;
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.declaration.MethodDeclaration;
 import com.leon.cool.lang.tokenizer.Token;
+import com.leon.cool.lang.tree.compile.TreeScanner;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
 

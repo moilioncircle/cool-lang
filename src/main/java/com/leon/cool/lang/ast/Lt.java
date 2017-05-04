@@ -2,8 +2,8 @@ package com.leon.cool.lang.ast;
 
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.infrastructure.Context;
-import com.leon.cool.lang.tree.EvalTreeVisitor;
-import com.leon.cool.lang.tree.TreeVisitor;
+import com.leon.cool.lang.tree.compile.TreeVisitor;
+import com.leon.cool.lang.tree.runtime.EvalTreeVisitor;
 
 /**
  * Copyright leon

@@ -9,7 +9,8 @@ import com.leon.cool.lang.support.declaration.MethodDeclaration;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.support.infrastructure.ObjectHeap;
 import com.leon.cool.lang.support.infrastructure.SymbolTable;
-import com.leon.cool.lang.tree.EvalTreeVisitor;
+import com.leon.cool.lang.tree.compile.impl.TypeCheckTreeScanner;
+import com.leon.cool.lang.tree.runtime.EvalTreeVisitor;
 import com.leon.cool.lang.type.Type;
 import com.leon.cool.lang.type.TypeEnum;
 import com.leon.cool.lang.util.StringUtil;
@@ -301,7 +302,7 @@ public class TreeSupport implements Closeable {
      *
      * @param types
      * @return 最小公共父类型
-     * @see com.leon.cool.lang.tree.TypeCheckTreeScanner
+     * @see TypeCheckTreeScanner
      * @see com.leon.cool.lang.ast.CaseDef
      * @see com.leon.cool.lang.ast.Cond
      */
