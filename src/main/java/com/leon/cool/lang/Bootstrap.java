@@ -7,7 +7,8 @@ import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.CoolScanner;
 import com.leon.cool.lang.tokenizer.CoolTokenizer;
-import com.leon.cool.lang.tree.*;
+import com.leon.cool.lang.tree.compile.impl.*;
+import com.leon.cool.lang.tree.runtime.impl.EvalTreeScanner;
 
 import static com.leon.cool.lang.util.FileUtil.readFile;
 
@@ -52,7 +53,6 @@ public class Bootstrap {
                 typeCheckTreeScanner.errMsgs.forEach(System.err::println);
                 return;
             }
-            //expr.accept(new PrintTypeInfoTreeScanner());
             //runtime
             expr.accept(new EvalTreeScanner(treeSupport), new Context(null, null));
         }

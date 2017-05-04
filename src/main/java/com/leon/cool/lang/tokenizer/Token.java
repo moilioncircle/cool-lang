@@ -4,7 +4,7 @@ import com.leon.cool.lang.ast.TreeNode;
 import com.leon.cool.lang.glossary.Pos;
 import com.leon.cool.lang.glossary.TokenKind;
 import com.leon.cool.lang.tree.TreeElement;
-import com.leon.cool.lang.tree.TreeVisitor;
+import com.leon.cool.lang.tree.compile.TreeVisitor;
 
 /**
  * Copyright leon

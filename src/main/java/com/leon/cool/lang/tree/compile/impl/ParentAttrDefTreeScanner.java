@@ -1,7 +1,8 @@
-package com.leon.cool.lang.tree;
+package com.leon.cool.lang.tree.compile.impl;
 
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.support.TreeSupport;
+import com.leon.cool.lang.tree.compile.TreeScanner;
 
 /**
  * Copyright leon
@@ -18,17 +19,19 @@ import com.leon.cool.lang.support.TreeSupport;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @author leon on 15-11-1
+ * @author leon on 15-10-19
  */
-public class ParentMethodDefTreeScanner extends TreeScanner {
+public class ParentAttrDefTreeScanner extends TreeScanner {
 
-    public ParentMethodDefTreeScanner(TreeSupport treeSupport) {
+    public ParentAttrDefTreeScanner(TreeSupport treeSupport) {
         super(treeSupport);
     }
 
     public void applyClassDef(ClassDef classDef) {
         String className = classDef.type.name;
-        treeSupport.mergeMethodGraph(className);
+        treeSupport.createSymbolTable(className);
+        treeSupport.lookupSymbolTable(className).enterScope();
+        treeSupport.mergeAttrGraph(className);
         super.applyClassDef(classDef);
     }
 }

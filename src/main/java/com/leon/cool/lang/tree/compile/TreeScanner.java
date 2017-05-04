@@ -1,4 +1,4 @@
-package com.leon.cool.lang.tree;
+package com.leon.cool.lang.tree.compile;
 
 import com.leon.cool.lang.ast.*;
 import com.leon.cool.lang.support.TreeSupport;

@@ -4,8 +4,8 @@ import com.leon.cool.lang.glossary.TokenKind;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tokenizer.Token;
-import com.leon.cool.lang.tree.EvalTreeVisitor;
-import com.leon.cool.lang.tree.TreeVisitor;
+import com.leon.cool.lang.tree.compile.TreeVisitor;
+import com.leon.cool.lang.tree.runtime.EvalTreeVisitor;
 
 import java.util.ArrayList;
 import java.util.List;

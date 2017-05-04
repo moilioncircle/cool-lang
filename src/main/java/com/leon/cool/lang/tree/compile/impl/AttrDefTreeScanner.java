@@ -1,9 +1,10 @@
-package com.leon.cool.lang.tree;
+package com.leon.cool.lang.tree.compile.impl;
 
 import com.leon.cool.lang.ast.AttrDef;
 import com.leon.cool.lang.ast.ClassDef;
 import com.leon.cool.lang.support.TreeSupport;
 import com.leon.cool.lang.support.declaration.AttrDeclaration;
+import com.leon.cool.lang.tree.compile.TreeScanner;
 
 import static com.leon.cool.lang.support.ErrorSupport.error;
 import static com.leon.cool.lang.support.ErrorSupport.errorPos;
