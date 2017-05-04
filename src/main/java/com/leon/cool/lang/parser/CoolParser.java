@@ -48,7 +48,7 @@ public class CoolParser {
     }
 
     /*
-    program ::= [[class; ]] +
+     * program ::= [[class; ]] +
      */
     public Program parseProgram() {
         List<ClassDef> classDefs = new ArrayList<>();
@@ -78,7 +78,7 @@ public class CoolParser {
     }
 
     /*
-    class ::= class TYPE [inherits TYPE] { [[feature; ]] ∗ }
+     * class ::= class TYPE [inherits TYPE] { [[feature; ]] ∗ }
      */
     private ClassDef parseClass() {
         accept(CLASS);
@@ -130,8 +130,8 @@ public class CoolParser {
     }
 
     /*
-    feature ::= ID( [ formal [[, formal]] ∗ ] ) : TYPE { expr }
-            |ID : TYPE [ <- expr ]
+     * feature ::= ID( [ formal [[, formal]] ∗ ] ) : TYPE { expr }
+     *            |ID : TYPE [ <- expr ]
      */
     private Feature parseFeature() {
         if (token.kind == ID) {
@@ -185,7 +185,7 @@ public class CoolParser {
     }
 
     /*
-    formal ::= ID : TYPE
+     * formal ::= ID : TYPE
      */
     private Formal parseFormal() {
         if (token.kind == ID) {
@@ -204,39 +204,37 @@ public class CoolParser {
     }
 
     /*
-    expr ::= ID <- expr
-        | ID( [ expr [[, expr]] ∗ ] ) //dispatch
-        | ID
-        | if expr then expr else expr fi
-        | while expr loop expr pool
-        | { [[expr; ]] + }
-        | let ID : TYPE [ <- expr ] [[, ID : TYPE [ <- expr ]]] ∗ in expr
-        | case expr of [[ID : TYPE => expr; ]] + esac
-        | new TYPE
-        | isvoid expr
-        | ~expr
-        | not expr
-        | (expr)
-        | integer
-        | string
-        | true
-        | false
-
-        -- left recursive
-        | expr[@TYPE].ID( [ expr [[, expr]] ∗ ] ) //static dispatch
-        | expr + expr
-        | expr − expr
-        | expr ∗ expr
-        | expr / expr
-        | expr < expr
-        | expr <= expr
-        | expr = expr
-     */
-
-    /*
-    expr = false... exprRest
-
-    exprRest = + - / * expr exprRest
+     * expr ::= ID <- expr
+     *     | ID( [ expr [[, expr]] ∗ ] ) //dispatch
+     *     | ID
+     *     | if expr then expr else expr fi
+     *     | while expr loop expr pool
+     *     | { [[expr; ]] + }
+     *     | let ID : TYPE [ <- expr ] [[, ID : TYPE [ <- expr ]]] ∗ in expr
+     *     | case expr of [[ID : TYPE => expr; ]] + esac
+     *     | new TYPE
+     *     | isvoid expr
+     *     | ~expr
+     *     | not expr
+     *     | (expr)
+     *     | integer
+     *     | string
+     *     | true
+     *     | false
+     *
+     *     -- left recursive
+     *     | expr[@TYPE].ID( [ expr [[, expr]] ∗ ] ) //static dispatch
+     *     | expr + expr
+     *     | expr − expr
+     *     | expr ∗ expr
+     *     | expr / expr
+     *     | expr < expr
+     *     | expr <= expr
+     *     | expr = expr
+     *
+     * expr = false... exprRest
+     *
+     * exprRest = + - / * expr exprRest
      */
     public Expression parseExpr() {
         newSuffixExprList();
@@ -250,7 +248,7 @@ public class CoolParser {
     }
 
     /*
-    Same as SymbolTable
+     * Same as SymbolTable
      */
     private final List<List<Object>> suffixExprListSupply = new ArrayList<>();
     private final List<Deque<TokenKind>> opStackSupply = new ArrayList<>();
@@ -620,7 +618,7 @@ public class CoolParser {
     }
 
     /*
-    Shunting yard algorithm
+     * Shunting yard algorithm
      */
     private Expression expr(List<Object> suffixExpr) {
         Pos startPos = errStartTokenSupply.peek().startPos;
