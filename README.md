@@ -1,7 +1,9 @@
 # cool-lang
+
 An interpreter of Classroom Object Oriented Language(Stanford cs143) written by Java8
 
 ## Requirements
+
 ```
     $java -version
     $java version "1.8.0_20"
@@ -12,6 +14,7 @@ An interpreter of Classroom Object Oriented Language(Stanford cs143) written by 
 ```
 
 ## Usage
+
 ```
     $cd cool-lang/
     $mvn clean package
@@ -25,8 +28,10 @@ An interpreter of Classroom Object Oriented Language(Stanford cs143) written by 
     Hello, world! chen bao yi
 ```
 
-##Syntax examples
+## Syntax examples
+
 * sort_list.cl  
+
 ```
 Class List inherits IO {
         (* Since abort() returns Object, we need something of
@@ -176,6 +181,7 @@ class Main1 inherits IO {
     };
 };
 ```  
+
 * palindrome.cl
   
 ```
