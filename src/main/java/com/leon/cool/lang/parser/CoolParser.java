@@ -763,6 +763,8 @@ public class CoolParser {
                     break;
                 case EOF:
                     return false;
+                default:
+                    break;
             }
             nextToken();
         }
@@ -780,6 +782,7 @@ public class CoolParser {
 
     private Token token;
 
+    @SuppressWarnings("unused")
     private Token token() {
         return token;
     }
@@ -789,6 +792,7 @@ public class CoolParser {
         token = scanner.token();
     }
 
+    @SuppressWarnings("unused")
     private boolean peekToken(Predicate<TokenKind> tk) {
         return peekToken(0, tk);
     }
@@ -797,6 +801,7 @@ public class CoolParser {
         return tk.test(scanner.token(lookAhead + 1).kind);
     }
 
+    @SuppressWarnings("unused")
     private boolean peekToken(Predicate<TokenKind> tk1, Predicate<TokenKind> tk2) {
         return peekToken(0, tk1, tk2);
     }
@@ -806,6 +811,7 @@ public class CoolParser {
                 tk2.test(scanner.token(lookAhead + 2).kind);
     }
 
+    @SuppressWarnings("unused")
     private boolean peekToken(Predicate<TokenKind> tk1, Predicate<TokenKind> tk2, Predicate<TokenKind> tk3) {
         return peekToken(0, tk1, tk2, tk3);
     }
@@ -817,6 +823,7 @@ public class CoolParser {
     }
 
     @SafeVarargs
+    @SuppressWarnings("unused")
     private final boolean peekToken(Predicate<TokenKind>... kinds) {
         return peekToken(0, kinds);
     }

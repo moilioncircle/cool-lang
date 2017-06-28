@@ -31,11 +31,6 @@ public class ObjectType implements Type {
     }
 
     @Override
-    public Type replace() {
-        return this;
-    }
-
-    @Override
     public String className() {
         return toString();
     }

@@ -35,6 +35,7 @@ public class ClassGraphTreeScanner extends TreeScanner {
         super(treeSupport);
     }
 
+    @Override
     public void applyProgram(Program program) {
         super.applyProgram(program);
         treeSupport.checkUndefinedClass();
@@ -56,6 +57,7 @@ public class ClassGraphTreeScanner extends TreeScanner {
         super.applyClassDef(classDef);
     }
 
+    @Override
     public void applyStaticDispatch(StaticDispatch staticDispatch) {
         if (staticDispatch.type.isPresent() && isSelfType(staticDispatch.type.get())) {
             error("type.error.cast.type", errorPos(staticDispatch.type.get()));

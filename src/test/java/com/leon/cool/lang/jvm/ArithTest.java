@@ -11,10 +11,12 @@ import java.util.Scanner;
 public class ArithTest {
 
     private static class A {
+        @SuppressWarnings("unused")
         A new$SELF_TYPE() {
             return new A();
         }
 
+        @SuppressWarnings("unused")
         A self() {
             return this;
         }
@@ -45,6 +47,7 @@ public class ArithTest {
             return A$method4(num1, num2);
         }
 
+        @SuppressWarnings("unused")
         E method5(int num) {
             return A$method5(num);
         }
@@ -171,8 +174,6 @@ public class ArithTest {
 
         A C$method6(int num) {
             {
-                int x;
-                x = -num;
                 return (new A()).set_var(num);
             }
         }
@@ -252,18 +253,18 @@ public class ArithTest {
 
         A E$method6(int num) {
             {
-                int x;
-                x = num / 8;
                 return (new A()).set_var(num);
             }
         }
     }
 
     private static class A2I {
+        @SuppressWarnings("unused")
         A2I new$SELF_TYPE() {
             return new A2I();
         }
 
+        @SuppressWarnings("unused")
         A2I self() {
             return this;
         }
@@ -398,6 +399,7 @@ public class ArithTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class Main {
         String char$ = "";
         A avar;
@@ -499,6 +501,7 @@ public class ArithTest {
         String Main$prompt() {
             System.out.print("\n");
             System.out.print("Please enter a number...  ");
+            @SuppressWarnings("resource")
             Scanner scanner = new Scanner(System.in);
             if (scanner.hasNext()) return scanner.next();
             return "";

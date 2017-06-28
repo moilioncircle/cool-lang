@@ -36,12 +36,14 @@ public class MethodDefTreeScanner extends TreeScanner {
         super(treeSupport);
     }
 
+    @Override
     public void applyClassDef(ClassDef classDef) {
         className = classDef.type.name;
         treeSupport.createMethodGraph(className);
         super.applyClassDef(classDef);
     }
 
+    @Override
     public void applyMethodDef(MethodDef methodDef) {
         if (isTypeDefined(treeSupport.classGraph, methodDef.type)) {
             error("type.error.undefined", methodDef.type.name, errorPos(methodDef.type));
