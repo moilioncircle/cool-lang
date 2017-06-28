@@ -1,5 +1,6 @@
 package com.leon.cool.lang.factory;
 
+import com.leon.cool.lang.glossary.Nullable;
 import com.leon.cool.lang.object.*;
 
 /**
@@ -32,7 +33,8 @@ public class ObjectFactory {
         return new CoolInt();
     }
 
-    public static CoolString coolString(String i) {
+    public static CoolString coolString(@Nullable String i) {
+        if (i == null) return new CoolString();
         return new CoolString(i, i.length());
     }
 
