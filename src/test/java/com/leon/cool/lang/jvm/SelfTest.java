@@ -25,6 +25,7 @@ public class SelfTest {
 //    as the declared type of a let variable,
 //    or as the declared type of an attribute.
 //    No other uses of SELF_TYPE are permitted.
+    @SuppressWarnings("unused")
     private static class Silly {
         Silly copy() {
             return this;

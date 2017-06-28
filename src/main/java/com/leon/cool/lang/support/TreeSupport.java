@@ -179,6 +179,7 @@ public class TreeSupport implements Closeable {
         });
     }
 
+    @Override
     public void close() {
         try {
             if (reader != null) {

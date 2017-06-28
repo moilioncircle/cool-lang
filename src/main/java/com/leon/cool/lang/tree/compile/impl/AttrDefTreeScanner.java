@@ -34,12 +34,14 @@ public class AttrDefTreeScanner extends TreeScanner {
         super(treeSupport);
     }
 
+    @Override
     public void applyClassDef(ClassDef classDef) {
         className = classDef.type.name;
         treeSupport.createAttrGraph(className);
         super.applyClassDef(classDef);
     }
 
+    @Override
     public void applyAttrDef(AttrDef attrDef) {
         if (isSelf(attrDef.id)) {
             error("type.error.assign.self", errorPos(attrDef.id));

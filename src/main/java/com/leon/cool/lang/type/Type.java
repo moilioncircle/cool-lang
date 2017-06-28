@@ -20,7 +20,9 @@ package com.leon.cool.lang.type;
 public interface Type {
     TypeEnum type();
 
-    Type replace();
+    default Type replace() {
+        return this;
+    }
 
     String className();
 }

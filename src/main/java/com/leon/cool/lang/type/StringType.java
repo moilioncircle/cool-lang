@@ -27,11 +27,6 @@ public class StringType implements Type {
     }
 
     @Override
-    public Type replace() {
-        return this;
-    }
-
-    @Override
     public String className() {
         return toString();
     }

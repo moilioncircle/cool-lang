@@ -39,7 +39,7 @@ public class SymbolTable<T> {
 
     public void addId(String id, T info) {
         if (tbl.isEmpty()) {
-            System.out.println("addId: can't add a symbol without a scope.");
+            System.out.println("addId:" + id + ", can't add a symbol without a scope.");
         }
         tbl.peek().put(id, info);
     }

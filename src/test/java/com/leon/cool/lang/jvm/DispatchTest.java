@@ -16,6 +16,7 @@ public class DispatchTest {
     }
 
     private static class Prev {
+        @SuppressWarnings("unused")
         protected void test() {
             Prev$test();
         }

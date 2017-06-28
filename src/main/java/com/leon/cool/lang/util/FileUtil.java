@@ -21,6 +21,9 @@ import java.io.*;
  */
 public class FileUtil {
 
+    private FileUtil() {
+    }
+
     public static String readJarFile(String fileName) {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(FileUtil.class.getClassLoader().getResourceAsStream(fileName)))) {

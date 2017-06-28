@@ -1,5 +1,6 @@
 package com.leon.cool.lang.tree;
 
+import com.leon.cool.lang.glossary.Out;
 import com.leon.cool.lang.object.CoolObject;
 import com.leon.cool.lang.support.infrastructure.Context;
 import com.leon.cool.lang.tree.compile.TreeVisitor;
@@ -32,5 +33,5 @@ public interface TreeElement {
      * @param context
      * @return
      */
-    CoolObject accept(EvalTreeVisitor visitor, Context context);
+    CoolObject accept(EvalTreeVisitor visitor, @Out Context context);
 }

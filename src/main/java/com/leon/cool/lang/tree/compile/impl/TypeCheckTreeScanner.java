@@ -53,6 +53,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         super.applyProgram(program);
     }
 
+    @Override
     public void applyClassDef(ClassDef classDef) {
         className = classDef.type.name;
         super.applyClassDef(classDef);
@@ -122,6 +123,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         }
     }
 
+    @Override
     public void applyCaseDef(CaseDef caseDef) {
         int size = caseDef.branchList.stream().map(e -> {
             if (isSelf(e.id)) {
@@ -148,6 +150,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         treeSupport.lookupSymbolTable(className).exitScope();
     }
 
+    @Override
     public void applyMethodDef(MethodDef methodDef) {
         treeSupport.lookupSymbolTable(className).enterScope();
         methodDef.formals.forEach(e -> {
@@ -176,6 +179,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         }
     }
 
+    @Override
     public void applyLet(Let let) {
         treeSupport.lookupSymbolTable(className).enterScope();
         super.applyLet(let);
@@ -198,6 +202,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
         treeSupport.lookupSymbolTable(className).addId(letAttrDef.id.name, letAttrDef.type.name);
     }
 
+    @Override
     public void applyAssign(Assign assign) {
         if (isSelf(assign.id.tok)) {
             reportTypeCheckError("type.error.assign.self", errorPos(assign.id));
@@ -379,6 +384,7 @@ public class TypeCheckTreeScanner extends TreeScanner {
 
     }
 
+    @Override
     public void applyIdConst(IdConst idConst) {
         Optional<String> type = treeSupport.lookupSymbolTable(className).lookup(idConst.tok.name);
         if (type.isPresent()) {

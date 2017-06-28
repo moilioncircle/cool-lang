@@ -36,6 +36,7 @@ public class HairyscaryTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class Bazz {
         int h = attr$h();
         Foo g = attr$g();
@@ -69,6 +70,7 @@ public class HairyscaryTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class Foo extends Bazz {
         Razz a = attr$a();
         int b = attr$b();
@@ -92,6 +94,7 @@ public class HairyscaryTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class Razz extends Foo {
         Bar e = attr$e();
         int f = attr$f();
@@ -105,6 +108,7 @@ public class HairyscaryTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class Bar extends Razz {
         int c = attr$c();
         Object d = attr$d();

@@ -20,6 +20,10 @@ import com.leon.cool.lang.object.*;
  * @author leon on 15-10-21
  */
 public class ObjectFactory {
+
+    private ObjectFactory() {
+    }
+
     public static CoolInt coolInt(int i) {
         return new CoolInt(i);
     }

@@ -27,6 +27,7 @@ public class ParentAttrDefTreeScanner extends TreeScanner {
         super(treeSupport);
     }
 
+    @Override
     public void applyClassDef(ClassDef classDef) {
         String className = classDef.type.name;
         treeSupport.createSymbolTable(className);

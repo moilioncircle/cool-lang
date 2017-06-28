@@ -23,6 +23,10 @@ import static com.leon.cool.lang.support.ErrorSupport.error;
  * @author leon on 15-10-16
  */
 public class TypeFactory {
+
+    private TypeFactory() {
+    }
+
     public static Type stringType() {
         return new StringType();
     }
